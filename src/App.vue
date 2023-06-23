@@ -28,7 +28,7 @@ const msg = ref("");
 onMounted(async () => {
   msg.value = "引擎初始化";
   if (!canvas.value) throw new TypeError("Canvas not found");
-  engine.value = await EngineFactory.CreateAsync(canvas.value, null);
+  engine.value = await EngineFactory.CreateAsync(canvas.value, {});
   const scene = new Scene(engine.value);
   scene.clearColor = new Color4(0.05, 0.05, 0.05);
 
