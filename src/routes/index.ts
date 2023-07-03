@@ -11,7 +11,6 @@ const router = createRouter({
       path: "/gpu",
       component: () => import("../pages/GpuView.vue"),
     },
-
   ],
 });
 

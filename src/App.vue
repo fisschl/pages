@@ -1,5 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// @ts-ignore
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
+useDark();
+</script>
 
 <template>
-  <RouterView />
+  <ElConfigProvider :locale="zhCn">
+    <RouterView />
+  </ElConfigProvider>
 </template>

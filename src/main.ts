@@ -4,6 +4,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/tailwind.css";
 import "./assets/base.css";
+import "element-plus/theme-chalk/dark/css-vars.css";
 import router from "./routes";
 import store from "./store";
 
