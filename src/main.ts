@@ -1,11 +1,21 @@
 /// <reference types="vite/client" />
 
+import { createPinia } from "pinia";
 import { createApp } from "vue";
+import { createVuetify } from "vuetify";
+import "vuetify/styles";
 import App from "./App.vue";
-import "./assets/tailwind.css";
 import "./assets/base.css";
-import "element-plus/theme-chalk/dark/css-vars.css";
+import "./assets/tailwind.css";
 import router from "./routes";
-import store from "./store";
+import { zhHans } from "vuetify/locale";
 
-createApp(App).use(router).use(store).mount("#app");
+const vuetify = createVuetify({
+  locale: {
+    locale: "zhHans",
+    messages: { zhHans },
+  },
+});
+const pinia = createPinia();
+
+createApp(App).use(router).use(pinia).use(vuetify).mount("#app");

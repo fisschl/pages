@@ -1,11 +1,13 @@
 <script setup lang="ts">
-// @ts-ignore
-import zhCn from "element-plus/dist/locale/zh-cn.mjs";
-useDark();
+import { useTheme } from "vuetify";
+
+const isDark = useDark();
+const theme = useTheme();
+watchEffect(() => {
+  theme.global.name.value = isDark.value ? "dark" : "light";
+});
 </script>
 
 <template>
-  <ElConfigProvider :locale="zhCn">
-    <RouterView />
-  </ElConfigProvider>
+  <RouterView />
 </template>
