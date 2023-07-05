@@ -11,10 +11,6 @@ const router = createRouter({
       path: "/gpu",
       component: () => import("@/pages/GpuView.vue"),
     },
-    {
-      path: "/avatar-edit",
-      component: () => import("@/pages/AvatarEditView.vue"),
-    },
   ],
 });
 

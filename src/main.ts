@@ -3,14 +3,17 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import { createVuetify } from "vuetify";
+import { zhHans } from "vuetify/locale";
 import "vuetify/styles";
 import App from "./App.vue";
 import "./assets/base.css";
 import "./assets/tailwind.css";
 import router from "./routes";
-import { zhHans } from "vuetify/locale";
 
 const vuetify = createVuetify({
+  theme: {
+    defaultTheme: "dark",
+  },
   locale: {
     locale: "zhHans",
     messages: { zhHans },
