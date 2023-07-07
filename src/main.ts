@@ -1,13 +1,14 @@
 /// <reference types="vite/client" />
 
+import "@unocss/reset/normalize.css";
 import { createPinia } from "pinia";
+import "virtual:uno.css";
 import { createApp } from "vue";
 import { createVuetify } from "vuetify";
 import { zhHans } from "vuetify/locale";
 import "vuetify/styles";
 import App from "./App.vue";
 import "./assets/base.css";
-import "./assets/tailwind.css";
 import router from "./routes";
 
 const vuetify = createVuetify({
