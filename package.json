@@ -7,9 +7,9 @@
     "cz": "git add . && czg"
   },
   "dependencies": {
-    "@babylonjs/core": "^6.11.1",
-    "@babylonjs/loaders": "^6.11.1",
-    "@unocss/reset": "^0.53.4",
+    "@babylonjs/core": "^6.11.2",
+    "@babylonjs/loaders": "^6.11.2",
+    "@unocss/reset": "^0.53.5",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/tsconfig": "^0.4.0",
     "@vueuse/core": "^10.2.1",
@@ -18,9 +18,8 @@
     "pinia": "^2.1.4",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.1.6",
-    "unocss": "^0.53.4",
     "unplugin-auto-import": "^0.16.6",
-    "vite": "^4.4.1",
+    "vite": "^4.4.2",
     "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.3.4",
     "vue-hooks-plus": "^1.7.6",
@@ -29,17 +28,20 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.7",
-    "@types/node": "^20.4.0",
-    "@unocss/eslint-config": "^0.53.4",
+    "@types/node": "^20.4.1",
     "@vue/eslint-config-prettier": "^7.1.0",
+    "prettier-plugin-tailwindcss": "^0.3.0",
     "@vue/eslint-config-typescript": "^11.0.3",
-    "czg": "^1.6.1",
+    "czg": "^1.7.0",
     "eslint": "^8.44.0",
     "eslint-plugin-vue": "^9.15.1",
     "prettier": "^2.8.8",
     "vue-tsc": "^1.8.4"
   },
   "prettier": {
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ],
     "endOfLine": "auto"
   },
   "eslintConfig": {

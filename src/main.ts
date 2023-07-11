@@ -2,7 +2,6 @@
 
 import "@unocss/reset/normalize.css";
 import { createPinia } from "pinia";
-import "virtual:uno.css";
 import { createApp } from "vue";
 import { createVuetify } from "vuetify";
 import { zhHans } from "vuetify/locale";

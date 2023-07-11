@@ -3,13 +3,12 @@ import vue from "@vitejs/plugin-vue";
 import AutoImport from "unplugin-auto-import/vite";
 import { fileURLToPath, URL } from "node:url";
 import vuetify from "vite-plugin-vuetify";
-import UnoCSS from "unocss/vite";
+import tailwindcss from "tailwindcss";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/pages/",
   plugins: [
-    UnoCSS(),
     vue(),
     vuetify(),
     AutoImport({
@@ -26,5 +25,8 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true,
+        postcss: {
+      plugins: [tailwindcss()],
+    },
   },
 });
