@@ -25,7 +25,7 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true,
-        postcss: {
+    postcss: {
       plugins: [tailwindcss()],
     },
   },
