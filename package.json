@@ -4,6 +4,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "tsc": "vue-tsc --noEmit",
     "cz": "git add . && czg"
   },
   "dependencies": {
