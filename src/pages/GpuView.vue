@@ -11,8 +11,6 @@ import {
   Vector3,
 } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
-import { useResizeObserver } from "@vueuse/core";
-import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const canvas = ref<HTMLCanvasElement>();
 
@@ -38,7 +36,7 @@ onMounted(async () => {
     Math.PI / 2,
     4,
     new Vector3(0, 1.5, 0),
-    scene
+    scene,
   );
   camera.lowerRadiusLimit = 1;
   camera.upperRadiusLimit = 100;
@@ -52,7 +50,7 @@ onMounted(async () => {
     "",
     "//cdn.fisschl.world/3d/irena/",
     "scene.gltf",
-    scene
+    scene,
   );
 
   const pipeline = new DefaultRenderingPipeline();
@@ -69,5 +67,3 @@ onMounted(async () => {
     <span class="flex-1 text-center">{{ msg }}</span>
   </section>
 </template>
-
-<style scoped></style>

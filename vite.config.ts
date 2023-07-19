@@ -10,10 +10,10 @@ export default defineConfig({
   base: "/pages/",
   plugins: [
     vue(),
-    vuetify(),
     AutoImport({
       imports: ["vue", "vue-router", "@vueuse/core", "pinia"],
     }),
+    vuetify(),
   ],
   build: {
     sourcemap: true,
