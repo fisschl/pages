@@ -11,6 +11,10 @@ const router = createRouter({
       path: "/gpu",
       component: () => import("@/pages/GpuView.vue"),
     },
+    {
+      path: "/markdown",
+      component: () => import("@/pages/markdown/MarkdownView.vue"),
+    },
   ],
 });
 
