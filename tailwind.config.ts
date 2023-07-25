@@ -1,11 +1,14 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
 
 const config: Config = {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{vue,ts}",
+    "./node_modules/@milkdown/**/*.js",
+  ],
   darkMode: "class",
-  corePlugins: {
-    preflight: false,
-  },
+  plugins: [typography],
 };
 
 export default config;
