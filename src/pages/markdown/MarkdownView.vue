@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { MilkdownProvider } from "@milkdown/vue";
 import MilkdownEdit from "./MilkdownEdit.vue";
+import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/vue";
 
 const content = ref("");
 const file = ref<File[]>([]);
@@ -10,28 +11,29 @@ const milk = ref<InstanceType<typeof MilkdownEdit>>();
 const handleSelectFile = async () => {
   const item = file.value[0];
   if (!item) return;
-  const text = await item.text();
-  content.value = text;
+  content.value = await item.text();
   milk.value?.reset();
 };
 </script>
 
 <template>
   <MilkdownProvider>
-    <article class="flex h-screen flex-col px-4">
-      <header class="mt-2 flex gap-3">
-        <VFileInput
-          v-model="file"
-          density="compact"
-          accept=".txt,.md"
-          @update:model-value="handleSelectFile"
+    <ProsemirrorAdapterProvider>
+      <article class="flex h-screen flex-col px-4">
+        <header class="mt-2 flex gap-3">
+          <VFileInput
+            v-model="file"
+            density="compact"
+            accept=".txt,.md"
+            @update:model-value="handleSelectFile"
+          />
+        </header>
+        <MilkdownEdit
+          ref="milk"
+          v-model:content="content"
+          class="flex-1 overflow-auto pb-6"
         />
-      </header>
-      <MilkdownEdit
-        ref="milk"
-        v-model:content="content"
-        class="flex-1 overflow-auto pb-6"
-      />
-    </article>
+      </article>
+    </ProsemirrorAdapterProvider>
   </MilkdownProvider>
 </template>

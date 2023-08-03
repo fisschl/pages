@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Editor, rootCtx } from "@milkdown/core";
+import {
+  defaultValueCtx,
+  Editor,
+  editorViewOptionsCtx,
+  rootCtx,
+} from "@milkdown/core";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { cursor } from "@milkdown/plugin-cursor";
 import { emoji } from "@milkdown/plugin-emoji";
@@ -14,11 +19,9 @@ import "@milkdown/theme-nord/style.css";
 import { Milkdown, useEditor } from "@milkdown/vue";
 import "prism-themes/themes/prism-nord.css";
 import "katex/dist/katex.min.css";
-import { defaultValueCtx } from "@milkdown/core";
 import { math } from "@milkdown/plugin-math";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { debounce } from "lodash-es";
-import { editorViewOptionsCtx } from "@milkdown/core";
 import { replaceAll } from "@milkdown/utils";
 
 const props = defineProps<{

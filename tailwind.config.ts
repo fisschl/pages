@@ -5,7 +5,7 @@ const config: Config = {
   content: [
     "./index.html",
     "./src/**/*.{vue,ts}",
-    "./node_modules/@milkdown/**/*.js",
+    "./node_modules/@milkdown/theme-nord/**/*.ts",
   ],
   darkMode: "class",
   plugins: [typography],
