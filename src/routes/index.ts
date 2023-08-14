@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: "/gpu",
+      redirect: "/markdown",
     },
     {
       path: "/gpu",

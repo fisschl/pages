@@ -39,6 +39,7 @@
     "ofetch": "^1.1.1",
     "pinia": "^2.1.6",
     "prism-themes": "^1.9.0",
+    "prosemirror-view": "^1.31.7",
     "tailwindcss": "^3.3.3",
     "unplugin-auto-import": "^0.16.6",
     "vite": "^4.4.9",

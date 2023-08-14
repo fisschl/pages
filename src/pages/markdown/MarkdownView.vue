@@ -5,14 +5,12 @@ import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/vue";
 
 const content = useLocalStorage(location.pathname + ":content", "");
 const file = ref<File[]>([]);
-
 const milk = ref<InstanceType<typeof MilkdownEdit>>();
 
 const handleSelectFile = async () => {
   const item = file.value[0];
   if (!item) return;
   content.value = await item.text();
-  milk.value?.reset();
 };
 </script>
 
@@ -30,7 +28,7 @@ const handleSelectFile = async () => {
         </header>
         <MilkdownEdit
           ref="milk"
-          v-model:content="content"
+          v-model="content"
           class="flex-1 overflow-auto pb-6"
         />
       </article>

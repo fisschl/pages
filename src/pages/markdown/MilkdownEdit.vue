@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import "@milkdown/theme-nord/style.css";
 import "prism-themes/themes/prism-nord.css";
 import "katex/dist/katex.min.css";
+import "prosemirror-view/style/prosemirror.css";
 
 import {
   defaultValueCtx,
@@ -25,15 +25,23 @@ import { debounce } from "lodash-es";
 import { replaceAll } from "@milkdown/utils";
 
 const props = defineProps<{
-  content: string;
+  modelValue: string;
   readonly?: boolean;
 }>();
 
 const emit = defineEmits<{
-  "update:content": [string];
+  "update:modelValue": [string];
 }>();
 
-const content = useVModel(props, "content", emit);
+const modelValue = useVModel(props, "modelValue", emit);
+const content = ref(props.modelValue);
+
+watch(modelValue, async (value) => {
+  await nextTick();
+  if (value === content.value) return;
+  content.value = value;
+  editor.get()?.action(replaceAll(value));
+});
 
 const editor = useEditor((root) => {
   return Editor.make()
@@ -43,10 +51,14 @@ const editor = useEditor((root) => {
       ctx.get(listenerCtx).markdownUpdated(
         debounce((_ctx, markdown) => {
           content.value = markdown;
+          modelValue.value = content.value;
         }, 500),
       );
       ctx.update(editorViewOptionsCtx, (prev) => ({
         ...prev,
+        attributes: {
+          class: "prose dark:prose-invert max-w-none outline-none",
+        },
         editable: () => !props.readonly,
       }));
     })
@@ -62,21 +74,10 @@ const editor = useEditor((root) => {
     .use(trailing)
     .use(prism);
 });
-
-const reset = async () => {
-  await nextTick();
-  editor.get()?.action(replaceAll(content.value));
-};
-
-defineExpose({ reset });
 </script>
 
 <template>
-  <Milkdown class="prose max-w-none dark:prose-invert" />
+  <Milkdown class="editor" />
 </template>
 
-<style scoped>
-.prose :deep(.ProseMirror) {
-  outline: none;
-}
-</style>
+<style scoped></style>
