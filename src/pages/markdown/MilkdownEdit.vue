@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import "@milkdown/theme-nord/style.css";
+import "prism-themes/themes/prism-nord.css";
+import "katex/dist/katex.min.css";
+
 import {
   defaultValueCtx,
   Editor,
@@ -14,11 +18,7 @@ import { prism } from "@milkdown/plugin-prism";
 import { trailing } from "@milkdown/plugin-trailing";
 import { commonmark } from "@milkdown/preset-commonmark";
 import { gfm } from "@milkdown/preset-gfm";
-import { nord } from "@milkdown/theme-nord";
-import "@milkdown/theme-nord/style.css";
 import { Milkdown, useEditor } from "@milkdown/vue";
-import "prism-themes/themes/prism-nord.css";
-import "katex/dist/katex.min.css";
 import { math } from "@milkdown/plugin-math";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { debounce } from "lodash-es";
@@ -50,7 +50,6 @@ const editor = useEditor((root) => {
         editable: () => !props.readonly,
       }));
     })
-    .config(nord)
     .use(commonmark)
     .use(history)
     .use(gfm)
@@ -73,5 +72,11 @@ defineExpose({ reset });
 </script>
 
 <template>
-  <Milkdown />
+  <Milkdown class="prose max-w-none dark:prose-invert" />
 </template>
+
+<style scoped>
+.prose :deep(.ProseMirror) {
+  outline: none;
+}
+</style>

@@ -3,7 +3,7 @@ import { MilkdownProvider } from "@milkdown/vue";
 import MilkdownEdit from "./MilkdownEdit.vue";
 import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/vue";
 
-const content = ref("");
+const content = useLocalStorage(location.pathname + ":content", "");
 const file = ref<File[]>([]);
 
 const milk = ref<InstanceType<typeof MilkdownEdit>>();

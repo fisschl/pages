@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 import "@mdi/font/css/materialdesignicons.css";
+import "@/assets/tailwind.css";
 import "./assets/base.css";
 import "vuetify/styles";
 
