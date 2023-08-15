@@ -17,7 +17,7 @@ const handleSelectFile = async () => {
 <template>
   <MilkdownProvider>
     <ProsemirrorAdapterProvider>
-      <article class="flex h-screen flex-col px-4">
+      <article class="px-4">
         <header class="mt-2 flex gap-3">
           <VFileInput
             v-model="file"
@@ -26,11 +26,7 @@ const handleSelectFile = async () => {
             @update:model-value="handleSelectFile"
           />
         </header>
-        <MilkdownEdit
-          ref="milk"
-          v-model="content"
-          class="flex-1 overflow-auto pb-6"
-        />
+        <MilkdownEdit ref="milk" v-model="content" class="pb-6" />
       </article>
     </ProsemirrorAdapterProvider>
   </MilkdownProvider>

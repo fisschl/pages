@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: "/markdown",
+      redirect: "/main",
     },
     {
       path: "/gpu",
@@ -14,6 +14,20 @@ const router = createRouter({
     {
       path: "/markdown",
       component: () => import("@/pages/markdown/MarkdownView.vue"),
+    },
+    {
+      path: "/main",
+      component: () => import("@/layout/MainLayout.vue"),
+      children: [
+        {
+          path: "",
+          component: () => import("@/pages/MainView.vue"),
+        },
+        {
+          path: "top",
+          component: () => import("@/pages/TopSearchView.vue"),
+        },
+      ],
     },
   ],
 });

@@ -7,7 +7,6 @@ import tailwindcss from "tailwindcss";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/pages/",
   plugins: [
     vue(),
     AutoImport({
@@ -15,9 +14,6 @@ export default defineConfig({
     }),
     vuetify(),
   ],
-  build: {
-    sourcemap: true,
-  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

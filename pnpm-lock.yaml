@@ -11,9 +11,6 @@ dependencies:
   '@babylonjs/loaders':
     specifier: ^6.16.0
     version: 6.16.0(@babylonjs/core@6.16.0)(babylonjs-gltf2interface@6.15.0)
-  '@mdi/font':
-    specifier: ^7.2.96
-    version: 7.2.96
   '@milkdown/core':
     specifier: ^7.2.4
     version: 7.2.4(@milkdown/ctx@7.2.4)(@milkdown/prose@7.2.4)(@milkdown/transformer@7.2.4)
@@ -71,6 +68,9 @@ dependencies:
   '@prosemirror-adapter/vue':
     specifier: ^0.2.6
     version: 0.2.6(vue@3.3.4)
+  '@tabler/icons-vue':
+    specifier: ^2.30.0
+    version: 2.30.0(vue@3.3.4)
   '@tailwindcss/typography':
     specifier: ^0.5.9
     version: 0.5.9(tailwindcss@3.3.3)
@@ -83,6 +83,9 @@ dependencies:
   '@vueuse/core':
     specifier: ^10.3.0
     version: 10.3.0(vue@3.3.4)
+  date-fns:
+    specifier: ^2.30.0
+    version: 2.30.0
   katex:
     specifier: ^0.16.8
     version: 0.16.8
@@ -194,6 +197,13 @@ packages:
     hasBin: true
     dependencies:
       '@babel/types': 7.22.10
+
+  /@babel/runtime@7.22.10:
+    resolution: {integrity: sha512-21t/fkKLMZI4pqP2wlmsQAWnYW1PDyKyyUV4vCi+B25ydmdaYTKXPwCj0BzSUnZf4seIiYvSA3jcZ3gdsMFkLQ==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.0
+    dev: false
 
   /@babel/types@7.22.10:
     resolution: {integrity: sha512-obaoigiLrlDZ7TUQln/8m4mSqIW2QFeOrCQc9r+xsaHGNoplVNYlRVpsfE8Vj35GEm2ZH4ZhrNYogs/3fj85kg==}
@@ -500,10 +510,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
-    dev: false
-
-  /@mdi/font@7.2.96:
-    resolution: {integrity: sha512-e//lmkmpFUMZKhmCY9zdjRe4zNXfbOIJnn6xveHbaV2kSw5aJ5dLXUxcRt1Gxfi7ZYpFLUWlkG2MGSFAiqAu7w==}
     dev: false
 
   /@milkdown/core@7.2.4(@milkdown/ctx@7.2.4)(@milkdown/prose@7.2.4)(@milkdown/transformer@7.2.4):
@@ -913,6 +919,19 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       escape-string-regexp: 5.0.0
+    dev: false
+
+  /@tabler/icons-vue@2.30.0(vue@3.3.4):
+    resolution: {integrity: sha512-p3DWtMbZ+x6dX7aVeF/LI/Vh8+LZ92OkL5oXkLiDdJf30MhmPZ+1WB1UoYEFIrnonActAWEcPOa5KhQkMOwk4Q==}
+    peerDependencies:
+      vue: '>=3.0.1'
+    dependencies:
+      '@tabler/icons': 2.30.0
+      vue: 3.3.4
+    dev: false
+
+  /@tabler/icons@2.30.0:
+    resolution: {integrity: sha512-tvtmkI4ALjKThVVORh++sB9JnkFY7eGInKxNy+Df7WVQiF7T85tlvGADzlgX4Ic+CK5MIUzZ0jhOlQ/RRlgXpg==}
     dev: false
 
   /@tailwindcss/typography@0.5.9(tailwindcss@3.3.3):
@@ -1566,6 +1585,13 @@ packages:
     engines: {node: '>=v12.20.0'}
     hasBin: true
     dev: true
+
+  /date-fns@2.30.0:
+    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
+    engines: {node: '>=0.11'}
+    dependencies:
+      '@babel/runtime': 7.22.10
+    dev: false
 
   /de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
@@ -3425,6 +3451,10 @@ packages:
       '@types/prismjs': 1.26.0
       hastscript: 7.2.0
       parse-entities: 4.0.1
+    dev: false
+
+  /regenerator-runtime@0.14.0:
+    resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
     dev: false
 
   /remark-emoji@3.1.2:

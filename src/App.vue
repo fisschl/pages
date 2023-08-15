@@ -11,3 +11,11 @@ watchEffect(() => {
 <template>
   <RouterView />
 </template>
+
+<style>
+body {
+  font-family: "HarmonyOS Sans", ui-sans-serif, system-ui, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+</style>
