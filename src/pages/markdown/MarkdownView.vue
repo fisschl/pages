@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { MilkdownProvider } from "@milkdown/vue";
 import MilkdownEdit from "./MilkdownEdit.vue";
-import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/vue";
 import { IconDownload } from "@tabler/icons-vue";
 
 const content = useLocalStorage("main-markdown-content", "");
@@ -28,20 +27,18 @@ const handleDownload = async () => {
 </script>
 
 <template>
-  <MilkdownProvider>
-    <ProsemirrorAdapterProvider>
-      <article class="px-4">
-        <header class="mt-2 flex gap-3">
-          <VFileInput
-            v-model="file"
-            density="compact"
-            accept=".txt,.md"
-            @update:model-value="handleSelectFile"
-          />
-          <VBtn title="下载" :icon="IconDownload" @click="handleDownload" />
-        </header>
-        <MilkdownEdit ref="milk" v-model="content" class="pb-6" />
-      </article>
-    </ProsemirrorAdapterProvider>
-  </MilkdownProvider>
+  <article class="px-4">
+    <header class="mt-2 flex gap-3">
+      <VFileInput
+        v-model="file"
+        density="compact"
+        accept=".txt,.md"
+        @update:model-value="handleSelectFile"
+      />
+      <VBtn title="下载" :icon="IconDownload" @click="handleDownload" />
+    </header>
+    <MilkdownProvider>
+      <MilkdownEdit ref="milk" v-model="content" class="pb-6" />
+    </MilkdownProvider>
+  </article>
 </template>

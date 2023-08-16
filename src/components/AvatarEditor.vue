@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { inputAvatar } from "@/utils/avatar";
 
-const props = defineProps<{
-  modelValue: string | undefined;
-}>();
-
+const model = defineModel<string>();
 const emit = defineEmits<{
-  "update:modelValue": [value: string];
-  change: [value: string];
+  change: [string];
 }>();
-
-const modelValue = useVModel(props, "modelValue", emit);
 
 const handleSelectImg = async () => {
   const url = await inputAvatar();
   if (!url) return;
-  modelValue.value = url;
-  emit("change", modelValue.value);
+  model.value = url;
+  emit("change", model.value);
 };
 </script>
 

@@ -9,7 +9,9 @@ import postcssPresetEnv from "postcss-preset-env";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      script: { defineModel: true },
+    }),
     AutoImport({
       imports: ["vue", "vue-router", "@vueuse/core", "pinia"],
     }),

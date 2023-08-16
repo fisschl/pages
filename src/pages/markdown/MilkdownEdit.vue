@@ -2,7 +2,6 @@
 import "prism-themes/themes/prism-nord.css";
 import "katex/dist/katex.min.css";
 import "prosemirror-view/style/prosemirror.css";
-
 import {
   defaultValueCtx,
   Editor,
@@ -25,46 +24,39 @@ import { debounce } from "lodash-es";
 import { replaceAll } from "@milkdown/utils";
 
 const props = defineProps<{
-  modelValue: string;
   readonly?: boolean;
 }>();
 
-const emit = defineEmits<{
-  "update:modelValue": [string];
-}>();
+const model = defineModel<string>();
+const content = ref(model.value);
 
-const modelValue = useVModel(props, "modelValue", emit);
-const content = ref(props.modelValue);
-
-watch(modelValue, async (value) => {
+watch(model, async (value) => {
   await nextTick();
   if (value === content.value) return;
   content.value = value;
-  editor.get()?.action(replaceAll(value));
+  editor.get()?.action(replaceAll(value || ""));
 });
+
+const handleUpdate = debounce((_ctx, markdown) => {
+  content.value = markdown;
+  model.value = content.value;
+}, 1000);
 
 const editor = useEditor((root) => {
   return Editor.make()
     .config((ctx) => {
       ctx.set(rootCtx, root);
       if (content.value) ctx.set(defaultValueCtx, content.value);
-      ctx.get(listenerCtx).markdownUpdated(
-        debounce((_ctx, markdown) => {
-          content.value = markdown;
-          modelValue.value = content.value;
-        }, 500),
-      );
+      ctx.get(listenerCtx).markdownUpdated(handleUpdate);
       ctx.update(editorViewOptionsCtx, (prev) => ({
         ...prev,
-        attributes: {
-          class: "prose dark:prose-invert max-w-none outline-none",
-        },
+        attributes: { class: "prose dark:prose-invert" },
         editable: () => !props.readonly,
       }));
     })
     .use(commonmark)
-    .use(history)
     .use(gfm)
+    .use(history)
     .use(emoji)
     .use(listener)
     .use(math)
@@ -80,4 +72,9 @@ const editor = useEditor((root) => {
   <Milkdown class="editor" />
 </template>
 
-<style scoped></style>
+<style scoped>
+.editor :deep(.ProseMirror) {
+  max-width: none;
+  outline: none;
+}
+</style>
