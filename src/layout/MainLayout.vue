@@ -8,7 +8,7 @@ import {
   IconMarkdown,
 } from "@tabler/icons-vue";
 
-const drawer = ref(false);
+const drawer = useLocalStorage("main-drawer", false);
 
 const MenuList = [
   {
@@ -65,7 +65,7 @@ const MenuList = [
     </VNavigationDrawer>
     <VMain>
       <RouterView />
-      <VFooter>
+      <VFooter class="py-8">
         <VBtn href="https://beian.miit.gov.cn/" variant="text" target="_blank">
           豫ICP备2023011860号-1
         </VBtn>

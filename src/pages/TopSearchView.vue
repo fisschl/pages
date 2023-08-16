@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { request, type Page } from "@/utils/fetch";
 import { VSkeletonLoader } from "vuetify/labs/VSkeletonLoader";
+import { debounce } from "lodash-es";
 
 interface TopSearch {
   id: string;
@@ -42,12 +43,12 @@ const load = async () => {
     });
 };
 
-const refresh = () => {
+const refresh = debounce(() => {
   formData.page = 1;
   return load();
-};
+}, 300);
 
-refresh();
+load();
 </script>
 
 <template>
