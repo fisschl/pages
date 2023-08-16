@@ -4,6 +4,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import { fileURLToPath, URL } from "node:url";
 import vuetify from "vite-plugin-vuetify";
 import tailwindcss from "tailwindcss";
+import postcssPresetEnv from "postcss-preset-env";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -22,7 +23,7 @@ export default defineConfig({
   css: {
     devSourcemap: true,
     postcss: {
-      plugins: [tailwindcss()],
+      plugins: [tailwindcss(), postcssPresetEnv()],
     },
   },
 });
