@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <article class="prose mx-auto my-10 px-8 text-lg dark:prose-invert">
+  <article class="prose my-16 px-8 text-lg dark:prose-invert">
     <p>海客谈瀛洲，烟涛微茫信难求，</p>
     <p>越人语天姥，云霞明灭或可睹。</p>
     <p>天姥连天向天横，势拔五岳掩赤城。</p>
