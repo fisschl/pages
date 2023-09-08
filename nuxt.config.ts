@@ -1,7 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ["@nuxt/devtools", "@nuxt/ui"],
-  devtools: { enabled: true },
   app: {
     head: {
       link: [
@@ -25,5 +24,9 @@ export default defineNuxtConfig({
         },
       ],
     },
+  },
+  devtools: { enabled: true },
+  ui: {
+    icons: ["tabler"],
   },
 });
