@@ -47,10 +47,15 @@ const setSelectorPosition = (...elements: HTMLElement[]) => {
   const right = Math.max(...rects.map((rect) => rect.right));
   const bottom = Math.max(...rects.map((rect) => rect.bottom));
   const { scrollTop, scrollLeft } = container.value;
-  selector.value.style.left = `${left + scrollLeft}px`;
-  selector.value.style.top = `${top + scrollTop}px`;
+  const { clientLeft, clientTop } = container.value;
+  selector.value.style.left = `${left + scrollLeft - clientLeft}px`;
+  selector.value.style.top = `${top + scrollTop - clientTop}px`;
   selector.value.style.width = `${right - left}px`;
   selector.value.style.height = `${bottom - top}px`;
+};
+
+const lessThan = (left: number, right: number) => {
+  return left - right < 3;
 };
 
 /**
@@ -58,10 +63,10 @@ const setSelectorPosition = (...elements: HTMLElement[]) => {
  */
 const overlap = (a: DOMRect, b: DOMRect) => {
   return !(
-    a.right <= b.left ||
-    b.right <= a.left ||
-    a.bottom <= b.top ||
-    b.bottom <= a.top
+    lessThan(a.right, b.left) ||
+    lessThan(b.right, a.left) ||
+    lessThan(a.bottom, b.top) ||
+    lessThan(b.bottom, a.top)
   );
 };
 
@@ -107,20 +112,24 @@ useEventListener("mouseup", () => {
     class="prose relative h-screen w-screen max-w-none overflow-auto px-10 py-6 dark:prose-invert"
   >
     <table ref="container" class="table-ele">
-      <tr>
-        <th v-for="column in columns" :key="column">
-          {{ column.toUpperCase() }}
-        </th>
-      </tr>
-      <tr v-for="row in rows" :key="row.id">
-        <td
-          v-for="column in columns"
-          :key="column"
-          :class="`cell-${column}-${row.id}`"
-        >
-          {{ row[column] }}
-        </td>
-      </tr>
+      <thead>
+        <tr>
+          <th v-for="column in columns" :key="column">
+            {{ column.toUpperCase() }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in rows" :key="row.id">
+          <td
+            v-for="column in columns"
+            :key="column"
+            :class="`cell-${column}-${row.id}`"
+          >
+            {{ row[column] }}
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
