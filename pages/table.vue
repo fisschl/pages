@@ -134,15 +134,15 @@ useEventListener("mouseup", () => {
   </div>
 </template>
 
-<style>
-.prose .selector {
+<style scoped>
+.prose :deep(.selector) {
   border: 1px solid #46a53adc;
   background-color: #3fcb2d50;
   position: absolute;
   pointer-events: none;
 }
 
-.prose td.selected {
+.prose :deep(td.selected) {
   background-color: #2d99cb7e;
 }
 </style>
