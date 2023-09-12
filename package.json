@@ -45,7 +45,6 @@
       "plugin:prettier/recommended"
     ],
     "rules": {
-      "no-undef": "off",
       "vue/no-v-html": "off"
     }
   }
