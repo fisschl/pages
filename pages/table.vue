@@ -114,7 +114,47 @@ useEventListener("mousemove", (e) => {
   getSelection()?.removeAllRanges();
 });
 
-const autoFill = (...list: HTMLElement[]) => {};
+const getRow = (tr: HTMLElement) => {
+  const mat = tr.className.match(/row-(\S+)/);
+  return mat && mat[1];
+};
+
+const getColumn = (td: HTMLElement) => {
+  const mat = td.className.match(/column-(\S+)/);
+  return mat && mat[1];
+};
+
+const autoFill = (...list: HTMLElement[]) => {
+  const rowIds: string[] = [];
+  const columnIds: string[] = [];
+  list.forEach((ele) => {
+    const r = getRow(ele);
+    if (r && !rowIds.includes(r)) rowIds.push(r);
+    const c = getColumn(ele);
+    if (c && !columnIds.includes(c)) columnIds.push(c);
+  });
+  const dataList = rowIds.map((r) => {
+    return rows.find((row) => row.id === r);
+  });
+  columnIds.forEach((c) => {
+    const start = dataList[0];
+    if (!start) return;
+    if (c === "level") {
+      const numbers = start.level.split(/\D+/).map(Number);
+      const index = numbers.length - 1;
+      dataList.forEach((row) => {
+        if (!row) return;
+        row[c] = numbers.join(".");
+        numbers[index]++;
+      });
+      return;
+    }
+    dataList.forEach((row) => {
+      if (!row) return;
+      row[c] = start[c];
+    });
+  });
+};
 
 useEventListener("mouseup", () => {
   if (!selectRect.value) return;
