@@ -3,9 +3,9 @@ const { data } = useFetch("/api/news");
 </script>
 
 <template>
-  <main class="p-4">
-    <UTable :rows="data || undefined" />
-  </main>
+  <div class="flex h-screen w-screen flex-col">
+    <UTable class="mx-4 flex-1 overflow-auto" :rows="data || undefined" />
+  </div>
 </template>
 
 <style scoped></style>
