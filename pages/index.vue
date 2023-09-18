@@ -5,11 +5,6 @@ const links = [
     icon: "i-tabler-home",
     to: "/",
   },
-  {
-    label: "表格",
-    icon: "i-tabler-table",
-    to: "/table",
-  },
 ];
 </script>
 

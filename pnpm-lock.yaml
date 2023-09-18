@@ -17,9 +17,6 @@ dependencies:
   '@prisma/client':
     specifier: ^5.2.0
     version: 5.2.0(prisma@5.2.0)
-  '@tabler/icons-vue':
-    specifier: ^2.34.0
-    version: 2.34.0(vue@3.3.4)
   '@tailwindcss/typography':
     specifier: ^0.5.10
     version: 0.5.10(tailwindcss@3.3.3)
@@ -1949,19 +1946,6 @@ packages:
       tuf-js: 2.1.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /@tabler/icons-vue@2.34.0(vue@3.3.4):
-    resolution: {integrity: sha512-73PC5C3+iIv8ntt68dO52bTSeLPzyUWPTnavBaBJ7vlqxKTod2q9ZmlWNjK8zxJBfrNIEsdRauuEWXbwiH2GBA==}
-    peerDependencies:
-      vue: '>=3.0.1'
-    dependencies:
-      '@tabler/icons': 2.34.0
-      vue: 3.3.4
-    dev: false
-
-  /@tabler/icons@2.34.0:
-    resolution: {integrity: sha512-65GsJsT4ZBETWcdrNxbsjsbRoZvbVk3CcU2SafaElrzP1wpOeuAn9aELVEbxhdyZyP9dg2SCfgH6iAArJgp7lw==}
     dev: false
 
   /@tailwindcss/aspect-ratio@0.4.2(tailwindcss@3.3.3):
