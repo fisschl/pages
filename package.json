@@ -6,7 +6,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview --host",
     "cz": "git add . && czg",
-    "postinstall": "nuxt prepare && prisma generate"
+    "postinstall": "nuxt prepare && prisma generate",
+    "db:push": "prisma db push"
   },
   "dependencies": {
     "@iconify-json/tabler": "^1.1.91",

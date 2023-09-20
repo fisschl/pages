@@ -8,12 +8,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model News {
+model article {
   id         String   @id @default(cuid())
   title      String
-  url        String
-  type       String
+  user       String
   updateTime DateTime @updatedAt
-
-  @@index([title, updateTime(sort: Desc)])
 }
