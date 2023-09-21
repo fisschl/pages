@@ -13,13 +13,13 @@
     "@iconify-json/tabler": "^1.1.91",
     "@nuxt/devtools": "latest",
     "@nuxt/ui": "^2.8.1",
-    "@prisma/client": "^5.2.0",
+    "@prisma/client": "^5.3.1",
     "@tailwindcss/typography": "^0.5.10",
     "@vueuse/core": "^10.4.1",
     "date-fns": "^2.30.0",
     "lodash-es": "^4.17.21",
-    "nuxt": "^3.7.2",
-    "prisma": "^5.2.0",
+    "nuxt": "^3.7.3",
+    "prisma": "^5.3.1",
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
