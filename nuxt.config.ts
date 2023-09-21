@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/devtools", "@nuxt/ui", "@vueuse/nuxt"],
+  modules: ["@nuxt/devtools", "@nuxt/ui", "@vueuse/nuxt", "@nuxt/content"],
   app: {
     head: {
       link: [
@@ -20,6 +20,10 @@ export default defineNuxtConfig({
       script: [
         {
           src: "https://cdn.jsdelivr.net/npm/canvas-confetti/dist/confetti.browser.min.js",
+          async: true,
+        },
+        {
+          src: "https://cdn.jsdelivr.net/npm/shiki",
           async: true,
         },
       ],
