@@ -1,7 +1,7 @@
 <script setup lang="ts">
+const nav = useNav();
 const handleLinkClick = () => {
-  if (lg.value) return;
-  nav.value.isNavVisible = false;
+  nav.value.isDrawerNavVisible = false;
 };
 
 const links = reactive([
@@ -36,11 +36,11 @@ const links = reactive([
     click: handleLinkClick,
   },
 ]);
-const nav = useNav();
 const lg = useMediaQuery(LG);
-watch(lg, (lg) => {
-  nav.value.isNavVisible = lg;
-});
+const handleChangeNavVisible = (value: boolean) => {
+  if (lg.value) nav.value.isVerticalNavVisible = value;
+  else nav.value.isDrawerNavVisible = value;
+};
 </script>
 
 <template>
@@ -50,13 +50,14 @@ watch(lg, (lg) => {
     >
       <h1 class="flex-1"></h1>
       <UToggle
-        v-model="nav.isNavVisible"
+        :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
         on-icon="i-tabler-menu"
         off-icon="i-tabler-minimize"
+        @update:model-value="handleChangeNavVisible"
       />
     </header>
     <div class="flex">
-      <nav v-if="nav.isNavVisible && lg">
+      <nav v-if="nav.isVerticalNavVisible" class="hidden lg:block">
         <UVerticalNavigation
           :links="links"
           class="sticky top-14 w-48 py-4 pl-3"
@@ -64,10 +65,9 @@ watch(lg, (lg) => {
         />
       </nav>
       <USlideover
-        v-if="!lg"
-        v-model="nav.isNavVisible"
+        v-model="nav.isDrawerNavVisible"
         side="left"
-        class="w-52"
+        class="w-52 lg:hidden"
       >
         <UVerticalNavigation class="mx-4 my-3" :links="links" />
       </USlideover>

@@ -1,7 +1,9 @@
-export const useNav = () =>
-  useState(() => ({
-    isNavVisible: false,
+export const useNav = () => {
+  return useState(() => ({
+    isVerticalNavVisible: true,
+    isDrawerNavVisible: false,
   }));
+};
 
 export const SM = `(min-width: 640px)`;
 export const MD = `(min-width: 768px)`;
