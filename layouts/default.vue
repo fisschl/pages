@@ -49,12 +49,14 @@ const handleChangeNavVisible = (value: boolean) => {
       class="sticky top-0 flex gap-4 bg-gray-200/20 px-4 py-3 backdrop-blur dark:bg-gray-700/20"
     >
       <h1 class="flex-1"></h1>
-      <UToggle
-        :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
-        on-icon="i-tabler-menu"
-        off-icon="i-tabler-minimize"
-        @update:model-value="handleChangeNavVisible"
-      />
+      <ClientOnly>
+        <UToggle
+          :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
+          on-icon="i-tabler-menu"
+          off-icon="i-tabler-minimize"
+          @update:model-value="handleChangeNavVisible"
+        />
+      </ClientOnly>
     </header>
     <div class="flex">
       <nav v-if="nav.isVerticalNavVisible" class="hidden lg:block">

@@ -1,3 +1,3 @@
 <template>
-  <ContentDoc class="prose mx-5 my-4 flex-1 dark:prose-invert" />
+  <ContentDoc class="prose mx-5 my-4 max-w-none flex-1 dark:prose-invert" />
 </template>
