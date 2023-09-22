@@ -24,6 +24,7 @@
     "nuxt": "^3.7.3",
     "prisma": "^5.3.1",
     "shiki": "^0.14.4",
+    "prettier": "^3.0.3",
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
@@ -33,7 +34,6 @@
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.4.1",
     "typescript": "^5.2.2"
   },

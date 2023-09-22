@@ -35,6 +35,12 @@ const links = reactive([
     to: "https://store.fisschl.world",
     click: handleLinkClick,
   },
+  {
+    label: "代码格式化",
+    icon: "i-tabler-braces",
+    to: "/format",
+    click: handleLinkClick,
+  },
 ]);
 const lg = useMediaQuery(LG);
 const handleChangeNavVisible = (value: boolean) => {

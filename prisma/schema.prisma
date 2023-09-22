@@ -8,9 +8,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model article {
-  id         String   @id @default(cuid())
-  title      String
-  user       String
-  updateTime DateTime @updatedAt
+model user {
+  id       String @id @default(cuid())
+  name     String
+  password String
 }
