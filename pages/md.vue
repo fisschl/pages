@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Marked } from "marked";
-import { highlight } from "~/composables/highlight";
+import { highlight } from "~/utils/highlight";
 
 const marked = new Marked();
 const article = ref<HTMLElement | null>(null);

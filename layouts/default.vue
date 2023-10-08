@@ -18,28 +18,38 @@ const links = reactive([
     click: handleLinkClick,
   },
   {
+    label: "代码格式化",
+    icon: "i-tabler-indent-increase",
+    to: "/format",
+    click: handleLinkClick,
+  },
+  {
     label: "AI",
     icon: "i-tabler-brand-openai",
     to: "https://gpt.fisschl.world",
     click: handleLinkClick,
+    target: "_blank",
   },
   {
     label: "博客",
     icon: "i-tabler-brand-blogger",
     to: "https://memos.fisschl.world",
     click: handleLinkClick,
+    target: "_blank",
   },
   {
     label: "共享文件",
     icon: "i-tabler-device-floppy",
     to: "https://store.fisschl.world",
     click: handleLinkClick,
+    target: "_blank",
   },
   {
-    label: "代码格式化",
-    icon: "i-tabler-braces",
-    to: "/format",
+    label: "代码仓库",
+    icon: "i-tabler-brand-git",
+    to: "https://git.fisschl.world",
     click: handleLinkClick,
+    target: "_blank",
   },
 ]);
 const lg = useMediaQuery(LG);

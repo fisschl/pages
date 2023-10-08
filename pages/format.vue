@@ -3,18 +3,15 @@ import { debounce } from "lodash-es";
 
 const params = reactive<{
   text?: string;
-  filepath?: string;
+  extension?: string;
 }>({});
 
 const submit = debounce(() => {
-  const { filepath, text } = params;
-  if (!filepath || !text) return;
+  const { extension, text } = params;
+  if (!extension || !text) return;
   return $fetch("/api/format", {
     method: "POST",
-    body: {
-      text,
-      filepath: filepath.includes(".") ? filepath : `*.${filepath}`,
-    },
+    body: { extension, text },
   }).then((res) => {
     params.text = res;
   });
@@ -24,8 +21,8 @@ const submit = debounce(() => {
 <template>
   <div class="w-full flex-1 px-4 py-3">
     <UForm :state="params" @submit="submit">
-      <UFormGroup label="文件名/扩展名" name="filepath" class="mb-3">
-        <UInput v-model="params.filepath" />
+      <UFormGroup label="扩展名" name="extension" class="mb-3">
+        <UInput v-model="params.extension" />
       </UFormGroup>
       <UFormGroup label="文本" name="text">
         <UTextarea
