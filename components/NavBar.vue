@@ -1,7 +1,11 @@
 <script setup lang="ts">
 const nav = useNav();
-const handleLinkClick = () => {
-  nav.value.isDrawerNavVisible = false;
+
+const handleClick = (e: MouseEvent) => {
+  if (!(e.target instanceof HTMLElement)) return;
+  const ele = e.target.closest("a");
+  if (!ele) return;
+  if (!nav.lg) nav.visible = false;
 };
 
 const links = reactive([
@@ -12,19 +16,16 @@ const links = reactive([
         label: "主页",
         icon: "i-tabler-home",
         to: "/",
-        click: handleLinkClick,
       },
       {
         label: "Markdown",
         icon: "i-tabler-markdown",
         to: "/md",
-        click: handleLinkClick,
       },
       {
         label: "代码格式化",
         icon: "i-tabler-indent-increase",
         to: "/format",
-        click: handleLinkClick,
       },
     ],
   },
@@ -61,7 +62,7 @@ const links = reactive([
 </script>
 
 <template>
-  <section>
+  <section @click="handleClick">
     <template v-for="group in links" :key="group.label">
       <b class="mx-1 mb-2 mt-3 block text-sm">
         {{ group.label }}

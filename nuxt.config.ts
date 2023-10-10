@@ -1,6 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/devtools", "@nuxt/ui", "@vueuse/nuxt", "@nuxt/content"],
+  modules: [
+    "@nuxt/devtools",
+    "@nuxt/ui",
+    "@vueuse/nuxt",
+    "@nuxt/content",
+    "@pinia/nuxt",
+  ],
   app: {
     head: {
       link: [

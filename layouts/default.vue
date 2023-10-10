@@ -1,10 +1,13 @@
 <script setup lang="ts">
 const nav = useNav();
-const lg = useMediaQuery(LG);
-const handleChangeNavVisible = (value: boolean) => {
-  if (lg.value) nav.value.isVerticalNavVisible = value;
-  else nav.value.isDrawerNavVisible = value;
-};
+
+onMounted(() => {
+  nav.visible = nav.lg;
+});
+whenever(
+  () => !nav.lg,
+  () => (nav.visible = false),
+);
 </script>
 
 <template>
@@ -14,27 +17,15 @@ const handleChangeNavVisible = (value: boolean) => {
       :class="$style.header"
     >
       <h1 class="flex-1"></h1>
-      <UToggle
-        :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
-        on-icon="i-tabler-menu"
-        off-icon="i-tabler-minimize"
-        @update:model-value="handleChangeNavVisible"
-      />
+      <NavToggleButton />
     </header>
     <div class="flex">
-      <ClientOnly>
-        <nav v-if="nav.isVerticalNavVisible && lg">
-          <NavBar :class="$style.navbar" class="py-4 pl-3" />
-        </nav>
-        <USlideover
-          v-if="!lg"
-          v-model="nav.isDrawerNavVisible"
-          side="left"
-          class="w-52 lg:hidden"
-        >
-          <NavBar class="mx-4 my-3" />
-        </USlideover>
-      </ClientOnly>
+      <nav v-if="nav.visible && nav.lg">
+        <NavBar :class="$style.navbar" class="py-4 pl-3" />
+      </nav>
+      <USlideover v-if="!nav.lg" v-model="nav.visible" side="left" class="w-52">
+        <NavBar class="mx-4 my-3" />
+      </USlideover>
       <slot />
     </div>
   </div>
