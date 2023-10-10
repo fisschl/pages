@@ -1,63 +1,5 @@
 <script setup lang="ts">
 const nav = useNav();
-const handleLinkClick = () => {
-  nav.value.isDrawerNavVisible = false;
-};
-
-const links = reactive([
-  {
-    label: "工具",
-    children: [
-      {
-        label: "主页",
-        icon: "i-tabler-home",
-        to: "/",
-        click: handleLinkClick,
-      },
-      {
-        label: "Markdown",
-        icon: "i-tabler-markdown",
-        to: "/md",
-        click: handleLinkClick,
-      },
-      {
-        label: "代码格式化",
-        icon: "i-tabler-indent-increase",
-        to: "/format",
-        click: handleLinkClick,
-      },
-    ],
-  },
-  {
-    label: "页面",
-    children: [
-      {
-        label: "AI",
-        icon: "i-tabler-brand-openai",
-        to: "https://gpt.fisschl.world",
-        target: "_blank",
-      },
-      {
-        label: "博客",
-        icon: "i-tabler-brand-blogger",
-        to: "https://memos.fisschl.world",
-        target: "_blank",
-      },
-      {
-        label: "共享文件",
-        icon: "i-tabler-device-floppy",
-        to: "https://store.fisschl.world",
-        target: "_blank",
-      },
-      {
-        label: "代码仓库",
-        icon: "i-tabler-brand-git",
-        to: "https://git.fisschl.world",
-        target: "_blank",
-      },
-    ],
-  },
-]);
 const lg = useMediaQuery(LG);
 const handleChangeNavVisible = (value: boolean) => {
   if (lg.value) nav.value.isVerticalNavVisible = value;
@@ -66,54 +8,57 @@ const handleChangeNavVisible = (value: boolean) => {
 </script>
 
 <template>
-  <div>
+  <div :class="$style.page">
     <header
-      class="sticky top-0 flex gap-4 bg-gray-200/20 px-4 py-3 backdrop-blur dark:bg-gray-700/20"
+      class="gap-4 bg-gray-200/20 px-4 backdrop-blur dark:bg-gray-700/20"
+      :class="$style.header"
     >
       <h1 class="flex-1"></h1>
-      <ClientOnly>
-        <UToggle
-          :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
-          on-icon="i-tabler-menu"
-          off-icon="i-tabler-minimize"
-          @update:model-value="handleChangeNavVisible"
-        />
-      </ClientOnly>
+      <UToggle
+        :model-value="lg ? nav.isVerticalNavVisible : nav.isDrawerNavVisible"
+        on-icon="i-tabler-menu"
+        off-icon="i-tabler-minimize"
+        @update:model-value="handleChangeNavVisible"
+      />
     </header>
     <div class="flex">
-      <nav v-if="nav.isVerticalNavVisible" class="hidden lg:block">
-        <UVerticalNavigation
-          :links="links"
-          class="sticky top-14 w-48 overflow-auto py-4 pl-3"
-          :class="$style['nav-height']"
+      <ClientOnly>
+        <nav v-if="nav.isVerticalNavVisible && lg">
+          <NavBar :class="$style.navbar" class="py-4 pl-3" />
+        </nav>
+        <USlideover
+          v-if="!lg"
+          v-model="nav.isDrawerNavVisible"
+          side="left"
+          class="w-52 lg:hidden"
         >
-          <template #default="{ link }">
-            <div class="w-full text-left">
-              <div class="mb-2">
-                {{ link.label }}
-              </div>
-              <UVerticalNavigation
-                v-if="link.children"
-                :links="link.children"
-              />
-            </div>
-          </template>
-        </UVerticalNavigation>
-      </nav>
-      <USlideover
-        v-model="nav.isDrawerNavVisible"
-        side="left"
-        class="w-52 lg:hidden"
-      >
-        <UVerticalNavigation class="mx-4 my-3" :links="links" />
-      </USlideover>
+          <NavBar class="mx-4 my-3" />
+        </USlideover>
+      </ClientOnly>
       <slot />
     </div>
   </div>
 </template>
 
 <style module>
-.nav-height {
-  height: calc(100vh - 5rem);
+.page {
+  --header-height: 3.5rem;
+  --navbar-width: 12rem;
+}
+
+.header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+.navbar {
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  position: sticky;
+  top: var(--header-height);
+  width: var(--navbar-width);
 }
 </style>
