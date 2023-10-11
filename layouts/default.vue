@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const nav = useNav();
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   nav.visible = nav.lg;
 });
 whenever(
