@@ -25,16 +25,7 @@ export default defineNuxtConfig({
           href: "https://cdn.fisschl.world/LXGWWenKai/font.css",
         },
       ],
-      script: [
-        {
-          src: "https://cdn.jsdelivr.net/npm/canvas-confetti/dist/confetti.browser.min.js",
-          async: true,
-        },
-        {
-          src: "https://cdn.jsdelivr.net/npm/shiki",
-          async: true,
-        },
-      ],
+      script: [],
     },
   },
   devtools: { enabled: true },
