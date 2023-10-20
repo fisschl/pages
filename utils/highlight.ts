@@ -1,10 +1,4 @@
-import { getHighlighter, setCDN } from "shiki";
 import { debounce } from "lodash-es";
-
-const asyncHighlighter = (() => {
-  setCDN("https://cdn.jsdelivr.net/npm/shiki/");
-  return getHighlighter({});
-})();
 
 export const parseHtml = (html: string) => {
   const parser = new DOMParser();
@@ -14,23 +8,27 @@ export const parseHtml = (html: string) => {
   return ele;
 };
 
-export const highlight = debounce(
-  async (element: HTMLElement | undefined | null) => {
-    if (typeof window === "undefined") return;
-    const highlighter = await asyncHighlighter;
-    element?.querySelectorAll("pre code").forEach((block) => {
-      const pre = block.closest("pre");
-      if (!pre || pre.classList.contains("shiki")) return;
-      const lang = block.className.match(/language-(\S+)/)?.[1];
-      if (!lang) return;
-      const code = block.textContent;
-      if (!code) return;
-      const html = highlighter.codeToHtml(code, { lang });
-      const newPre = parseHtml(html);
-      if (!newPre) return;
-      newPre.dataset.lang = lang;
-      pre.replaceWith(newPre);
+export const highlightAll = debounce((element?: HTMLElement) => {
+  if (typeof window === "undefined") return;
+  element = element || document.body;
+  element.querySelectorAll("pre code").forEach(async (code) => {
+    if (!code || code.classList.contains("shiki")) return;
+    const text = code.textContent;
+    const matches = code.className.match(/language-(\w+)/) || [];
+    const lang = matches[1];
+    if (!text || !lang) return;
+    const html = await $fetch("/api/highlight", {
+      method: "POST",
+      body: JSON.stringify({ text, lang }),
     });
-  },
-  200,
-);
+    const ele = parseHtml(html);
+    if (!ele) return;
+    ele.dataset.lang = lang;
+    const pre = code.closest("pre") || code;
+    if (!(pre instanceof HTMLElement)) return;
+    ele.classList.add(...pre.classList);
+    Object.assign(ele.style, pre.style);
+    Object.assign(ele.dataset, pre.dataset);
+    pre.replaceWith(ele);
+  });
+}, 200);

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Marked } from "marked";
-import { highlight } from "~/utils/highlight";
+import { highlightAll } from "~/utils/highlight";
 
 const marked = new Marked();
-const article = ref<HTMLElement | null>(null);
+const article = ref<HTMLElement>();
 
 const dataText = useLocalStorage("pages-markdown-text", "# Hello World");
 
@@ -21,7 +21,7 @@ onChange((files) => {
 });
 
 const mdHtml = computed(() => {
-  highlight(article.value);
+  highlightAll(article.value);
   return marked.parse(dataText.value);
 });
 </script>
