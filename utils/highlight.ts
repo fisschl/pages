@@ -8,10 +8,12 @@ export const parseHtml = (html: string) => {
   return ele;
 };
 
-export const highlightAll = debounce((element?: HTMLElement) => {
+export type ElementParam = MaybeRefOrGetter<HTMLElement | undefined | null>;
+
+export const highlightAll = debounce((element: ElementParam) => {
   if (typeof window === "undefined") return;
-  element = element || document.body;
-  element.querySelectorAll("pre code").forEach(async (code) => {
+  const ele = toValue(element) || document.body;
+  ele.querySelectorAll("pre code").forEach(async (code) => {
     if (!code || code.classList.contains("shiki")) return;
     const text = code.textContent;
     const matches = code.className.match(/language-(\w+)/) || [];
