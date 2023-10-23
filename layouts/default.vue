@@ -53,6 +53,7 @@ whenever(
   align-items: center;
   position: sticky;
   top: 0;
+  z-index: 20;
 }
 
 .navbar {
@@ -61,5 +62,6 @@ whenever(
   position: sticky;
   top: var(--header-height);
   width: var(--navbar-width);
+  z-index: 10;
 }
 </style>
