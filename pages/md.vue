@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Marked } from "marked";
-import { highlight } from "~/utils/highlight";
+import { highlightAll } from "~/utils/highlight";
 
 const marked = new Marked();
-const article = ref<HTMLElement | null>(null);
+const article = ref<HTMLElement>();
 
-const dataText = useLocalStorage("pages-markdown-text", "# Hello World");
+const dataText = useLocalStorage("pages-markdown-text", "");
 
 const { open, onChange } = useFileDialog({ accept: ".md,.txt" });
 onChange((files) => {
@@ -20,9 +20,11 @@ onChange((files) => {
   reader.readAsText(file);
 });
 
-const mdHtml = computed(() => {
-  highlight(article.value);
-  return marked.parse(dataText.value);
+const markdownHtml = ref("");
+
+watchImmediate(dataText, async (text) => {
+  markdownHtml.value = await marked.parse(text);
+  highlightAll(article);
 });
 </script>
 
@@ -34,8 +36,8 @@ const mdHtml = computed(() => {
     </div>
     <article
       ref="article"
-      class="prose mx-5 my-4 max-w-none dark:prose-invert"
-      v-html="mdHtml"
+      class="prose mx-4 my-4 max-w-none dark:prose-invert"
+      v-html="markdownHtml"
     ></article>
   </div>
 </template>
