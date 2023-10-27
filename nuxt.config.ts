@@ -18,11 +18,7 @@ export default defineNuxtConfig({
         },
         {
           rel: "stylesheet",
-          href: "https://cdn.fisschl.world/HarmonyOS_Sans_SC/font.css",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://cdn.fisschl.world/LXGWWenKai/font.css",
+          href: "https://cdn.fisschl.world/MiSans/font.css",
         },
       ],
       script: [],
