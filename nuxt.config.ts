@@ -28,4 +28,7 @@ export default defineNuxtConfig({
   ui: {
     icons: ["tabler"],
   },
+  eslint: {
+    fix: true,
+  },
 });
