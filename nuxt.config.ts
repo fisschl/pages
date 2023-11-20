@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     "@nuxt/devtools",
     "@nuxt/ui",
     "@vueuse/nuxt",
-    "@nuxtjs/eslint-module",
     "@nuxt/image",
     "@nuxt/content",
     "@pinia/nuxt",
@@ -27,8 +26,5 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ui: {
     icons: ["tabler"],
-  },
-  eslint: {
-    fix: true,
   },
 });
