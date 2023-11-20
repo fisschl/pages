@@ -18,7 +18,7 @@ const submit = debounce(async () => {
   params.text = res;
   const html = await $fetch("/api/highlight", {
     method: "POST",
-    body: JSON.stringify({ text: res, lang: extension }),
+    body: { text: res, lang: extension },
   });
   highlightHtml.value = html;
 }, 500);

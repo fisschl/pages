@@ -18,11 +18,6 @@ const links = reactive([
         to: "/",
       },
       {
-        label: "Markdown",
-        icon: "i-tabler-markdown",
-        to: "/md",
-      },
-      {
         label: "代码格式化",
         icon: "i-tabler-indent-increase",
         to: "/format",
