@@ -32,17 +32,17 @@ onMounted(() => {
         },
       }),
     ],
+    editorProps: {
+      attributes: {
+        class: "prose mx-4 my-4 max-w-none dark:prose-invert",
+      },
+    },
   });
 });
 </script>
 
 <template>
-  <div class="w-full flex-1">
-    <EditorContent
-      :editor="editor"
-      class="prose mx-4 my-4 max-w-none dark:prose-invert"
-    />
-  </div>
+  <EditorContent :editor="editor" class="flex-1" />
 </template>
 
 <style module></style>
