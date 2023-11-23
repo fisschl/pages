@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare && prisma generate"
   },
   "dependencies": {
-    "@antv/g2": "^5.1.9",
     "@hocuspocus/provider": "^2.8.1",
     "@iconify-json/tabler": "^1.1.98",
     "@nuxt/content": "^2.9.0",

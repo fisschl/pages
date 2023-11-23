@@ -13,6 +13,11 @@ const links = reactive([
         icon: "i-tabler-indent-increase",
         to: "/format",
       },
+      {
+        label: "富文本",
+        icon: "i-tabler-edit",
+        to: "/editor",
+      },
     ],
   },
   {

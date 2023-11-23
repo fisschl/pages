@@ -8,13 +8,10 @@ const user = useUserStore();
     class="gap-4 bg-gray-200/20 px-4 backdrop-blur dark:bg-gray-700/20"
     :class="$style.header"
   >
-    <UButton v-if="user.u" label="Button" color="gray">
-      <template #leading>
-        <UIcon name="i-tabler-user" style="font-size: 16px" />
-      </template>
+    <h1 class="flex-1">大道之行也 天下为公</h1>
+    <UBadge v-if="user.u">
       {{ user.u?.name }}
-    </UButton>
-    <h1 class="flex-1"></h1>
+    </UBadge>
     <UToggle
       v-model="nav.visible"
       on-icon="i-tabler-menu"

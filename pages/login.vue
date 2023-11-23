@@ -19,6 +19,7 @@ const validate = () => {
 const isRegister = ref(false);
 const store = useUserStore();
 const router = useRouter();
+const route = useRoute();
 
 const onSubmit = async () => {
   if (!validate()) return;
@@ -39,7 +40,8 @@ const onSubmit = async () => {
   });
   const u = await $fetch("/api/user");
   store.u = u;
-  router.push("/");
+  const from = route.query.from?.toString();
+  await router.push(from || "/");
 };
 </script>
 
