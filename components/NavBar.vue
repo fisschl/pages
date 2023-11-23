@@ -1,13 +1,4 @@
 <script setup lang="ts">
-const nav = useNav();
-
-const handleClick = (e: MouseEvent) => {
-  if (!(e.target instanceof HTMLElement)) return;
-  const ele = e.target.closest("a");
-  if (!ele) return;
-  if (!nav.lg) nav.visible = false;
-};
-
 const links = reactive([
   {
     label: "工具",
@@ -57,14 +48,14 @@ const links = reactive([
 </script>
 
 <template>
-  <section @click="handleClick">
+  <nav class="overflow-y-auto px-3 py-4">
     <template v-for="group in links" :key="group.label">
       <b class="mx-1 mb-2 mt-3 block text-sm">
         {{ group.label }}
       </b>
       <UVerticalNavigation :links="group.children" />
     </template>
-  </section>
+  </nav>
 </template>
 
 <style module></style>

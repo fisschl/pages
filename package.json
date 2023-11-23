@@ -7,8 +7,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview --host",
     "cz": "git add . && czg",
-    "postinstall": "nuxt prepare && prisma generate",
-    "db:push": "prisma db push"
+    "postinstall": "nuxt prepare && prisma generate"
   },
   "dependencies": {
     "@antv/g2": "^5.1.9",
@@ -32,6 +31,7 @@
     "date-fns": "^2.30.0",
     "lodash-es": "^4.17.21",
     "marked": "^10.0.0",
+    "nanoid": "^5.0.3",
     "nuxt": "^3.8.2",
     "pinia": "^2.1.7",
     "prettier": "^3.1.0",

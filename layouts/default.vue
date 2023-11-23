@@ -1,33 +1,17 @@
 <script setup lang="ts">
 const nav = useNav();
-
-onMounted(async () => {
-  await nextTick();
-  nav.visible = nav.lg;
-});
-whenever(
-  () => !nav.lg,
-  () => (nav.visible = false),
-);
 </script>
 
 <template>
   <div :class="$style.page">
-    <header
-      class="gap-4 bg-gray-200/20 px-4 backdrop-blur dark:bg-gray-700/20"
-      :class="$style.header"
-    >
-      <h1 class="flex-1"></h1>
-      <NavToggleButton />
-    </header>
-    <div class="flex">
-      <nav v-if="nav.visible && nav.lg">
-        <NavBar :class="$style.navbar" class="py-4 pl-3" />
-      </nav>
-      <USlideover v-if="!nav.lg" v-model="nav.visible" side="left" class="w-52">
-        <NavBar class="mx-4 my-3" />
-      </USlideover>
-      <slot />
+    <HeaderBar />
+    <div class="md:flex">
+      <NavBar
+        v-if="nav.visible"
+        :class="$style.navbar"
+        class="z-10 md:sticky"
+      />
+      <slot></slot>
     </div>
     <footer class="my-10 text-center text-sm text-gray-500">
       <a
@@ -44,24 +28,13 @@ whenever(
 <style module>
 .page {
   --header-height: 3.5rem;
-  --navbar-width: 12rem;
 }
 
-.header {
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.navbar {
-  height: calc(100vh - var(--header-height));
-  overflow-y: auto;
-  position: sticky;
-  top: var(--header-height);
-  width: var(--navbar-width);
-  z-index: 10;
+@media (min-width: 768px) {
+  .navbar {
+    height: calc(100vh - var(--header-height));
+    top: var(--header-height);
+    width: 12rem;
+  }
 }
 </style>
