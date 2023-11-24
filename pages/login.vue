@@ -40,7 +40,8 @@ const onSubmit = async () => {
   });
   const u = await $fetch("/api/user");
   store.u = u;
-  const from = route.query.from?.toString();
+  const { from } = route.query;
+  if (typeof from !== "string") return;
   await router.push(from || "/");
 };
 </script>

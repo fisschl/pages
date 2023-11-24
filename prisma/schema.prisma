@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(cuid())
-  name     String @unique
+  id       String    @id @default(cuid())
+  name     String    @unique
   password String
+  articles Article[]
 }
 
 model Article {
-  id   String @id @default(cuid())
-  name String
-  body Bytes
+  id    String @id @default(cuid())
+  name  String
+  body  Bytes
+  users User[]
 }
