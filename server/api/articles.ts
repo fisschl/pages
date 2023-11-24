@@ -1,5 +1,6 @@
 import { omit } from "lodash-es";
 import { checkUser } from "../utils/user";
+import "../utils/hocuspocus";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);

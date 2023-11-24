@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 import { Buffer } from "buffer";
 import { createHash } from "crypto";
 import { nanoid } from "nanoid";
-import { createClient } from "redis";
 
 const SALT = "GO GO GO!";
 
@@ -13,10 +12,6 @@ export const hashPassword = (password: string): string => {
 };
 
 export const prisma = new PrismaClient();
-
-export const redis = createClient({
-  url: process.env.REDIS_URL,
-});
 
 export const getSessionKey = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));

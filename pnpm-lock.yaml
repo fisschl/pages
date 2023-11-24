@@ -16,7 +16,7 @@ dependencies:
     version: 2.8.1(y-protocols@1.0.6)(yjs@13.6.10)
   '@hocuspocus/transformer':
     specifier: ^2.8.1
-    version: 2.8.1(@tiptap/pm@2.1.12)(yjs@13.6.10)
+    version: 2.8.1(@tiptap/pm@2.1.12)(y-prosemirror@1.2.1)(yjs@13.6.10)
   '@iconify-json/tabler':
     specifier: ^1.1.98
     version: 1.1.98
@@ -43,10 +43,10 @@ dependencies:
     version: 0.5.10(tailwindcss@3.3.5)
   '@tiptap/extension-collaboration':
     specifier: ^2.1.12
-    version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)
+    version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)(y-prosemirror@1.2.1)
   '@tiptap/extension-collaboration-cursor':
     specifier: ^2.1.12
-    version: 2.1.12(@tiptap/core@2.1.12)
+    version: 2.1.12(@tiptap/core@2.1.12)(y-prosemirror@1.2.1)
   '@tiptap/pm':
     specifier: ^2.1.12
     version: 2.1.12
@@ -98,6 +98,9 @@ dependencies:
   tailwindcss:
     specifier: ^3.3.5
     version: 3.3.5
+  y-prosemirror:
+    specifier: ^1.2.1
+    version: 1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10)
 
 devDependencies:
   '@nuxt/eslint-config':
@@ -1062,7 +1065,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@hocuspocus/transformer@2.8.1(@tiptap/pm@2.1.12)(yjs@13.6.10):
+  /@hocuspocus/transformer@2.8.1(@tiptap/pm@2.1.12)(y-prosemirror@1.2.1)(yjs@13.6.10):
     resolution: {integrity: sha512-0WtE/fxGwD/BEdl22udznD+skggvF6D0kEpw7jTEUdfvqwSJEyUxq3tm1S1hVmZyQI21qDw6yTTgP7Ujf1WbSg==}
     peerDependencies:
       '@tiptap/pm': ^2.1.12
@@ -1072,6 +1075,7 @@ packages:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
       '@tiptap/pm': 2.1.12
       '@tiptap/starter-kit': 2.1.12(@tiptap/pm@2.1.12)
+      y-prosemirror: 1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10)
       yjs: 13.6.10
     dev: false
 
@@ -2490,16 +2494,17 @@ packages:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
     dev: false
 
-  /@tiptap/extension-collaboration-cursor@2.1.12(@tiptap/core@2.1.12):
+  /@tiptap/extension-collaboration-cursor@2.1.12(@tiptap/core@2.1.12)(y-prosemirror@1.2.1):
     resolution: {integrity: sha512-1hxo8bJWOvNccU7+yQSeUNU/sXPMXJ645WdXU5bylD4q/Ph/7u3gFxPPLu+j8WiLisBbj31saPk/DaOukIFTVg==}
     peerDependencies:
       '@tiptap/core': ^2.0.0
       y-prosemirror: 1.0.20
     dependencies:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
+      y-prosemirror: 1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10)
     dev: false
 
-  /@tiptap/extension-collaboration@2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12):
+  /@tiptap/extension-collaboration@2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)(y-prosemirror@1.2.1):
     resolution: {integrity: sha512-U/2Vo1RyFIhi2oMW371wO145PU8mjQp7shCDdio/hNF+GasaNN9mrqkMBj8JBhH7UOTJcEqLPP4df1nEDo1BBQ==}
     peerDependencies:
       '@tiptap/core': ^2.0.0
@@ -2508,6 +2513,7 @@ packages:
     dependencies:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
       '@tiptap/pm': 2.1.12
+      y-prosemirror: 1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10)
     dev: false
 
   /@tiptap/extension-document@2.1.12(@tiptap/core@2.1.12):
@@ -10512,6 +10518,23 @@ packages:
       cssfilter: 0.0.10
     dev: false
     optional: true
+
+  /y-prosemirror@1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10):
+    resolution: {integrity: sha512-czMBfB1eL2awqmOSxQM8cS/fsUOGE6fjvyPLInrh4crPxFiw67wDpwIW+EGBYKRa04sYbS0ScGj7ZgvWuDrmBQ==}
+    peerDependencies:
+      prosemirror-model: ^1.7.1
+      prosemirror-state: ^1.2.3
+      prosemirror-view: ^1.9.10
+      y-protocols: ^1.0.1
+      yjs: ^13.5.38
+    dependencies:
+      lib0: 0.2.88
+      prosemirror-model: 1.19.3
+      prosemirror-state: 1.4.3
+      prosemirror-view: 1.32.4
+      y-protocols: 1.0.6(yjs@13.6.10)
+      yjs: 13.6.10
+    dev: false
 
   /y-protocols@1.0.6(yjs@13.6.10):
     resolution: {integrity: sha512-vHRF2L6iT3rwj1jub/K5tYcTT/mEYDUppgNPXwp8fmLpui9f7Yeq3OEtTLVF012j39QnV+KEQpNqoN7CWU7Y9Q==}
