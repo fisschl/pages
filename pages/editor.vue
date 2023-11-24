@@ -15,7 +15,7 @@ const createEditor = () => {
   if (!user.u?.name) return;
   const provider = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",
-    name: "example-document",
+    name: "clpbx2uox00001bm1a3qbgg8y",
   });
   editor.value = new Editor({
     extensions: [

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { user } from "@prisma/client";
+import type { User } from "@prisma/client";
 import { isEmpty } from "lodash-es";
 
 definePageMeta({
   layout: false,
 });
 
-const state = reactive<Partial<user>>({});
+const state = reactive<Partial<User>>({});
 const errors = ref<Partial<Record<keyof typeof state, string>>>({});
 
 const validate = () => {
