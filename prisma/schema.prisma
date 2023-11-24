@@ -7,16 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model user {
   id       String    @id @default(cuid())
   name     String    @unique
   password String
-  articles Article[]
+  articles article[]
 }
 
-model Article {
+model article {
   id    String @id @default(cuid())
   name  String
   body  Bytes
-  users User[]
+  users user[]
 }

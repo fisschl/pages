@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { Buffer } from "buffer";
 import { createHash } from "crypto";
 import { nanoid } from "nanoid";
@@ -10,8 +9,6 @@ export const hashPassword = (password: string): string => {
     .update(password + SALT)
     .digest("base64url");
 };
-
-export const prisma = new PrismaClient();
 
 export const getSessionKey = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { User } from "@prisma/client";
+import type { user } from "@prisma/client";
 import { isEmpty } from "lodash-es";
 
-const state = reactive<Partial<User>>({});
+const state = reactive<Partial<user>>({});
 const errors = ref<Partial<Record<keyof typeof state, string>>>({});
 
 const validate = () => {

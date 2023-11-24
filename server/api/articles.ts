@@ -1,10 +1,10 @@
 import { omit } from "lodash-es";
 import { checkUser } from "../utils/user";
-import "../utils/hocuspocus";
+import { db } from "~/server/utils/db";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
-  const list = await prisma.article.findMany({
+  const list = await db.article.findMany({
     where: {
       users: { some: user },
     },

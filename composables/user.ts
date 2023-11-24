@@ -1,7 +1,7 @@
-import type { User } from "@prisma/client";
+import type { user } from "@prisma/client";
 
 export const useUserStore = defineStore("user", () => {
-  const u = ref<User>();
+  const u = ref<user>();
 
   return { u };
 });

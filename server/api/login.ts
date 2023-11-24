@@ -1,8 +1,6 @@
-import { prisma } from "../utils/password";
-
 export default defineEventHandler(async (event) => {
   const { name, password } = getQuery(event);
-  const user = await prisma.user.findFirst({
+  const user = await db.user.findFirst({
     where: { name: String(name), password: hashPassword(String(password)) },
   });
   if (!user) throw createError({ status: 401 });
