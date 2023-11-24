@@ -10,10 +10,7 @@
     "postinstall": "nuxt prepare && prisma generate"
   },
   "dependencies": {
-    "@hocuspocus/extension-database": "^2.8.1",
     "@hocuspocus/provider": "^2.8.1",
-    "@hocuspocus/server": "^2.8.1",
-    "@hocuspocus/transformer": "^2.8.1",
     "@iconify-json/tabler": "^1.1.98",
     "@nuxt/content": "^2.9.0",
     "@nuxt/devtools": "^1.0.3",
