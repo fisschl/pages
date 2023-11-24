@@ -5,17 +5,25 @@ import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 
-const user = useUserStore();
+const user = await useMustLogin();
+const route = useRoute();
 
-user.tryLogin();
+if (!route.query.id) {
+  await navigateTo("/main/article");
+}
 
+const token = useCookie("token");
 const editor = ref<Editor>();
 
-const createEditor = () => {
-  if (!user.u?.name) return;
+onMounted(() => {
+  const username = user.u?.name;
+  if (!username) return;
+  const id = route.query.id;
+  if (typeof id !== "string") return;
   const provider = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",
-    name: "clpbx2uox00001bm1a3qbgg8y",
+    name: id,
+    token: token.value,
   });
   editor.value = new Editor({
     extensions: [
@@ -25,7 +33,7 @@ const createEditor = () => {
       }),
       CollaborationCursor.configure({
         provider: provider,
-        user: { name: user.u.name },
+        user: { name: username },
       }),
     ],
     editorProps: {
@@ -34,25 +42,23 @@ const createEditor = () => {
       },
     },
   });
-};
-
-onMounted(() => {
-  createEditor();
 });
 </script>
 
 <template>
-  <EditorContent :editor="editor" class="m-4 flex-1" :class="$style.editor" />
+  <EditorContent :editor="editor" class="m-4 flex-1" />
 </template>
 
-<style module>
-.editor :global(.collaboration-cursor__caret) {
+<style module></style>
+
+<style>
+.collaboration-cursor__caret {
   border-right: 2px solid;
   pointer-events: none;
   position: relative;
 }
 
-.editor :global(.collaboration-cursor__label) {
+.collaboration-cursor__label {
   color: black;
   font-size: 14px;
   line-height: 18px;

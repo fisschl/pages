@@ -62,7 +62,8 @@
       "plugin:prettier/recommended"
     ],
     "rules": {
-      "vue/no-v-html": "off"
+      "vue/no-v-html": "off",
+      "vue/no-multiple-template-root": "off"
     }
   }
 }

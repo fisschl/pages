@@ -6,17 +6,17 @@ const links = reactive([
       {
         label: "主页",
         icon: "i-tabler-home",
-        to: "/",
+        to: "/main/home",
       },
       {
         label: "代码格式化",
         icon: "i-tabler-indent-increase",
-        to: "/format",
+        to: "/main/format",
       },
       {
-        label: "富文本",
-        icon: "i-tabler-edit",
-        to: "/editor",
+        label: "文章",
+        icon: "i-tabler-article",
+        to: "/main/article",
       },
     ],
   },

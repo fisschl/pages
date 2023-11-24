@@ -1,11 +1,14 @@
+import { omit } from "lodash-es";
 import { checkUser } from "../utils/user";
 
 export default defineEventHandler(async (event) => {
-  await checkUser(event);
-  const { id } = getQuery(event);
-  if (!id || typeof id !== "string") throw createError({ status: 400 });
-  await prisma.article.delete({
-    where: { id },
+  const user = await checkUser(event);
+  const list = await prisma.article.findMany({
+    where: {
+      users: { some: user },
+    },
   });
-  return true;
+  return list.map((item) => {
+    return omit(item, "body");
+  });
 });

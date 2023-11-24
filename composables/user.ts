@@ -2,16 +2,20 @@ import type { User } from "@prisma/client";
 
 export const useUserStore = defineStore("user", () => {
   const u = ref<User>();
-  const router = useRouter();
+
+  return { u };
+});
+
+export const useMustLogin = async () => {
+  const user = useUserStore();
   const route = useRoute();
 
-  const tryLogin = () => {
-    if (u.value) return;
-    router.replace({
+  if (!user.u) {
+    await navigateTo({
       path: "/login",
       query: { from: route.fullPath },
     });
-  };
+  }
 
-  return { u, tryLogin };
-});
+  return user;
+};
