@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
     where: {
       users: { some: user },
     },
+    orderBy: { updateAt: "desc" },
   });
   return list.map((item) => {
     return omit(item, "body");

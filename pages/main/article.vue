@@ -1,16 +1,38 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
+import { formatDistanceToNow, parseJSON } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import type { RouteLocationRaw } from "#vue-router";
 
 await useMustLogin();
 
-const { data } = useFetch("/api/articles");
+const columns = [
+  {
+    key: "name",
+    label: "标题",
+  },
+  {
+    key: "updateAt",
+    label: "更新时间",
+  },
+];
+
+const headers = useRequestHeaders(["cookie"]);
+const { data } = await useFetch("/api/articles", { headers });
 
 const links = computed(() => {
   return data.value?.map((item) => {
-    const qs = new URLSearchParams(pick(item, "id"));
+    const to: RouteLocationRaw = {
+      path: "/editor",
+      query: pick(item, "id"),
+    };
+    const timeText = formatDistanceToNow(parseJSON(item.updateAt), {
+      locale: zhCN,
+    });
     return {
-      label: item.name,
-      to: `/editor?${qs}`,
+      ...item,
+      to,
+      updateAt: timeText + "前",
     };
   });
 });
@@ -28,12 +50,16 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <div class="m-4">
-    <UButton @click="handleCreate"> 新建 </UButton>
+  <div class="mt-3 flex justify-end px-4">
+    <UButton class="px-6" @click="handleCreate"> 新建 </UButton>
   </div>
-  <div class="flex flex-col items-center">
-    <UVerticalNavigation :links="links" class="max-w-md" />
-  </div>
+  <UTable :rows="links" :columns="columns">
+    <template #name-data="{ row }">
+      <NuxtLink :to="row.to" class="text-green-500 hover:underline">
+        {{ row.name }}
+      </NuxtLink>
+    </template>
+  </UTable>
 </template>
 
 <style module></style>

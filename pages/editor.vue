@@ -9,12 +9,16 @@ const user = await useMustLogin();
 const route = useRoute();
 const id = route.query.id?.toString();
 if (!id) await navigateTo("/main/article");
-const { data } = await useFetch("/api/article_token", { query: { id } });
+const headers = useRequestHeaders(["cookie"]);
+const { data: article_token } = await useFetch("/api/article_token", {
+  headers,
+  query: { id },
+});
 const editor = ref<Editor>();
 
 onMounted(() => {
   const username = user.u?.name;
-  const token = data.value?.token;
+  const token = article_token.value?.token;
   if (!username || !id || !token) return;
   const provider = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",

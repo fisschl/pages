@@ -2,7 +2,8 @@
 import "~/assets/index.css";
 
 const store = useUserStore();
-const { data } = await useAsyncData("user", () => $fetch("/api/user"));
+const headers = useRequestHeaders(["cookie"]);
+const { data } = await useFetch("/api/user", { headers });
 store.u = data.value || undefined;
 </script>
 

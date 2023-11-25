@@ -1,8 +1,7 @@
 import type { user } from "@prisma/client";
 import type { H3Event, EventHandlerRequest } from "h3";
 
-export const getUser = async (token: unknown): Promise<user | undefined> => {
-  if (!token || typeof token !== "string") return;
+export const getUser = async (token: string): Promise<user | undefined> => {
   const str = await redis.get(token);
   if (!str) return;
   return JSON.parse(str);
@@ -10,10 +9,10 @@ export const getUser = async (token: unknown): Promise<user | undefined> => {
 
 export const checkUser = async (
   event: H3Event<EventHandlerRequest>,
-  token?: unknown,
 ): Promise<user> => {
-  if (!token) token = getCookie(event, "token");
+  const token = getCookie(event, "token");
+  if (!token) throw createError({ status: 401 });
   const user = await getUser(token);
-  if (!user) throw createError({ status: 401 });
+  if (!user) throw createError({ status: 403 });
   return user;
 };
