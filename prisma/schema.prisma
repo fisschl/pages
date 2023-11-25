@@ -17,7 +17,7 @@ model user {
 model article {
   id       String   @id @default(cuid())
   name     String
-  body     Bytes
+  body     Bytes?
   users    user[]
-  updateAt DateTime @updatedAt
+  updateAt DateTime @default(now()) @updatedAt
 }
