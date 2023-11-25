@@ -8,3 +8,6 @@ export const redis = createClient({
 export const connect = once(async () => {
   await redis.connect();
 });
+
+export const HOUR = 60 * 60;
+export const DAY = 24 * HOUR;

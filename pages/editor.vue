@@ -7,34 +7,32 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 
 const user = await useMustLogin();
 const route = useRoute();
-
-if (!route.query.id) {
-  await navigateTo("/main/article");
-}
-
-const token = useCookie("token");
+const id = route.query.id?.toString();
+if (!id) await navigateTo("/main/article");
+const { data } = await useFetch("/api/article_token", { query: { id } });
 const editor = ref<Editor>();
 
 onMounted(() => {
   const username = user.u?.name;
-  if (!username) return;
-  const id = route.query.id;
-  if (typeof id !== "string") return;
+  const token = data.value?.token;
+  if (!username || !id || !token) return;
   const provider = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",
     name: id,
-    token: token.value,
+    token,
+  });
+  const collaboration = Collaboration.configure({
+    document: provider.document,
+  });
+  const collaborationCursor = CollaborationCursor.configure({
+    provider: provider,
+    user: { name: username },
   });
   editor.value = new Editor({
     extensions: [
       StarterKit.configure({ history: false }),
-      Collaboration.configure({
-        document: provider.document,
-      }),
-      CollaborationCursor.configure({
-        provider: provider,
-        user: { name: username },
-      }),
+      collaboration,
+      collaborationCursor,
     ],
     editorProps: {
       attributes: {

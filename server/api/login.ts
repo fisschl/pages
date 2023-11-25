@@ -1,3 +1,5 @@
+import { addDays, differenceInSeconds } from "date-fns";
+
 export default defineEventHandler(async (event) => {
   const { name, password } = getQuery(event);
   const user = await db.user.findFirst({
@@ -5,9 +7,10 @@ export default defineEventHandler(async (event) => {
   });
   if (!user) throw createError({ status: 401 });
   const token = getSessionKey();
-  setCookie(event, "token", token);
+  const expires = addDays(new Date(), 30);
+  setCookie(event, "token", token, { expires, httpOnly: true });
   await redis.set(token, JSON.stringify(user), {
-    EX: 60 * 60 * 24 * 30,
+    EX: differenceInSeconds(expires, new Date()),
   });
   return true;
 });

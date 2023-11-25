@@ -10,7 +10,7 @@ export const hashPassword = (password: string): string => {
     .digest("base64url");
 };
 
-export const getSessionKey = () => {
+export const getRandomKey = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return nanoid() + Buffer.from(bytes).toString("base64url");
 };
