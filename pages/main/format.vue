@@ -9,16 +9,18 @@ const params = reactive<{
 const highlightHtml = ref<string>();
 
 const submit = debounce(async () => {
-  const { extension, text } = params;
+  let { extension, text } = params;
+  extension = extension?.trim().toLowerCase();
+  text = text?.trim();
   if (!extension || !text) return;
-  const res = await $fetch("/api/format", {
+  text = await $fetch("/api/format", {
     method: "POST",
     body: { extension, text },
   });
-  params.text = res;
+  params.text = text;
   const html = await $fetch("/api/highlight", {
     method: "POST",
-    body: { text: res, lang: extension },
+    body: { text, lang: extension },
   });
   highlightHtml.value = html;
 }, 500);
@@ -27,26 +29,26 @@ const { copy, copied } = useClipboard();
 </script>
 
 <template>
-  <UForm :state="params" class="mx-3 mb-3 mt-5" @submit="submit">
+  <UForm :state="params" class="mx-3 mb-3 mt-5" @submit.prevent>
     <UFormGroup label="扩展名" name="extension" class="mb-3 max-w-xs">
-      <UInput v-model="params.extension" />
+      <UInput v-model="params.extension" @update:model-value="submit" />
     </UFormGroup>
     <UFormGroup label="文本" name="text">
       <UTextarea v-model="params.text" :rows="5" @update:model-value="submit" />
     </UFormGroup>
   </UForm>
-  <article
-    v-if="params.text && highlightHtml"
-    class="prose relative mx-3 max-w-none dark:prose-invert"
-  >
+  <div v-if="params.text && highlightHtml" class="relative mx-3">
     <UButton
       class="absolute right-2 top-2"
       variant="link"
       :icon="copied ? 'i-tabler-checks' : 'i-tabler-copy'"
       @click="copy(params.text)"
     />
-    <div v-html="highlightHtml"></div>
-  </article>
+    <article
+      class="prose max-w-none dark:prose-invert"
+      v-html="highlightHtml"
+    ></article>
+  </div>
 </template>
 
 <style module></style>

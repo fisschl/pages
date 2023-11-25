@@ -31,7 +31,9 @@ const handleCreate = async () => {
   <div class="m-4">
     <UButton @click="handleCreate"> 新建 </UButton>
   </div>
-  <UVerticalNavigation :links="links" />
+  <div class="flex flex-col items-center">
+    <UVerticalNavigation :links="links" class="max-w-md" />
+  </div>
 </template>
 
 <style module></style>

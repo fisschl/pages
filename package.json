@@ -28,6 +28,7 @@
     "@vueuse/nuxt": "^10.6.1",
     "@vueuse/router": "^10.6.1",
     "date-fns": "^2.30.0",
+    "gridstack": "^10.0.0",
     "lodash-es": "^4.17.21",
     "marked": "^10.0.0",
     "nanoid": "^5.0.3",
