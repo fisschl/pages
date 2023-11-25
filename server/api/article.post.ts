@@ -11,7 +11,6 @@ export default defineEventHandler(async (event) => {
   const item = await db.article.create({
     data: {
       name,
-      body: Buffer.from(""),
       users: { connect: user },
     },
   });
