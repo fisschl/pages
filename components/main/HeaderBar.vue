@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const nav = useNav();
+import { useNavStore } from "~/composables/nav";
+
+const nav = useNavStore();
 const user = useUserStore();
 </script>
 

@@ -14,22 +14,24 @@ const { data: article_token } = await useFetch("/api/article_token", {
   headers,
   query: { id },
 });
-const editor = ref<Editor>();
+const editor = shallowRef<Editor>();
+const hocuspocus = shallowRef<HocuspocusProvider>();
 
 onMounted(() => {
   const username = user.u?.name;
   const token = article_token.value?.token;
   if (!username || !id || !token) return;
-  const provider = new HocuspocusProvider({
+  hocuspocus.value = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",
     name: id,
     token,
+    preserveConnection: false,
   });
   const collaboration = Collaboration.configure({
-    document: provider.document,
+    document: hocuspocus.value.document,
   });
   const collaborationCursor = CollaborationCursor.configure({
-    provider: provider,
+    provider: hocuspocus.value,
     user: { name: username },
   });
   editor.value = new Editor({
@@ -44,6 +46,11 @@ onMounted(() => {
       },
     },
   });
+});
+
+onBeforeUnmount(() => {
+  editor.value?.destroy();
+  hocuspocus.value?.destroy();
 });
 </script>
 

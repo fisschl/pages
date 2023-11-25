@@ -3,6 +3,7 @@ import { pick } from "lodash-es";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { RouteLocationRaw } from "#vue-router";
+import type { article } from "@prisma/client";
 
 await useMustLogin();
 
@@ -13,7 +14,11 @@ const columns = [
   },
   {
     key: "updateAt",
-    label: "更新时间",
+    label: "最近访问",
+  },
+  {
+    key: "actions",
+    label: "操作",
   },
 ];
 
@@ -26,13 +31,14 @@ const links = computed(() => {
       path: "/editor",
       query: pick(item, "id"),
     };
-    const timeText = formatDistanceToNow(parseJSON(item.updateAt), {
+    const updateAt = formatDistanceToNow(parseJSON(item.updateAt), {
       locale: zhCN,
+      addSuffix: true,
     });
     return {
       ...item,
       to,
-      updateAt: timeText + "前",
+      updateAt,
     };
   });
 });
@@ -47,6 +53,20 @@ const handleCreate = async () => {
     query: pick(item, "id"),
   });
 };
+
+const actions = (row: Pick<article, "id">) => {
+  return [
+    [
+      {
+        label: "删除",
+        icon: "i-tabler-trash",
+        click: () => {
+          console.log(row);
+        },
+      },
+    ],
+  ];
+};
 </script>
 
 <template>
@@ -58,6 +78,11 @@ const handleCreate = async () => {
       <NuxtLink :to="row.to" class="text-green-500 hover:underline">
         {{ row.name }}
       </NuxtLink>
+    </template>
+    <template #actions-data="{ row }">
+      <UDropdown :items="actions(row)">
+        <UButton color="gray" variant="ghost" icon="i-tabler-dots" />
+      </UDropdown>
     </template>
   </UTable>
 </template>

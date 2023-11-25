@@ -15,5 +15,9 @@ export default defineEventHandler(async (event) => {
   if (!item) throw createError({ status: 403 });
   const token = getRandomKey();
   await redis.set(token, id, { EX: 8 * HOUR });
+  await db.article.update({
+    where: { id },
+    data: { updateAt: new Date() },
+  });
   return { token };
 });
