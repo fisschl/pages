@@ -32,12 +32,21 @@ dependencies:
   '@tailwindcss/typography':
     specifier: ^0.5.10
     version: 0.5.10(tailwindcss@3.3.5)
+  '@tiptap/extension-character-count':
+    specifier: ^2.1.12
+    version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)
   '@tiptap/extension-collaboration':
     specifier: ^2.1.12
     version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)(y-prosemirror@1.2.1)
   '@tiptap/extension-collaboration-cursor':
     specifier: ^2.1.12
     version: 2.1.12(@tiptap/core@2.1.12)(y-prosemirror@1.2.1)
+  '@tiptap/extension-gapcursor':
+    specifier: ^2.1.12
+    version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)
+  '@tiptap/extension-placeholder':
+    specifier: ^2.1.12
+    version: 2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12)
   '@tiptap/pm':
     specifier: ^2.1.12
     version: 2.1.12
@@ -92,9 +101,15 @@ dependencies:
   tailwindcss:
     specifier: ^3.3.5
     version: 3.3.5
+  y-indexeddb:
+    specifier: ^9.0.12
+    version: 9.0.12(yjs@13.6.10)
   y-prosemirror:
     specifier: ^1.2.1
     version: 1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10)
+  yjs:
+    specifier: ^13.6.10
+    version: 13.6.10
 
 devDependencies:
   '@nuxt/eslint-config':
@@ -2424,6 +2439,16 @@ packages:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
     dev: false
 
+  /@tiptap/extension-character-count@2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12):
+    resolution: {integrity: sha512-+GFbBG13nvF8mFIeisSERG/Q3CuRsTNwVZIRbJTLgGdbHXFqPhJh4Xfm7cv7OaOYevUlVyO+z5pGD7wIl1bLqQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
+      '@tiptap/pm': 2.1.12
+    dev: false
+
   /@tiptap/extension-code-block@2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12):
     resolution: {integrity: sha512-RXtSYCVsnk8D+K80uNZShClfZjvv1EgO42JlXLVGWQdIgaNyuOv/6I/Jdf+ZzhnpsBnHufW+6TJjwP5vJPSPHA==}
     peerDependencies:
@@ -2569,6 +2594,16 @@ packages:
       '@tiptap/core': ^2.0.0
     dependencies:
       '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
+    dev: false
+
+  /@tiptap/extension-placeholder@2.1.12(@tiptap/core@2.1.12)(@tiptap/pm@2.1.12):
+    resolution: {integrity: sha512-K52o7B1zkP4vaVy3z4ZwHn+tQy6KlXtedj1skLg+796ImwH2GYS5z6MFOTfKzBO2hLncUzLco/s0C5PLCD6SDw==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.1.12(@tiptap/pm@2.1.12)
+      '@tiptap/pm': 2.1.12
     dev: false
 
   /@tiptap/extension-strike@2.1.12(@tiptap/core@2.1.12):
@@ -10461,6 +10496,16 @@ packages:
       cssfilter: 0.0.10
     dev: false
     optional: true
+
+  /y-indexeddb@9.0.12(yjs@13.6.10):
+    resolution: {integrity: sha512-9oCFRSPPzBK7/w5vOkJBaVCQZKHXB/v6SIT+WYhnJxlEC61juqG0hBrAf+y3gmSMLFLwICNH9nQ53uscuse6Hg==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      yjs: ^13.0.0
+    dependencies:
+      lib0: 0.2.88
+      yjs: 13.6.10
+    dev: false
 
   /y-prosemirror@1.2.1(prosemirror-model@1.19.3)(prosemirror-state@1.4.3)(prosemirror-view@1.32.4)(y-protocols@1.0.6)(yjs@13.6.10):
     resolution: {integrity: sha512-czMBfB1eL2awqmOSxQM8cS/fsUOGE6fjvyPLInrh4crPxFiw67wDpwIW+EGBYKRa04sYbS0ScGj7ZgvWuDrmBQ==}

@@ -23,7 +23,7 @@ const columns = [
 ];
 
 const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch("/api/articles", { headers });
+const { data, refresh } = await useFetch("/api/articles", { headers });
 
 const links = computed(() => {
   return data.value?.map((item) => {
@@ -60,8 +60,12 @@ const actions = (row: Pick<article, "id">) => {
       {
         label: "删除",
         icon: "i-tabler-trash",
-        click: () => {
-          console.log(row);
+        click: async () => {
+          await $fetch("/api/article", {
+            method: "DELETE",
+            query: { id: row.id },
+          });
+          await refresh();
         },
       },
     ],
