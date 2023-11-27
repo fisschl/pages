@@ -13,7 +13,7 @@ const columns = [
     label: "标题",
   },
   {
-    key: "update_at",
+    key: "update_time",
     label: "最近访问",
   },
   {
@@ -31,14 +31,14 @@ const links = computed(() => {
       path: "/editor",
       query: pick(item, "id"),
     };
-    const update_at = formatDistanceToNow(parseJSON(item.update_at), {
+    const update_time = formatDistanceToNow(parseJSON(item.update_time), {
       locale: zhCN,
       addSuffix: true,
     });
     return {
       ...item,
       to,
-      update_at,
+      update_time,
     };
   });
 });

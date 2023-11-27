@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   await redis.set(token, id, { EX: 8 * HOUR });
   await db.article.update({
     where: { id },
-    data: { update_at: new Date() },
+    data: { update_time: new Date() },
   });
   return token;
 });
