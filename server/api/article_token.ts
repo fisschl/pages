@@ -2,9 +2,6 @@ import { getRandomKey } from "../utils/password";
 import { HOUR } from "../utils/redis";
 import { checkUser } from "../utils/user";
 
-/**
- * 新增文章
- */
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const { id } = getQuery(event);
@@ -17,7 +14,7 @@ export default defineEventHandler(async (event) => {
   await redis.set(token, id, { EX: 8 * HOUR });
   await db.article.update({
     where: { id },
-    data: { updateAt: new Date() },
+    data: { update_at: new Date() },
   });
-  return { token };
+  return token;
 });

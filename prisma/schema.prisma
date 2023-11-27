@@ -16,9 +16,9 @@ model user {
 }
 
 model article {
-  id       String   @id @default(cuid())
-  name     String
-  body     Bytes?
-  users    user[]
-  updateAt DateTime @default(now()) @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  body      Bytes?
+  users     user[]
+  update_at DateTime @default(now()) @updatedAt
 }
