@@ -35,12 +35,12 @@ const hocuspocus = shallowRef<HocuspocusProvider>();
 
 onMounted(() => {
   const username = user.u?.name;
-  if (!username || !id || !token.value?.token) return;
+  if (!username || !id || !token.value) return;
   new IndexeddbPersistence(id, ydoc);
   hocuspocus.value = new HocuspocusProvider({
     url: "wss://fisschl.world/hocuspocus",
     name: id,
-    token: token.value.token,
+    token: token.value,
     preserveConnection: false,
     document: ydoc,
   });
