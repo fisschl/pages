@@ -1,14 +1,34 @@
 <script setup lang="ts">
-import StarterKit from "@tiptap/starter-kit";
-import Collaboration from "@tiptap/extension-collaboration";
 import { HocuspocusProvider } from "@hocuspocus/provider";
-import { Editor, EditorContent } from "@tiptap/vue-3";
+import Blockquote from "@tiptap/extension-blockquote";
+import Bold from "@tiptap/extension-bold";
+import BulletList from "@tiptap/extension-bullet-list";
+import Code from "@tiptap/extension-code";
+import CodeBlock from "@tiptap/extension-code-block";
+import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import Document from "@tiptap/extension-document";
+import Dropcursor from "@tiptap/extension-dropcursor";
+import Gapcursor from "@tiptap/extension-gapcursor";
+import HardBreak from "@tiptap/extension-hard-break";
+import Heading from "@tiptap/extension-heading";
+import Highlight from "@tiptap/extension-highlight";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import Image from "@tiptap/extension-image";
+import Italic from "@tiptap/extension-italic";
+import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
+import Paragraph from "@tiptap/extension-paragraph";
+import Placeholder from "@tiptap/extension-placeholder";
+import Strike from "@tiptap/extension-strike";
+import Text from "@tiptap/extension-text";
+import Typography from "@tiptap/extension-typography";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import { debounce, pick } from "lodash-es";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { Doc } from "yjs";
-import { debounce, pick } from "lodash-es";
-import Placeholder from "@tiptap/extension-placeholder";
-import CharacterCount from "@tiptap/extension-character-count";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
 
 const user = await useMustLogin();
 const route = useRoute();
@@ -45,13 +65,6 @@ onMounted(() => {
     preserveConnection: false,
     document: ydoc,
   });
-  const collaboration = Collaboration.configure({
-    document: hocuspocus.value.document,
-  });
-  const collaborationCursor = CollaborationCursor.configure({
-    provider: hocuspocus.value,
-    user: { name: username },
-  });
   editor.value = new Editor({
     editorProps: {
       attributes: {
@@ -59,13 +72,38 @@ onMounted(() => {
       },
     },
     extensions: [
-      StarterKit.configure({ history: false }),
-      collaboration,
-      collaborationCursor,
-      CharacterCount,
+      Collaboration.configure({
+        document: hocuspocus.value.document,
+      }),
+      CollaborationCursor.configure({
+        provider: hocuspocus.value,
+        user: { name: username },
+      }),
       Placeholder.configure({
         placeholder: "法律不容藐视，它自会证明它的价值。",
       }),
+      Highlight,
+      Typography,
+      Document,
+      Paragraph,
+      HorizontalRule,
+      Heading,
+      Strike,
+      Code,
+      Text,
+      Image,
+      Gapcursor,
+      Dropcursor,
+      Bold,
+      Italic,
+      OrderedList,
+      HardBreak,
+      Blockquote,
+      CodeBlock,
+      BulletList,
+      ListItem,
+      TaskList,
+      TaskItem,
     ],
   });
 });
@@ -153,6 +191,7 @@ const items = [
     <UButton
       size="xs"
       icon="i-tabler-bold"
+      title="粗体"
       :disabled="!editor.can().chain().focus().toggleBold().run()"
       :color="editor.isActive('bold') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleBold().run()"
@@ -160,6 +199,7 @@ const items = [
     <UButton
       size="xs"
       icon="i-tabler-italic"
+      title="斜体"
       :disabled="!editor.can().chain().focus().toggleItalic().run()"
       :color="editor.isActive('italic') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleItalic().run()"
@@ -167,6 +207,7 @@ const items = [
     <UButton
       size="xs"
       icon="i-tabler-strikethrough"
+      title="删除线"
       :disabled="!editor.can().chain().focus().toggleStrike().run()"
       :color="editor.isActive('strike') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleStrike().run()"
@@ -174,14 +215,24 @@ const items = [
     <UButton
       size="xs"
       icon="i-tabler-code"
+      title="代码"
       :disabled="!editor.can().chain().focus().toggleCode().run()"
       :color="editor.isActive('code') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleCode().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-highlight"
+      title="高亮"
+      :disabled="!editor.can().chain().focus().toggleHighlight().run()"
+      :color="editor.isActive('highlight') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleHighlight().run()"
     />
     <UButton size="xs" icon="i-tabler-eraser" color="white" @click="clear" />
     <UButton
       icon="i-tabler-letter-p"
       size="xs"
+      title="段落"
       :color="editor.isActive('paragraph') ? 'black' : 'white'"
       @click="editor.chain().focus().setParagraph().run()"
     />
@@ -189,67 +240,75 @@ const items = [
       <UButton
         size="xs"
         icon="i-tabler-heading"
+        title="标题"
         :color="editor.isActive('heading') ? 'black' : 'white'"
       />
     </UDropdown>
     <UButton
       size="xs"
+      icon="i-tabler-list"
+      title="列表"
       :color="editor.isActive('bulletList') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleBulletList().run()"
-    >
-      bullet list
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-list"
+      title="任务列表"
+      :color="editor.isActive('taskList') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleTaskList().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-list-numbers"
+      title="有序列表"
       :color="editor.isActive('orderedList') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleOrderedList().run()"
-    >
-      ordered list
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-source-code"
+      title="代码块"
       :color="editor.isActive('codeBlock') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleCodeBlock().run()"
-    >
-      code block
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-blockquote"
+      title="引用"
       :color="editor.isActive('blockquote') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleBlockquote().run()"
-    >
-      blockquote
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-spacing-vertical"
       color="white"
+      title="分割线"
       @click="editor.chain().focus().setHorizontalRule().run()"
-    >
-      horizontal rule
-    </UButton>
+    />
     <UButton
       size="xs"
       color="white"
+      title="强制换行"
+      icon="i-tabler-corner-down-left-double"
       @click="editor.chain().focus().setHardBreak().run()"
-    >
-      hard break
-    </UButton>
-    <UButton
-      size="xs"
-      color="white"
-      :disabled="!editor.can().chain().focus().undo().run()"
-      @click="editor.chain().focus().undo().run()"
-    >
-      undo
-    </UButton>
-    <UButton
-      size="xs"
-      color="white"
-      :disabled="!editor.can().chain().focus().redo().run()"
-      @click="editor.chain().focus().redo().run()"
-    >
-      redo
-    </UButton>
+    />
+    <UButtonGroup size="xs">
+      <UButton
+        color="white"
+        icon="i-tabler-arrow-back-up"
+        title="撤销"
+        :disabled="!editor.can().chain().focus().undo().run()"
+        @click="editor.chain().focus().undo().run()"
+      />
+      <UButton
+        color="white"
+        icon="i-tabler-arrow-forward-up"
+        title="重做"
+        :disabled="!editor.can().chain().focus().redo().run()"
+        @click="editor.chain().focus().redo().run()"
+      />
+    </UButtonGroup>
   </div>
   <EditorContent :editor="editor" class="mx-4 mb-10 mt-3 flex-1" />
 </template>
