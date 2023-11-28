@@ -14,6 +14,7 @@ const user = await useMustLogin();
 const route = useRoute();
 const id = route.query.id?.toString();
 if (!id) await navigateTo("/main/article");
+
 const headers = useRequestHeaders(["cookie"]);
 const { data: token } = await useFetch("/api/article_token", {
   headers,
@@ -80,6 +81,61 @@ const updateArticleName = debounce(async () => {
     body: pick(article.value, ["name", "id"]),
   });
 }, 500);
+
+/**
+ * 清除格式
+ */
+const clear = () => {
+  editor.value?.chain().focus().unsetAllMarks().run();
+  editor.value?.chain().focus().clearNodes().run();
+};
+
+const items = [
+  [
+    {
+      label: "一级标题",
+      icon: "i-tabler-h-1",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 1 }).run();
+      },
+    },
+    {
+      label: "二级标题",
+      icon: "i-tabler-h-2",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 2 }).run();
+      },
+    },
+    {
+      label: "三级标题",
+      icon: "i-tabler-h-3",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 3 }).run();
+      },
+    },
+    {
+      label: "四级标题",
+      icon: "i-tabler-h-4",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 4 }).run();
+      },
+    },
+    {
+      label: "五级标题",
+      icon: "i-tabler-h-5",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 5 }).run();
+      },
+    },
+    {
+      label: "六级标题",
+      icon: "i-tabler-h-6",
+      click: () => {
+        editor.value?.chain().focus().toggleHeading({ level: 6 }).run();
+      },
+    },
+  ],
+];
 </script>
 
 <template>
@@ -122,69 +178,20 @@ const updateArticleName = debounce(async () => {
       :color="editor.isActive('code') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleCode().run()"
     />
+    <UButton size="xs" icon="i-tabler-eraser" color="white" @click="clear" />
     <UButton
-      size="xs"
-      color="white"
-      @click="editor.chain().focus().unsetAllMarks().run()"
-    >
-      clear marks
-    </UButton>
-    <UButton
-      size="xs"
-      color="white"
-      @click="editor.chain().focus().clearNodes().run()"
-    >
-      clear nodes
-    </UButton>
-    <UButton
+      icon="i-tabler-letter-p"
       size="xs"
       :color="editor.isActive('paragraph') ? 'black' : 'white'"
       @click="editor.chain().focus().setParagraph().run()"
-    >
-      paragraph
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 1 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-    >
-      h1
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 2 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-    >
-      h2
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 3 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-    >
-      h3
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 4 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 4 }).run()"
-    >
-      h4
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 5 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 5 }).run()"
-    >
-      h5
-    </UButton>
-    <UButton
-      size="xs"
-      :color="editor.isActive('heading', { level: 6 }) ? 'black' : 'white'"
-      @click="editor.chain().focus().toggleHeading({ level: 6 }).run()"
-    >
-      h6
-    </UButton>
+    />
+    <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
+      <UButton
+        size="xs"
+        icon="i-tabler-heading"
+        :color="editor.isActive('heading') ? 'black' : 'white'"
+      />
+    </UDropdown>
     <UButton
       size="xs"
       :color="editor.isActive('bulletList') ? 'black' : 'white'"
