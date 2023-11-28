@@ -96,36 +96,32 @@ const updateArticleName = debounce(async () => {
   >
     <UButton
       size="xs"
+      icon="i-tabler-bold"
       :disabled="!editor.can().chain().focus().toggleBold().run()"
       :color="editor.isActive('bold') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleBold().run()"
-    >
-      bold
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-italic"
       :disabled="!editor.can().chain().focus().toggleItalic().run()"
       :color="editor.isActive('italic') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleItalic().run()"
-    >
-      italic
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-strikethrough"
       :disabled="!editor.can().chain().focus().toggleStrike().run()"
       :color="editor.isActive('strike') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleStrike().run()"
-    >
-      strike
-    </UButton>
+    />
     <UButton
       size="xs"
+      icon="i-tabler-code"
       :disabled="!editor.can().chain().focus().toggleCode().run()"
       :color="editor.isActive('code') ? 'black' : 'white'"
       @click="editor.chain().focus().toggleCode().run()"
-    >
-      code
-    </UButton>
+    />
     <UButton
       size="xs"
       color="white"
