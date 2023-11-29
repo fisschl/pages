@@ -1,4 +1,4 @@
-import { addDays, differenceInSeconds } from "date-fns";
+import { addDays } from "date-fns";
 
 export default defineEventHandler(async (event) => {
   const { name, password } = getQuery(event);
@@ -9,8 +9,7 @@ export default defineEventHandler(async (event) => {
   const token = getRandomKey();
   const expires = addDays(new Date(), 30);
   setCookie(event, "token", token, { expires, httpOnly: true });
-  await redis.set(token, JSON.stringify(user), {
-    EX: differenceInSeconds(expires, new Date()),
-  });
+  await redis.json.set(token, "$", user);
+  await redis.expireAt(token, expires);
   return true;
 });

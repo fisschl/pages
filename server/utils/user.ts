@@ -2,9 +2,9 @@ import type { user } from "@prisma/client";
 import type { H3Event, EventHandlerRequest } from "h3";
 
 export const getUser = async (token: string): Promise<user | undefined> => {
-  const str = await redis.get(token);
-  if (!str) return;
-  return JSON.parse(str);
+  const obj = await redis.json.get(token);
+  if (!obj) return;
+  return obj as user;
 };
 
 export const checkUser = async (
