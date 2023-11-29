@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
-import { formatDistanceToNow, parseJSON } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { formatDistanceToNow, parseJSON } from "date-fns/esm";
+import { zhCN } from "date-fns/esm/locale";
 import type { RouteLocationRaw } from "#vue-router";
 import type { article } from "@prisma/client";
 

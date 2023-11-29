@@ -1,4 +1,4 @@
-import { addDays, differenceInSeconds } from "date-fns";
+import { addDays, differenceInSeconds } from "date-fns/esm";
 
 export default defineEventHandler(async (event) => {
   const { name, password } = getQuery(event);
