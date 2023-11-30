@@ -34,6 +34,7 @@
     "gridstack": "^10.0.0",
     "lodash-es": "^4.17.21",
     "marked": "^10.0.0",
+    "meilisearch": "^0.36.0",
     "nanoid": "^5.0.3",
     "nuxt": "^3.8.2",
     "pinia": "^2.1.7",
