@@ -106,10 +106,10 @@ const items = [
 </script>
 
 <template>
-  <div v-if="article" class="flex items-center px-4 pb-3 pt-5">
+  <div v-if="article" class="flex items-center px-1 pb-1 pt-5">
     <input
       v-model="article.name"
-      class="flex-1 bg-transparent text-2xl outline-none"
+      class="flex-1 border-none bg-transparent text-2xl !ring-0"
       @input="updateArticleName"
     />
   </div>
