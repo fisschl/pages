@@ -1,17 +1,16 @@
+import { isString } from "lodash-es";
+import { meilisearch } from "../utils/meilisearch";
 import { checkUser } from "../utils/user";
-import { db } from "~/server/utils/db";
+
+export const articles = meilisearch.index("articles");
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
-  return db.article.findMany({
-    where: {
-      users: { some: user },
-    },
-    select: {
-      id: true,
-      name: true,
-      update_time: true,
-    },
-    orderBy: { update_time: "desc" },
+  const { search = "" } = getQuery(event);
+  if (!isString(search)) return;
+  const { hits } = await articles.search(search, {
+    filter: `users = ${user.id}`,
+    sort: search ? undefined : ["select_time:desc"],
   });
+  return hits;
 });
