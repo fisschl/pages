@@ -1,22 +1,17 @@
 import { omit } from "lodash-es";
 import { checkUser } from "../utils/user";
-import { z } from "zod";
-import { Item } from "../utils/zod";
-
-const Article = Item.extend({
-  name: z.string().optional(),
-});
+import type { article } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-  const param = Article.safeParse(await readBody(event));
-  if (!param.success) throw createError({ status: 400 });
+  const param: Partial<article> = await readBody(event);
+  if (!param.id) throw createError({ status: 400 });
   const user = await checkUser(event);
   const res = await db.article.update({
     where: {
-      id: param.data.id,
+      id: param.id,
       users: { some: user },
     },
-    data: { name: param.data.name },
+    data: omit(param, "id"),
   });
-  return omit(res, "body");
+  return !!res;
 });

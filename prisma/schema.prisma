@@ -18,7 +18,7 @@ model user {
 model article {
   id          String   @id @default(cuid())
   name        String
-  body        Bytes?
+  body        String   @default("法律不容藐视，它自会证明它的价值。")
   users       user[]
   update_time DateTime @default(now()) @updatedAt
 }
