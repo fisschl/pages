@@ -1,12 +1,12 @@
-import { checkUser } from "../utils/user";
 import type { article } from "@prisma/client";
-import { db } from "./user";
+import { prisma } from "./user";
+import { checkUser } from "~/server/api/login";
 
 export default defineEventHandler(async (event) => {
   const param: Partial<article> = await readBody(event);
   if (!param.id) throw createError({ status: 400 });
   const user = await checkUser(event);
-  return db.article.update({
+  return prisma.article.update({
     where: { id: param.id, users: { some: user }, deleted: false },
     data: { ...param },
   });

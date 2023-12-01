@@ -1,9 +1,13 @@
 import { isString, pick, throttle } from "lodash-es";
-import { meilisearch } from "../utils/meilisearch";
-import { checkUser } from "../utils/user";
 import { formatISO, parseISO } from "date-fns/esm";
-import { db } from "./user";
+import { prisma } from "./user";
+import { MeiliSearch } from "meilisearch";
+import { checkUser, redis } from "~/server/api/login";
 
+export const meilisearch = new MeiliSearch({
+  host: process.env.MEILISEARCH_HOST || "http://localhost:7700",
+  apiKey: process.env.MEILISEARCH_API_KEY,
+});
 export const articlesIndex = meilisearch.index("articles");
 
 export default defineEventHandler(async (event) => {
@@ -28,16 +32,16 @@ const syncArticle = throttle(async () => {
   const currentTime = new Date();
   await redis.set("meilisearch:articles:sync:time", formatISO(currentTime));
   // 删除已删除的
-  const deletedItems = await db.article.findMany({
+  const deletedItems = await prisma.article.findMany({
     where: { deleted: true },
     select: { id: true },
   });
   for (const { id } of deletedItems) {
     await articlesIndex.deleteDocument(id);
-    await db.article.delete({ where: { id } });
+    await prisma.article.delete({ where: { id } });
   }
   // 增量同步
-  const items = await db.article.findMany({
+  const items = await prisma.article.findMany({
     where: {
       update_time: { gte: lastSyncTime, lte: currentTime },
       deleted: false,
