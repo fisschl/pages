@@ -1,4 +1,4 @@
-import { omit } from "lodash-es";
+import { isString } from "lodash-es";
 import { checkUser } from "../utils/user";
 
 /**
@@ -7,12 +7,8 @@ import { checkUser } from "../utils/user";
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const { name } = await readBody(event);
-  if (!name) throw createError({ status: 400 });
-  const item = await db.article.create({
-    data: {
-      name,
-      users: { connect: user },
-    },
+  if (!name || !isString(name)) throw createError({ status: 400 });
+  return db.article.create({
+    data: { name, users: { connect: user } },
   });
-  return omit(item, "body");
 });
