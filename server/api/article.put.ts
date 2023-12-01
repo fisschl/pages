@@ -1,5 +1,6 @@
 import { checkUser } from "../utils/user";
 import type { article } from "@prisma/client";
+import { db } from "./user";
 
 export default defineEventHandler(async (event) => {
   const param: Partial<article> = await readBody(event);

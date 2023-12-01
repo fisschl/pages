@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { NuxtLink } from "#build/components";
-import type { article } from "@prisma/client";
 import { formatDistanceToNow, parseJSON } from "date-fns/esm";
 import { zhCN } from "date-fns/esm/locale";
 import { pick } from "lodash-es";
-import type { SerializeObject } from "nitropack";
+import type { Article } from "./article";
 
 const props = defineProps<{
-  item: SerializeObject<Omit<article, "body">>;
+  item: Article;
 }>();
 
 const emit = defineEmits<{

@@ -1,4 +1,5 @@
 import { isString } from "lodash-es";
+import { db } from "./user";
 
 export default defineEventHandler(async (event) => {
   const { id } = getQuery(event);
