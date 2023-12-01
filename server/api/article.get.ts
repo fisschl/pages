@@ -1,10 +1,12 @@
-import { Item } from "../utils/zod";
+import { isString } from "lodash-es";
 
 export default defineEventHandler(async (event) => {
-  const param = Item.safeParse(getQuery(event));
-  if (!param.success) throw createError({ status: 400 });
+  const { id } = getQuery(event);
+  if (!id || !isString(id)) throw createError({ status: 400 });
   const user = await checkUser(event);
-  return db.article.findUnique({
-    where: { id: param.data.id, users: { some: user } },
+  const res = db.article.update({
+    where: { id, users: { some: user } },
+    data: { update_time: new Date() },
   });
+  return res;
 });

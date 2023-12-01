@@ -1,15 +1,15 @@
-import { omit } from "lodash-es";
-import { Item } from "../utils/zod";
+import { isString, throttle } from "lodash-es";
+
+export const syncArticle = throttle(async () => {}, 10 * 1000);
 
 export default defineEventHandler(async (event) => {
-  const param = Item.safeParse(getQuery(event));
-  if (!param.success) throw createError({ status: 400 });
+  const { id } = getQuery(event);
+  if (!id || !isString(id)) throw createError({ status: 400 });
   const user = await checkUser(event);
-  const res = await db.article.delete({
-    where: {
-      id: param.data.id,
-      users: { some: user },
-    },
+  const res = await db.article.update({
+    where: { id, users: { some: user } },
+    data: { deleted: true },
   });
-  return omit(res, "body");
+  syncArticle();
+  return res;
 });

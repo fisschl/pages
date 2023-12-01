@@ -8,10 +8,8 @@ export default defineEventHandler(async (event) => {
       users: { some: user },
     },
     select: {
-      id: true,
-      name: true,
-      update_time: true,
+      body: false,
     },
-    orderBy: { update_time: "desc" },
+    orderBy: { select_time: "desc" },
   });
 });

@@ -21,4 +21,6 @@ model article {
   body        String   @default("法律不容藐视，它自会证明它的价值。")
   users       user[]
   update_time DateTime @default(now()) @updatedAt
+  select_time DateTime @default(now())
+  deleted     Boolean  @default(false)
 }
