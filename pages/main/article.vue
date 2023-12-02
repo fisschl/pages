@@ -38,7 +38,7 @@ const handleSearch = debounce(() => refresh(), 500);
       icon="i-tabler-search"
       @input="handleSearch"
     />
-    <UButton class="px-6" @click="handleCreate"> 新建 </UButton>
+    <UButton icon="i-tabler-plus" @click="handleCreate"> 新建 </UButton>
   </div>
   <ArticleListItem
     v-for="item in data"

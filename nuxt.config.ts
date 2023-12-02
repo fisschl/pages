@@ -8,21 +8,7 @@ export default defineNuxtConfig({
     "@nuxt/content",
     "@pinia/nuxt",
   ],
-  app: {
-    head: {
-      link: [
-        {
-          rel: "preconnect",
-          href: "https://cdn.fisschl.world",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://cdn.fisschl.world/MiSans/font.css",
-        },
-      ],
-      script: [],
-    },
-  },
+  app: {},
   devtools: { enabled: true },
   ui: {
     icons: ["tabler"],

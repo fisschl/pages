@@ -5,24 +5,33 @@ import StarterKit from "@tiptap/starter-kit";
 import Typography from "@tiptap/extension-typography";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import Link from "@tiptap/extension-link";
+import clsx from "clsx";
 import { debounce, pick } from "lodash-es";
 
 const route = useRoute();
 const id = route.query.id?.toString();
 if (!id) await navigateTo("/main/article");
+
 const headers = useRequestHeaders(["cookie"]);
 const { data: article } = await useFetch("/api/article", {
   headers,
   query: { id },
 });
+
+useHead({
+  title: article.value?.name,
+});
+
 const editor = shallowRef<Editor>();
+
+const $style = useCssModule();
 
 onMounted(() => {
   editor.value = new Editor({
     content: article.value?.body,
     editorProps: {
       attributes: {
-        class: "prose dark:prose-invert max-w-none outline-none",
+        class: clsx("prose dark:prose-invert", $style.tiptap),
       },
     },
     extensions: [StarterKit, Highlight, Typography, Image, Link],
@@ -215,12 +224,15 @@ const items = [
       />
     </div>
   </div>
-  <EditorContent :editor="editor" class="mx-4 mt-3 flex-1 pb-10" />
+  <EditorContent :editor="editor" class="mx-4 mt-3" />
+  <p class="cursor-text pb-36" @click="editor?.commands.focus('end')"></p>
 </template>
 
-<style module></style>
-
-<style>
+<style module>
+.tiptap {
+  max-width: none;
+  outline: none;
+}
 .tiptap > * p {
   margin: 0;
 }

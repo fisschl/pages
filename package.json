@@ -30,6 +30,7 @@
     "@vueuse/core": "^10.6.1",
     "@vueuse/nuxt": "^10.6.1",
     "@vueuse/router": "^10.6.1",
+    "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "gridstack": "^10.0.0",
     "lodash-es": "^4.17.21",

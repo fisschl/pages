@@ -12,7 +12,7 @@ const nav = useNavStore();
       :class="$style.navbar"
       class="z-10 md:sticky"
     />
-    <main class="flex-1">
+    <main class="flex-1 overflow-hidden">
       <NuxtPage />
     </main>
   </div>

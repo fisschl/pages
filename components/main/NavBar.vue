@@ -53,7 +53,7 @@ const links = reactive([
 </script>
 
 <template>
-  <nav class="overflow-y-auto px-3 py-4">
+  <nav class="flex-shrink-0 overflow-y-auto px-3 py-4">
     <template v-for="group in links" :key="group.label">
       <b class="mx-1 mb-2 mt-3 block text-sm">
         {{ group.label }}

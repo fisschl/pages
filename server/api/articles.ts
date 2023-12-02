@@ -18,6 +18,10 @@ export default defineEventHandler(async (event) => {
   const { hits } = await articlesIndex.search(query.search, {
     filter: `users = ${user.id}`,
     sort: query.search ? undefined : ["update_time:desc"],
+    attributesToHighlight: ["name", "body"],
+    attributesToCrop: ["body"],
+    cropLength: 20,
+    attributesToRetrieve: ["id", "name", "body", "update_time"],
   });
   syncArticle();
   return hits.map((item) => {
@@ -26,7 +30,7 @@ export default defineEventHandler(async (event) => {
   });
 });
 
-const syncArticle = throttle(async () => {
+export const syncArticle = throttle(async () => {
   const lastSyncTimeISO = await redis.get("meilisearch:articles:sync:time");
   const lastSyncTime = parseISO(lastSyncTimeISO || "2023-10-24T19:21:54+08:00");
   const currentTime = new Date();
