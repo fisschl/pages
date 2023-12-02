@@ -15,6 +15,7 @@ export interface ArticleSearchResult {
   name: string;
   body: string;
   update_time: string;
+  shared: boolean;
 }
 
 export default defineEventHandler(async (event) => {
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
       attributesToHighlight: ["body"],
       attributesToCrop: ["body"],
       cropLength: 20,
-      attributesToRetrieve: ["id", "name", "body", "update_time"],
+      attributesToRetrieve: ["id", "name", "body", "update_time", "shared"],
     },
   );
   syncArticle();
@@ -65,7 +66,7 @@ export const syncArticle = throttle(async () => {
   const documents = items.map((item) => {
     const users = item.users.map((user) => user.id);
     return {
-      ...pick(item, ["id", "name", "update_time"]),
+      ...pick(item, ["id", "name", "update_time", "shared"]),
       body: item.body.replace(/<[^>]+>/g, " "),
       users,
     };

@@ -11,7 +11,9 @@ import { useTitle } from "@vueuse/core";
 
 const $style = useCssModule();
 
+const user = useUserStore();
 const route = useRoute();
+
 const id = route.query.id?.toString();
 if (!id) await navigateTo("/main/article");
 
@@ -21,6 +23,8 @@ const body = ref("");
 
 const editor = shallowRef<Editor>();
 
+const shared = ref(false);
+
 onMounted(async () => {
   const res = await $fetch("/api/article", {
     query: { id },
@@ -28,6 +32,7 @@ onMounted(async () => {
   if (!res) return;
   title.value = res.name;
   body.value = res.body;
+  shared.value = res.shared;
   editor.value = new Editor({
     content: body.value,
     editorProps: {
@@ -44,6 +49,7 @@ onMounted(async () => {
         body: { id, body: html },
       });
     }, 500),
+    editable: !!user.u,
   });
   loading.value = false;
 });
@@ -67,7 +73,7 @@ const clear = () => {
   editor.value?.chain().focus().clearNodes().run();
 };
 
-const items = [
+const headerOptions = [
   [
     {
       label: "一级标题",
@@ -113,117 +119,143 @@ const items = [
     },
   ],
 ];
+
+const toast = useToast();
+
+const articleOptions = computed(() => {
+  return [
+    [
+      {
+        label: shared.value ? "取消共享" : "共享",
+        icon: shared.value ? "i-tabler-share-off" : "i-tabler-share",
+        click: async () => {
+          shared.value = !shared.value;
+          await $fetch("/api/article", {
+            method: "PUT",
+            body: { id, shared: shared.value },
+          });
+          if (shared.value) toast.add({ title: "已共享，所有人均可阅读" });
+          else toast.add({ title: "已取消共享，仅协作者可访问" });
+        },
+      },
+    ],
+  ];
+});
 </script>
 
 <template>
-  <div class="flex items-center px-1 pb-2 pt-5">
+  <div class="flex items-center overflow-x-auto px-4 pb-3 pt-5">
     <input
       v-model="title"
-      class="flex-1 border-none bg-transparent text-xl !ring-0"
+      class="flex-1 border-none bg-transparent p-0 text-xl !ring-0"
       @input="updateArticleName"
     />
+    <UDropdown v-if="user.u" mode="hover" :items="articleOptions">
+      <UButton icon="i-tabler-menu" color="white" variant="ghost" />
+    </UDropdown>
   </div>
-  <div v-if="editor" class="sticky top-0 z-10 bg-zinc-50 dark:bg-zinc-900">
-    <div class="flex flex-wrap items-center gap-2 px-4 py-2">
-      <UButton
-        v-if="editor.can().chain().focus().toggleBold().run()"
-        size="xs"
-        icon="i-tabler-bold"
-        title="粗体"
-        :color="editor.isActive('bold') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleBold().run()"
-      />
-      <UButton
-        v-if="editor.can().chain().focus().toggleItalic().run()"
-        size="xs"
-        icon="i-tabler-italic"
-        title="斜体"
-        :color="editor.isActive('italic') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleItalic().run()"
-      />
-      <UButton
-        v-if="editor.can().chain().focus().toggleStrike().run()"
-        size="xs"
-        icon="i-tabler-strikethrough"
-        title="删除线"
-        :color="editor.isActive('strike') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleStrike().run()"
-      />
-      <UButton
-        v-if="editor.can().chain().focus().toggleCode().run()"
-        size="xs"
-        icon="i-tabler-code"
-        title="代码"
-        :color="editor.isActive('code') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleCode().run()"
-      />
-      <UButton
-        v-if="editor.can().chain().focus().toggleHighlight().run()"
-        size="xs"
-        icon="i-tabler-highlight"
-        title="高亮"
-        :color="editor.isActive('highlight') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleHighlight().run()"
-      />
-      <UButton size="xs" icon="i-tabler-eraser" color="white" @click="clear" />
-      <UButton
-        icon="i-tabler-letter-p"
-        size="xs"
-        title="段落"
-        :color="editor.isActive('paragraph') ? 'black' : 'white'"
-        @click="editor.chain().focus().setParagraph().run()"
-      />
-      <UDropdown :items="items" mode="hover">
-        <UButton
-          size="xs"
-          icon="i-tabler-heading"
-          title="标题"
-          :color="editor.isActive('heading') ? 'black' : 'white'"
-        />
-      </UDropdown>
+  <div
+    v-if="editor"
+    class="sticky top-0 z-10 flex items-center gap-2 overflow-x-auto bg-zinc-50 px-4 py-2 dark:bg-zinc-900"
+  >
+    <UButton
+      v-if="editor.can().chain().focus().toggleBold().run()"
+      size="xs"
+      icon="i-tabler-bold"
+      title="粗体"
+      :color="editor.isActive('bold') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleBold().run()"
+    />
+    <UButton
+      v-if="editor.can().chain().focus().toggleItalic().run()"
+      size="xs"
+      icon="i-tabler-italic"
+      title="斜体"
+      :color="editor.isActive('italic') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleItalic().run()"
+    />
+    <UButton
+      v-if="editor.can().chain().focus().toggleStrike().run()"
+      size="xs"
+      icon="i-tabler-strikethrough"
+      title="删除线"
+      :color="editor.isActive('strike') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleStrike().run()"
+    />
+    <UButton
+      v-if="editor.can().chain().focus().toggleCode().run()"
+      size="xs"
+      icon="i-tabler-code"
+      title="代码"
+      :color="editor.isActive('code') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleCode().run()"
+    />
+    <UButton
+      v-if="editor.can().chain().focus().toggleHighlight().run()"
+      size="xs"
+      icon="i-tabler-highlight"
+      title="高亮"
+      :color="editor.isActive('highlight') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleHighlight().run()"
+    />
+    <UButton size="xs" icon="i-tabler-eraser" color="white" @click="clear" />
+    <UButton
+      icon="i-tabler-letter-p"
+      size="xs"
+      title="段落"
+      :color="editor.isActive('paragraph') ? 'black' : 'white'"
+      @click="editor.chain().focus().setParagraph().run()"
+    />
+    <UDropdown :items="headerOptions" mode="hover">
       <UButton
         size="xs"
-        icon="i-tabler-list"
-        title="列表"
-        :color="editor.isActive('bulletList') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleBulletList().run()"
+        icon="i-tabler-heading"
+        title="标题"
+        :color="editor.isActive('heading') ? 'black' : 'white'"
       />
-      <UButton
-        size="xs"
-        icon="i-tabler-list-numbers"
-        title="有序列表"
-        :color="editor.isActive('orderedList') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleOrderedList().run()"
-      />
-      <UButton
-        size="xs"
-        icon="i-tabler-source-code"
-        title="代码块"
-        :color="editor.isActive('codeBlock') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleCodeBlock().run()"
-      />
-      <UButton
-        size="xs"
-        icon="i-tabler-blockquote"
-        title="引用"
-        :color="editor.isActive('blockquote') ? 'black' : 'white'"
-        @click="editor.chain().focus().toggleBlockquote().run()"
-      />
-      <UButton
-        size="xs"
-        icon="i-tabler-spacing-vertical"
-        color="white"
-        title="分割线"
-        @click="editor.chain().focus().setHorizontalRule().run()"
-      />
-      <UButton
-        size="xs"
-        color="white"
-        title="强制换行"
-        icon="i-tabler-corner-down-left-double"
-        @click="editor.chain().focus().setHardBreak().run()"
-      />
-    </div>
+    </UDropdown>
+    <UButton
+      size="xs"
+      icon="i-tabler-list"
+      title="列表"
+      :color="editor.isActive('bulletList') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleBulletList().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-list-numbers"
+      title="有序列表"
+      :color="editor.isActive('orderedList') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleOrderedList().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-source-code"
+      title="代码块"
+      :color="editor.isActive('codeBlock') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleCodeBlock().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-blockquote"
+      title="引用"
+      :color="editor.isActive('blockquote') ? 'black' : 'white'"
+      @click="editor.chain().focus().toggleBlockquote().run()"
+    />
+    <UButton
+      size="xs"
+      icon="i-tabler-spacing-vertical"
+      color="white"
+      title="分割线"
+      @click="editor.chain().focus().setHorizontalRule().run()"
+    />
+    <UButton
+      size="xs"
+      color="white"
+      title="强制换行"
+      icon="i-tabler-corner-down-left-double"
+      @click="editor.chain().focus().setHardBreak().run()"
+    />
   </div>
   <EditorContent :editor="editor" class="mx-4 mt-4" />
   <p class="cursor-text pb-36" @click="editor?.commands.focus('end')"></p>

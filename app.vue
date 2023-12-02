@@ -14,6 +14,7 @@ store.u = data.value || undefined;
     </Head>
     <Body>
       <NuxtPage />
+      <UNotifications />
     </Body>
   </Html>
 </template>

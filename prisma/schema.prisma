@@ -22,4 +22,5 @@ model article {
   users       user[]
   update_time DateTime @default(now()) @updatedAt
   deleted     Boolean  @default(false)
+  shared      Boolean  @default(false)
 }
