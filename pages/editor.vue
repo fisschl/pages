@@ -58,7 +58,8 @@ onBeforeUnmount(() => {
   editor.value?.destroy();
 });
 
-const updateArticleName = debounce(async () => {
+const updateArticleName = debounce(async (text: string) => {
+  title.value = text.trim();
   await $fetch("/api/article", {
     method: "PUT",
     body: { id, name: title.value },
@@ -141,21 +142,38 @@ const articleOptions = computed(() => {
     ],
   ];
 });
+
+const isTitleEdit = ref(false);
+
+const handleTitleEdit = () => {
+  if (!editor.value?.isEditable) return;
+  isTitleEdit.value = true;
+};
 </script>
 
 <template>
-  <div class="flex items-center overflow-x-auto px-4 pb-3 pt-5">
-    <input
-      v-model="title"
-      class="flex-1 border-none bg-transparent p-0 text-xl !ring-0"
-      @input="updateArticleName"
+  <div class="flex items-center overflow-x-auto px-4 pb-2 pt-6">
+    <h1
+      v-if="!isTitleEdit"
+      class="mr-2 flex-1 cursor-text truncate text-xl"
+      @click="handleTitleEdit"
+    >
+      {{ title }}
+    </h1>
+    <UInput
+      v-if="isTitleEdit"
+      class="mr-2 flex-1"
+      autofocus
+      :model-value="title || undefined"
+      @update:model-value="updateArticleName"
+      @blur="isTitleEdit = false"
     />
     <UDropdown v-if="user.u" mode="hover" :items="articleOptions">
       <UButton icon="i-tabler-menu" color="white" variant="ghost" />
     </UDropdown>
   </div>
   <div
-    v-if="editor"
+    v-if="editor?.isEditable"
     class="sticky top-0 z-10 flex items-center gap-2 overflow-x-auto bg-zinc-50 px-4 py-2 dark:bg-zinc-900"
   >
     <UButton
@@ -258,7 +276,12 @@ const articleOptions = computed(() => {
     />
   </div>
   <EditorContent :editor="editor" class="mx-4 mt-4" />
-  <p class="cursor-text pb-36" @click="editor?.commands.focus('end')"></p>
+  <p
+    v-if="editor?.isEditable"
+    class="cursor-text pb-36"
+    @click="editor?.commands.focus('end')"
+  ></p>
+  <p v-if="!editor?.isEditable" class="pb-32"></p>
   <div v-if="loading" :class="$style.loader" class="backdrop-blur-lg">
     <UIcon name="i-tabler-loader" class="animate-spin text-2xl" />
   </div>
