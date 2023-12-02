@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   setCookie(event, "token", token, { expires, httpOnly: true });
   await redis.json.set(token, "$", user);
   await redis.expireAt(token, expires);
-  return true;
+  return { message: "登陆成功" };
 });
 
 export const redis = (() => {
