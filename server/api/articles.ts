@@ -10,24 +10,31 @@ export const meilisearch = new MeiliSearch({
 });
 export const articlesIndex = meilisearch.index("articles");
 
+export interface ArticleSearchResult {
+  id: string;
+  name: string;
+  body: string;
+  update_time: string;
+}
+
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const query = getQuery(event);
   if (!query.search) query.search = "";
   if (!isString(query.search)) return;
-  const { hits } = await articlesIndex.search(query.search, {
-    filter: `users = ${user.id}`,
-    sort: query.search ? undefined : ["update_time:desc"],
-    attributesToHighlight: ["name", "body"],
-    attributesToCrop: ["body"],
-    cropLength: 20,
-    attributesToRetrieve: ["id", "name", "body", "update_time"],
-  });
+  const { hits } = await articlesIndex.search<ArticleSearchResult>(
+    query.search,
+    {
+      filter: `users = ${user.id}`,
+      sort: query.search ? undefined : ["update_time:desc"],
+      attributesToHighlight: ["body"],
+      attributesToCrop: ["body"],
+      cropLength: 20,
+      attributesToRetrieve: ["id", "name", "body", "update_time"],
+    },
+  );
   syncArticle();
-  return hits.map((item) => {
-    delete item.users;
-    return item;
-  });
+  return hits;
 });
 
 export const syncArticle = throttle(async () => {

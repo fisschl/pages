@@ -6,29 +6,30 @@ import Typography from "@tiptap/extension-typography";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import Link from "@tiptap/extension-link";
 import clsx from "clsx";
-import { debounce, pick } from "lodash-es";
+import { debounce } from "lodash-es";
+import { useTitle } from "@vueuse/core";
+
+const $style = useCssModule();
 
 const route = useRoute();
 const id = route.query.id?.toString();
 if (!id) await navigateTo("/main/article");
 
-const headers = useRequestHeaders(["cookie"]);
-const { data: article } = await useFetch("/api/article", {
-  headers,
-  query: { id },
-});
-
-useHead({
-  title: article.value?.name,
-});
+const title = useTitle();
+const loading = ref(true);
+const body = ref("");
 
 const editor = shallowRef<Editor>();
 
-const $style = useCssModule();
-
-onMounted(() => {
+onMounted(async () => {
+  const res = await $fetch("/api/article", {
+    query: { id },
+  });
+  if (!res) return;
+  title.value = res.name;
+  body.value = res.body;
   editor.value = new Editor({
-    content: article.value?.body,
+    content: body.value,
     editorProps: {
       attributes: {
         class: clsx("prose dark:prose-invert", $style.tiptap),
@@ -37,14 +38,14 @@ onMounted(() => {
     extensions: [StarterKit, Highlight, Typography, Image, Link],
     onUpdate: debounce(async (opt) => {
       const html = opt.editor.getHTML();
-      if (!article.value) return;
-      article.value.body = html;
+      body.value = html;
       await $fetch("/api/article", {
         method: "PUT",
-        body: pick(article.value, ["id", "body"]),
+        body: { id, body: html },
       });
     }, 500),
   });
+  loading.value = false;
 });
 
 onBeforeUnmount(() => {
@@ -54,7 +55,7 @@ onBeforeUnmount(() => {
 const updateArticleName = debounce(async () => {
   await $fetch("/api/article", {
     method: "PUT",
-    body: pick(article.value, ["id", "name"]),
+    body: { id, name: title.value },
   });
 }, 500);
 
@@ -115,10 +116,10 @@ const items = [
 </script>
 
 <template>
-  <div v-if="article" class="flex items-center px-1 pb-1 pt-5">
+  <div class="flex items-center px-1 pb-2 pt-5">
     <input
-      v-model="article.name"
-      class="flex-1 border-none bg-transparent text-2xl !ring-0"
+      v-model="title"
+      class="flex-1 border-none bg-transparent text-xl !ring-0"
       @input="updateArticleName"
     />
   </div>
@@ -224,8 +225,11 @@ const items = [
       />
     </div>
   </div>
-  <EditorContent :editor="editor" class="mx-4 mt-3" />
+  <EditorContent :editor="editor" class="mx-4 mt-4" />
   <p class="cursor-text pb-36" @click="editor?.commands.focus('end')"></p>
+  <div v-if="loading" :class="$style.loader" class="backdrop-blur-lg">
+    <UIcon name="i-tabler-loader" class="animate-spin text-2xl" />
+  </div>
 </template>
 
 <style module>
@@ -235,5 +239,16 @@ const items = [
 }
 .tiptap > * p {
   margin: 0;
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
 }
 </style>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { debounce, pick } from "lodash-es";
-import type { Article } from "~/components/article/article";
 
 await useMustLogin();
 
@@ -9,7 +8,7 @@ const queryParams = reactive({
 });
 
 const headers = useRequestHeaders(["cookie"]);
-const { data, refresh } = await useFetch<Article[]>("/api/articles", {
+const { data, refresh } = await useFetch("/api/articles", {
   headers,
   query: queryParams,
   watch: false,
