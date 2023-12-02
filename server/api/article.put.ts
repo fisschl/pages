@@ -1,7 +1,9 @@
 import type { article } from "@prisma/client";
 import { prisma } from "./user";
 import { checkUser } from "~/server/api/login";
-import { syncArticle } from "./articles";
+
+
+import { trySyncArticlesIndex } from "~/server/api/articles";
 
 export default defineEventHandler(async (event) => {
   const param: Partial<article> = await readBody(event);
@@ -11,6 +13,6 @@ export default defineEventHandler(async (event) => {
     where: { id: param.id, users: { some: user }, deleted: false },
     data: { ...param },
   });
-  syncArticle();
+  trySyncArticlesIndex();
   return res;
 });

@@ -1,7 +1,9 @@
 import { isString } from "lodash-es";
 import { prisma } from "./user";
 import { checkUser } from "~/server/api/login";
-import { syncArticle } from "./articles";
+
+
+import { trySyncArticlesIndex } from "~/server/api/articles";
 
 /**
  * 新增文章
@@ -17,6 +19,6 @@ export default defineEventHandler(async (event) => {
       body: "法律不容藐视，它自会证明它的价值。",
     },
   });
-  syncArticle();
+  trySyncArticlesIndex();
   return res;
 });
