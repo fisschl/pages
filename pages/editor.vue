@@ -25,6 +25,14 @@ const editor = shallowRef<Editor>();
 
 const shared = ref(false);
 
+const handleFetchUpdate = debounce(async (html: string) => {
+  body.value = html;
+  await $fetch("/api/article", {
+    method: "PUT",
+    body: { id, body: html },
+  });
+}, 500);
+
 onMounted(async () => {
   const res = await $fetch("/api/article", {
     query: { id },
@@ -41,14 +49,10 @@ onMounted(async () => {
       },
     },
     extensions: [StarterKit, Highlight, Typography, Image, Link],
-    onUpdate: debounce(async (opt) => {
-      const html = opt.editor.getHTML();
-      body.value = html;
-      await $fetch("/api/article", {
-        method: "PUT",
-        body: { id, body: html },
-      });
-    }, 500),
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      handleFetchUpdate(html);
+    },
     editable: !!user.u,
   });
   loading.value = false;
