@@ -27,10 +27,12 @@ export const meilisearch = new MeiliSearch({
 });
 export const indexArticles = createMeiliSearchArticlesIndex();
 export const trySyncArticlesIndex = throttle(async () => {
-  const lastSyncTimeISO = await redis.get("meilisearch:articles:sync:time");
-  const lastSyncTime = parseISO(lastSyncTimeISO || "2023-10-24T19:21:54+08:00");
   const currentTime = new Date();
-  await redis.set("meilisearch:articles:sync:time", formatISO(currentTime));
+  const lastSyncTimeISO = await redis.getSet(
+    "meilisearch:articles:sync:time",
+    formatISO(currentTime),
+  );
+  const lastSyncTime = parseISO(lastSyncTimeISO || "2023-10-24T19:21:54+08:00");
   // 删除已删除的
   const deletedItems = await prisma.article.findMany({
     where: { deleted: true },

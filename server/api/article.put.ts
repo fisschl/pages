@@ -1,8 +1,6 @@
 import type { article } from "@prisma/client";
 import { prisma } from "./user";
 import { checkUser } from "~/server/api/login";
-
-
 import { trySyncArticlesIndex } from "~/server/api/articles";
 
 export default defineEventHandler(async (event) => {
