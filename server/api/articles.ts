@@ -12,21 +12,19 @@ export interface ArticleSearchResult {
   shared: boolean;
 }
 
-const createMeiliSearchArticlesIndex = () => {
-  const index = meilisearch.index("articles");
-  if (process.env.REFRESH === "true") {
-    console.log("Refreshing Articles Index");
-    index.updateFilterableAttributes(["users"]);
-    index.updateSearchableAttributes(["update_time"]);
-  }
-  return index;
-};
 export const meilisearch = new MeiliSearch({
   host: process.env.MEILISEARCH_HOST || "http://localhost:7700",
   apiKey: process.env.MEILISEARCH_API_KEY,
 });
-export const indexArticles = createMeiliSearchArticlesIndex();
+
+export const indexArticles = meilisearch.index("articles");
+
 export const trySyncArticlesIndex = throttle(async () => {
+  const res = await redis.set("meilisearch:articles:sync:lock", "1", {
+    EX: 3,
+    NX: true,
+  });
+  if (res !== "OK") return;
   const currentTime = new Date();
   const lastSyncTimeISO = await redis.getSet(
     "meilisearch:articles:sync:time",
@@ -63,7 +61,7 @@ export const trySyncArticlesIndex = throttle(async () => {
   });
   await indexArticles.addDocuments(documents, { primaryKey: "id" });
   console.log("Sync Articles Index Success", documents.length);
-}, 5 * 1000);
+}, 500);
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
