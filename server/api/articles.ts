@@ -66,8 +66,7 @@ export const trySyncArticlesIndex = throttle(async () => {
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const query = getQuery(event);
-  if (!query.search) query.search = "";
-  if (!isString(query.search)) return;
+  if (!isString(query.search)) query.search = "";
   const { hits } = await indexArticles.search<ArticleSearchResult>(
     query.search,
     {

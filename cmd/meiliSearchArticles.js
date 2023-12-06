@@ -8,4 +8,5 @@ export const meilisearch = new MeiliSearch({
 const index = meilisearch.index("articles");
 
 await index.updateFilterableAttributes(["users"]);
-await index.updateSearchableAttributes(["update_time"]);
+await index.updateSortableAttributes(["update_time"]);
+await index.updateSearchableAttributes(["id", "name", "body"]);
