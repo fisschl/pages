@@ -1,8 +1,10 @@
 import { addDays } from "date-fns/esm";
 import { prisma, redis } from "./user";
-import { getRandomKey, hashPassword } from "./register";
+import { hashPassword } from "./register";
+import { typeid } from "typeid-js";
 import { user } from "@prisma/client";
 import type { EventHandlerRequest, H3Event } from "h3";
+import { nanoid } from "nanoid";
 
 export default defineEventHandler(async (event) => {
   const { name, password } = getQuery(event);
@@ -10,7 +12,7 @@ export default defineEventHandler(async (event) => {
     where: { name: String(name), password: hashPassword(String(password)) },
   });
   if (!user) throw createError({ status: 401 });
-  const token = getRandomKey();
+  const token = typeid().toString() + nanoid(32);
   const expires = addDays(new Date(), 30);
   setCookie(event, "token", token, { expires, httpOnly: true });
   await redis.json.set(token, "$", user);

@@ -19,11 +19,11 @@ export const highlightAll = debounce((element: ElementParam) => {
     const matches = code.className.match(/language-(\w+)/) || [];
     const lang = matches[1];
     if (!text || !lang) return;
-    const html = await $fetch("/api/highlight", {
+    const res = await $fetch("/api/highlight", {
       method: "POST",
       body: JSON.stringify({ text, lang }),
     });
-    const ele = parseHtml(html);
+    const ele = parseHtml(res.code);
     if (!ele) return;
     ele.dataset.lang = lang;
     const pre = code.closest("pre") || code;

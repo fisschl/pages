@@ -18,11 +18,11 @@ const submit = debounce(async () => {
     body: { extension, text },
   });
   params.text = text;
-  const html = await $fetch("/api/highlight", {
+  const { code } = await $fetch("/api/highlight", {
     method: "POST",
     body: { text, lang: extension },
   });
-  highlightHtml.value = html;
+  highlightHtml.value = code;
 }, 500);
 
 const { copy, copied } = useClipboard();
@@ -50,5 +50,3 @@ const { copy, copied } = useClipboard();
     ></article>
   </div>
 </template>
-
-<style module></style>

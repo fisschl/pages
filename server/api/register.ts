@@ -1,6 +1,4 @@
 import { prisma } from "./user";
-import { nanoid } from "nanoid";
-import { Buffer } from "buffer";
 import { createHash } from "crypto";
 
 export default defineEventHandler(async (event) => {
@@ -20,9 +18,4 @@ export const hashPassword = (password: string): string => {
   return createHash("sha512")
     .update(password + SALT)
     .digest("base64url");
-};
-
-export const getRandomKey = () => {
-  const bytes = crypto.getRandomValues(new Uint8Array(32));
-  return nanoid() + Buffer.from(bytes).toString("base64url");
 };

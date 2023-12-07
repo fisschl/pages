@@ -13,11 +13,6 @@ const links = reactive([
         icon: "i-tabler-indent-increase",
         to: "/main/format",
       },
-      {
-        label: "文章",
-        icon: "i-tabler-article",
-        to: "/main/article",
-      },
     ],
   },
   {
