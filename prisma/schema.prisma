@@ -13,3 +13,41 @@ model user {
   name     String @unique
   password String
 }
+
+model table {
+  id     String   @id @default(cuid())
+  name   String
+  column column[]
+  row    row[]
+}
+
+model column {
+  id       String @id @default(cuid())
+  name     String
+  table    table  @relation(fields: [table_id], references: [id])
+  table_id String
+  cell     cell[]
+
+  @@index([table_id])
+}
+
+model row {
+  id       String @id @default(cuid())
+  table    table  @relation(fields: [table_id], references: [id])
+  table_id String
+  cell     cell[]
+
+  @@index([table_id])
+}
+
+model cell {
+  value     String
+  row       row    @relation(fields: [row_id], references: [id])
+  row_id    String
+  column    column @relation(fields: [column_id], references: [id])
+  column_id String
+
+  @@id([row_id, column_id])
+  @@index([row_id])
+  @@index([column_id])
+}
