@@ -35,9 +35,6 @@ dependencies:
   '@tiptap/extension-document':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)
-  '@tiptap/extension-hard-break':
-    specifier: ^2.1.13
-    version: 2.1.13(@tiptap/core@2.1.13)
   '@tiptap/extension-paragraph':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)
@@ -2421,14 +2418,6 @@ packages:
       '@tiptap/core': 2.1.13(@tiptap/pm@2.1.13)
       '@tiptap/pm': 2.1.13
       tippy.js: 6.3.7
-    dev: false
-
-  /@tiptap/extension-hard-break@2.1.13(@tiptap/core@2.1.13):
-    resolution: {integrity: sha512-TGkMzMQayuKg+vN4du0x1ahEItBLcCT1jdWeRsjdM8gHfzbPLdo4PQhVsvm1I0xaZmbJZelhnVsUwRZcIu1WNA==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-    dependencies:
-      '@tiptap/core': 2.1.13(@tiptap/pm@2.1.13)
     dev: false
 
   /@tiptap/extension-paragraph@2.1.13(@tiptap/core@2.1.13):

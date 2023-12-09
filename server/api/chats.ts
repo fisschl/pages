@@ -7,6 +7,6 @@ export default defineEventHandler(async (event) => {
   return prisma.chat.findMany({
     skip: parseInt(query.skip) || 0,
     take: 20,
-    orderBy: { create_time: "asc" },
+    orderBy: { create_time: "desc" },
   });
 });
