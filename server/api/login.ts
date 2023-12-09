@@ -1,4 +1,4 @@
-import { addDays } from "date-fns/esm";
+import addDays from "date-fns/esm/addDays";
 import { prisma, redis } from "./user";
 import { hashPassword } from "./register";
 import { typeid } from "typeid-js";
@@ -20,18 +20,10 @@ export default defineEventHandler(async (event) => {
   return { message: "登陆成功" };
 });
 
-export const getUser = async (token: string): Promise<user | undefined> => {
-  const obj = await redis.json.get(token);
-  if (!obj) return;
-  return obj as user;
-};
-
-export const checkUser = async (
-  event: H3Event<EventHandlerRequest>,
-): Promise<user> => {
+export const checkUser = async (event: H3Event<EventHandlerRequest>) => {
   const token = getCookie(event, "token");
   if (!token) throw createError({ status: 401 });
-  const user = await getUser(token);
+  const user = await redis.json.get(token);
   if (!user) throw createError({ status: 403 });
-  return user;
+  return user as user;
 };

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   await prisma.user.create({
     data: { name, password: hashPassword(password) },
   });
-  return true;
+  return { message: "注册成功" };
 });
 
 const SALT = "GO GO GO!";

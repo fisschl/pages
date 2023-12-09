@@ -51,3 +51,9 @@ model cell {
   @@index([row_id])
   @@index([column_id])
 }
+
+model chat {
+  id          String   @id @default(cuid())
+  message     String
+  create_time DateTime @default(now())
+}

@@ -8,12 +8,11 @@ export default defineEventHandler(async (event) => {
   return checkUser(event);
 });
 const createRedisClient = () => {
-  const redis = createClient({
+  const client = createClient({
     url: process.env.REDIS_URL,
   });
-  redis.on("error", (err) => console.log("Redis Client Error", err));
-  redis.connect().then(() => console.log("Redis Connected"));
-  return redis;
+  client.connect();
+  return client;
 };
 export const redis = createRedisClient();
 export const HOUR = 60 * 60;
