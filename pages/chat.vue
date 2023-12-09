@@ -4,11 +4,11 @@ import Text from "@tiptap/extension-text";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import Paragraph from "@tiptap/extension-paragraph";
 import { parseJSON } from "date-fns/esm";
+import { debounce } from "lodash-es";
 import DOMPurify from "dompurify";
 
 const editor = shallowRef<Editor>();
 const text = ref("");
-const form = ref<HTMLElement>();
 
 const submit = async () => {
   if (!text.value) return;
@@ -26,12 +26,6 @@ const CustomDocument = Document.extend({
       submit();
       return true;
     },
-    "Shift-Enter": () => {
-      return editor.value!.commands.splitBlock();
-    },
-    "Mod-Enter": () => {
-      return editor.value!.commands.splitBlock();
-    },
   }),
 });
 
@@ -48,11 +42,6 @@ onMounted(() => {
       text.value = editor.getHTML();
     },
   });
-});
-
-const isBreak = computed(() => {
-  const p = form.value?.querySelector(`.tiptap p:nth-child(2)`);
-  return text.value && p;
 });
 
 interface Message {
@@ -82,6 +71,14 @@ const load = async () => {
 const container = ref<HTMLElement>();
 const { y } = useScroll(container);
 
+whenever(
+  () => y.value < 20,
+  debounce(async () => {
+    if (!list.value.length) return;
+    await load();
+  }, 100),
+);
+
 onMounted(async () => {
   await load();
   await nextTick();
@@ -109,8 +106,13 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="container" class="h-screen overflow-auto">
-    <ol>
-      <li v-for="item in list" :key="item.id" class="group px-4 py-1">
+    <ol class="mb-3 flex flex-col">
+      <li
+        v-for="item in list"
+        :key="item.id"
+        class="group self-start px-3 py-2"
+        :data-key="item.id"
+      >
         <p
           class="px-3 py-1 text-xs text-transparent group-hover:text-gray-300 dark:group-hover:text-gray-500"
         >
@@ -122,30 +124,17 @@ onBeforeUnmount(() => {
         ></article>
       </li>
     </ol>
-    <div class="sticky bottom-0 px-4 py-3">
-      <form
-        ref="form"
-        class="overflow-hidden rounded-md border-2 border-gray-200 bg-zinc-100 pb-2 dark:border-gray-600 dark:bg-zinc-800"
-        :class="$style.editBox"
-      >
-        <EditorContent
-          :editor="editor"
-          :class="[$style.editor, isBreak ? 'w-full' : '']"
-          class="inline-block break-all px-3"
-        />
-        <UButton
-          icon="i-tabler-send"
-          class="float-right mx-2 mt-2 w-20 justify-center"
-          @click="submit"
-        />
-      </form>
-    </div>
+    <EditorContent
+      class="sticky bottom-0 cursor-text bg-zinc-100 px-4 py-3 dark:bg-zinc-800"
+      :editor="editor"
+      :class="$style.editor"
+      @click="editor?.commands.focus()"
+    />
   </div>
 </template>
 
 <style module>
-.editBox .editor {
-  min-width: calc(100% - 7rem);
-  padding-top: 0.78rem;
+.editor {
+  min-height: 3rem;
 }
 </style>
