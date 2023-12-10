@@ -30,7 +30,6 @@
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "dompurify": "^3.0.6",
-    "gridstack": "^10.0.0",
     "lodash-es": "^4.17.21",
     "meilisearch": "^0.36.0",
     "nanoid": "^5.0.4",
