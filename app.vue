@@ -6,13 +6,13 @@ store.u = data.value || undefined;
 </script>
 
 <template>
-  <Html :class="$style.root">
+  <Html lang="zh">
     <Head>
       <Title> My Site </Title>
       <Link rel="preconnect" href="https://cdn.fisschl.world" />
       <Link rel="stylesheet" href="https://cdn.fisschl.world/MiSans/font.css" />
     </Head>
-    <Body>
+    <Body :class="$style.root">
       <NuxtPage />
       <UNotifications />
     </Body>
@@ -21,6 +21,9 @@ store.u = data.value || undefined;
 
 <style module>
 .root {
-  --header-height: 3.5rem;
+  --main-header-height: 3.5rem;
+  --main-navbar-width: 12rem;
+  display: flex;
+  flex-direction: column;
 }
 </style>

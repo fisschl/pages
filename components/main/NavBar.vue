@@ -57,5 +57,3 @@ const links = reactive([
     </template>
   </nav>
 </template>
-
-<style module></style>

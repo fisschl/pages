@@ -24,7 +24,7 @@ const user = useUserStore();
 
 <style module>
 .header {
-  height: var(--header-height);
+  height: var(--main-header-height);
   display: flex;
   align-items: center;
   position: sticky;
