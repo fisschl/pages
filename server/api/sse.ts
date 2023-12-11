@@ -1,4 +1,14 @@
-import { subscriber } from "./chat";
+import { redis } from "./user";
+
+const createPubSub = () => {
+  const publisher = redis.duplicate();
+  publisher.connect();
+  const subscriber = redis.duplicate();
+  subscriber.connect();
+  return { publisher, subscriber };
+};
+
+export const { publisher, subscriber } = createPubSub();
 
 export default defineEventHandler(async (event) => {
   setHeaders(event, {

@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
 
-const params = reactive<{
+const params = useLocalStorage<{
   text?: string;
   extension?: string;
-}>({});
+}>("format-params", {});
+
+const extensions = ["json", "yaml", "md", "vue", "html", "js", "ts", "css"];
 
 const highlightHtml = ref<string>();
 
 const submit = debounce(async () => {
-  let { extension, text } = params;
+  let { extension, text } = params.value;
   extension = extension?.trim().toLowerCase();
   text = text?.trim();
   if (!extension || !text) return;
@@ -17,7 +19,7 @@ const submit = debounce(async () => {
     method: "POST",
     body: { extension, text },
   });
-  params.text = text;
+  params.value.text = text;
   const { code } = await $fetch("/api/highlight", {
     method: "POST",
     body: { text, lang: extension },
@@ -31,7 +33,11 @@ const { copy, copied } = useClipboard();
 <template>
   <UForm :state="params" class="mx-3 mb-3 mt-5" @submit.prevent>
     <UFormGroup label="扩展名" name="extension" class="mb-3 max-w-xs">
-      <UInput v-model="params.extension" @update:model-value="submit" />
+      <USelectMenu
+        v-model="params.extension"
+        :options="extensions"
+        @update:model-value="submit"
+      />
     </UFormGroup>
     <UFormGroup label="文本" name="text">
       <UTextarea v-model="params.text" :rows="5" @update:model-value="submit" />
