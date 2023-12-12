@@ -25,10 +25,8 @@ const user = useUserStore();
 <style module>
 .header {
   height: var(--main-header-height);
+  width: 100%;
   display: flex;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
 }
 </style>

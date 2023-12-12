@@ -23,7 +23,5 @@ store.u = data.value || undefined;
 .root {
   --main-header-height: 3.5rem;
   --main-navbar-width: 12rem;
-  display: flex;
-  flex-direction: column;
 }
 </style>

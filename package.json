@@ -8,7 +8,9 @@
     "preview": "nuxt preview --host",
     "cz": "git add . && czg",
     "postinstall": "nuxt prepare && pnpm gen",
-    "gen": "prisma generate"
+    "gen": "prisma generate",
+    "docker:build": "docker build -t registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest .",
+    "docker:push": "docker push registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest"
   },
   "dependencies": {
     "@iconify-json/tabler": "^1.1.100",
