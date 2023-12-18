@@ -29,6 +29,11 @@ const data = computed(() => {
     }
   }
 });
+
+const to = computed(() => {
+  const qs = new URLSearchParams({ id: props.item.id });
+  return `/main/poetry?${qs}`;
+});
 </script>
 
 <template>
@@ -37,11 +42,13 @@ const data = computed(() => {
       <span class="font-bold"> {{ data.title }} </span>
       <span class="text-sm text-gray-400"> {{ data.author }} </span>
     </p>
-    <div
-      :class="$style.content"
-      class="text-sm text-zinc-600 dark:text-zinc-200"
-      v-html="data.content"
-    ></div>
+    <NuxtLink :to="to">
+      <p
+        :class="$style.content"
+        class="text-sm text-zinc-600 dark:text-zinc-200"
+        v-html="data.content"
+      ></p>
+    </NuxtLink>
   </article>
 </template>
 
