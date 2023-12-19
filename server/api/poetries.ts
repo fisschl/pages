@@ -1,11 +1,12 @@
 import { MeiliSearch } from "meilisearch";
 import { z } from "zod";
 import { pick } from "lodash-es";
+import { getOptionsQueryFilter, OptionsQuerySchema } from "~/utils/query";
 
 const QuerySchema = z.object({
   keyword: z.string().default(""),
   offset: z.number().default(0),
-  library: z.string(),
+  library: OptionsQuerySchema,
 });
 
 export const meilisearch = new MeiliSearch({
@@ -17,18 +18,19 @@ export const poetriesIndex = meilisearch.index("poetries");
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
+  console.log(query);
   const { keyword, offset, library } = QuerySchema.parse(query);
-  const attributes = ["content", "paragraphs"];
+  const filter = getOptionsQueryFilter("library", library);
   const res = await poetriesIndex.search(keyword, {
     limit: 24,
     offset,
-    filter: `library = ${library}`,
-    attributesToCrop: attributes,
+    filter,
+    attributesToCrop: ["content"],
     cropLength: 50,
-    attributesToHighlight: attributes,
+    attributesToHighlight: ["content"],
   });
   return res.hits.map((item) => {
-    Object.assign(item, pick(item._formatted, attributes));
+    Object.assign(item, pick(item._formatted, "content"));
     delete item._formatted;
     return item;
   });
