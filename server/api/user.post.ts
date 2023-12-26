@@ -1,5 +1,5 @@
-import { prisma } from "./user";
 import { createHash } from "crypto";
+import { prisma } from "./session.get";
 
 export default defineEventHandler(async (event) => {
   const { name, password } = await readBody(event);

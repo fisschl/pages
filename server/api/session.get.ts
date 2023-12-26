@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { checkUser } from "~/server/api/login";
 import { createClient } from "redis";
+import { checkUser } from "./session.post";
 
 export const prisma = new PrismaClient();
 

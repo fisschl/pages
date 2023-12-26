@@ -1,28 +1,25 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
 
-const params = useLocalStorage<{
-  text?: string;
-  extension?: string;
-}>("format-params", {});
+const params = useLocalStorage("format-params", {
+  text: "",
+  extension: "json",
+});
 
 const extensions = ["json", "yaml", "md", "vue", "html", "js", "ts", "css"];
 
 const highlightHtml = ref<string>();
 
 const submit = debounce(async () => {
-  let { extension, text } = params.value;
-  extension = extension?.trim().toLowerCase();
-  text = text?.trim();
-  if (!extension || !text) return;
-  text = await $fetch("/api/format", {
+  if (!params.value.text) return;
+  const res = await $fetch("/api/format", {
     method: "POST",
-    body: { extension, text },
+    body: params.value,
   });
-  params.value.text = text;
+  params.value.text = res;
   const { code } = await $fetch("/api/highlight", {
     method: "POST",
-    body: { text, lang: extension },
+    body: { text: res, lang: params.value.extension },
   });
   highlightHtml.value = code;
 }, 500);

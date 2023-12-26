@@ -18,7 +18,6 @@ export const poetriesIndex = meilisearch.index("poetries");
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  console.log(query);
   const { keyword, offset, library } = QuerySchema.parse(query);
   const filter = getOptionsQueryFilter("library", library);
   const res = await poetriesIndex.search(keyword, {

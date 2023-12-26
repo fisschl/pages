@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const store = useUserStore();
 const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch("/api/user", { headers });
+const { data } = await useFetch("/api/session", { headers });
 store.u = data.value || undefined;
 </script>
 

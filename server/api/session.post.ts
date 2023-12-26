@@ -1,13 +1,13 @@
-import addDays from "date-fns/esm/addDays";
-import { prisma, redis } from "./user";
-import { hashPassword } from "./register";
+import { hashPassword } from "./user.post";
 import { typeid } from "typeid-js";
 import { user } from "@prisma/client";
 import type { EventHandlerRequest, H3Event } from "h3";
+import { addDays } from "date-fns";
 import { nanoid } from "nanoid";
+import { prisma, redis } from "./session.get";
 
 export default defineEventHandler(async (event) => {
-  const { name, password } = getQuery(event);
+  const { name, password } = await readBody(event);
   const user = await prisma.user.findFirst({
     where: { name: String(name), password: hashPassword(String(password)) },
   });

@@ -3,6 +3,12 @@ import { useNavStore } from "~/composables/nav";
 
 const nav = useNavStore();
 const user = useUserStore();
+
+const route = useRoute();
+const loginPath = computed(() => {
+  const qs = new URLSearchParams({ from: route.fullPath });
+  return `/login?${qs}`;
+});
 </script>
 
 <template>
@@ -14,6 +20,13 @@ const user = useUserStore();
     <UBadge v-if="user.u">
       {{ user.u?.name }}
     </UBadge>
+    <NuxtLink
+      v-else
+      :to="loginPath"
+      class="flex items-center hover:text-gray-600 dark:hover:text-gray-300"
+    >
+      <UIcon name="i-tabler-user" style="font-size: 18px" />
+    </NuxtLink>
     <UToggle
       v-model="nav.visible"
       on-icon="i-tabler-menu"

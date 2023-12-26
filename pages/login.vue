@@ -20,7 +20,7 @@ const route = useRoute();
 const onSubmit = async () => {
   if (!validate()) return;
   if (isRegister.value) {
-    await $fetch("/api/register", {
+    await $fetch("/api/user", {
       method: "POST",
       body: state,
       onResponseError: () => {
@@ -28,17 +28,18 @@ const onSubmit = async () => {
       },
     });
   }
-  await $fetch("/api/login", {
-    query: state,
+  await $fetch("/api/session", {
+    method: "POST",
+    body: state,
     onResponseError: () => {
       errors.value.password = "用户名或密码错误";
     },
   });
-  const u = await $fetch("/api/user");
+  const u = await $fetch("/api/session");
   store.u = u;
   const { from } = route.query;
   if (typeof from !== "string") return;
-  await router.push(from || "/");
+  await router.push(from);
 };
 </script>
 
