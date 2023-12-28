@@ -2,19 +2,19 @@ import { createHash } from "crypto";
 import { prisma } from "./session.get";
 
 export default defineEventHandler(async (event) => {
-  const { name, password } = await readBody(event);
-  if (!name || !password) {
-    throw createError({ status: 400 });
-  }
+  const req = await readBody(event);
+  const password = hashPassword(req.password);
+  if (!password) throw createError({ status: 400 });
   await prisma.user.create({
-    data: { name, password: hashPassword(password) },
+    data: { ...req, password },
   });
   return { message: "注册成功" };
 });
 
 const SALT = "GO GO GO!";
 
-export const hashPassword = (password: string): string => {
+export const hashPassword = (password: string) => {
+  if (!password) return undefined;
   return createHash("sha512")
     .update(password + SALT)
     .digest("base64url");

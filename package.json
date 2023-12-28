@@ -29,6 +29,7 @@
     "@vueuse/core": "^10.7.0",
     "@vueuse/nuxt": "^10.7.0",
     "@vueuse/router": "^10.7.0",
+    "ali-oss": "^6.19.0",
     "clsx": "^2.0.0",
     "date-fns": "^3.0.6",
     "dompurify": "^3.0.6",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.2.0",
+    "@types/ali-oss": "^6.16.11",
     "@types/dompurify": "^3.0.5",
     "@types/lodash-es": "^4.17.12",
     "czg": "^1.8.0",

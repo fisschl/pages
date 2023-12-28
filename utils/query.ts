@@ -6,9 +6,11 @@ export const OptionsQuerySchema = z
   .union([z.string(), z.array(z.string())])
   .optional();
 
-export type GetSetTuple<T> = [ComputedRef<T>, (value: T) => void];
+export type UseOptionsQueryReturn<T> = [ComputedRef<T>, (value: T) => void];
 
-export const useOptionsQuery = (key: string): GetSetTuple<string[]> => {
+export const useOptionsQuery = (
+  key: string,
+): UseOptionsQueryReturn<string[]> => {
   const route = useRoute();
   const options = computed(() => {
     const item = route.query[key];

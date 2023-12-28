@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const links = reactive([
+const route = useRoute();
+
+const links = computed(() => [
   {
     label: "工具",
     children: [
@@ -45,17 +47,33 @@ const links = reactive([
     ],
   },
 ]);
+
+const loginPath = computed(() => {
+  const qs = new URLSearchParams({ from: route.fullPath });
+  return `/login?${qs}`;
+});
+
+const user = useUserStore();
 </script>
 
 <template>
   <nav
-    class="overflow-y-auto bg-zinc-100 px-3 py-4 backdrop-blur dark:bg-zinc-700/30"
+    class="flex flex-col bg-zinc-100 px-3 pb-2 pt-4 backdrop-blur dark:bg-zinc-700/30"
   >
-    <template v-for="group in links" :key="group.label">
-      <b class="mx-1 mb-2 mt-3 block text-sm">
-        {{ group.label }}
-      </b>
-      <UVerticalNavigation :links="group.children" />
-    </template>
+    <div class="flex-1">
+      <template v-for="group in links" :key="group.label">
+        <b class="mx-1 mb-2 mt-3 block text-sm">
+          {{ group.label }}
+        </b>
+        <UVerticalNavigation :links="group.children" />
+      </template>
+    </div>
+    <UButton v-if="user.u" to="/main/user" color="gray" variant="ghost">
+      {{ user.u?.name }}
+    </UButton>
+    <UButton v-else :to="loginPath" variant="ghost" color="gray">
+      <UAvatar icon="i-tabler-user" size="sm" />
+      <span class="ml-2"> 登录 </span>
+    </UButton>
   </nav>
 </template>
