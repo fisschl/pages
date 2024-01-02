@@ -20,23 +20,26 @@ const route = useRoute();
 const onSubmit = async () => {
   if (!validate()) return;
   if (isRegister.value) {
-    await $fetch("/api/user", {
+    try {
+      await $fetch("/api/user", {
+        method: "POST",
+        body: state,
+      });
+    } catch (e) {
+      errors.value.name = "用户名已存在";
+      return;
+    }
+  }
+  try {
+    await $fetch("/api/session", {
       method: "POST",
       body: state,
-      onResponseError: () => {
-        errors.value.name = "用户名已存在";
-      },
     });
+  } catch (e) {
+    errors.value.password = "用户名或密码错误";
+    return;
   }
-  await $fetch("/api/session", {
-    method: "POST",
-    body: state,
-    onResponseError: () => {
-      errors.value.password = "用户名或密码错误";
-    },
-  });
-  const u = await $fetch("/api/session");
-  store.u = u;
+  store.user = await $fetch<user>("/api/user");
   const { from } = route.query;
   if (typeof from !== "string") return;
   await router.push(from);

@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
-import { prisma } from "./session.get";
+
+import { prisma } from "~/server/api/user.get";
 
 export default defineEventHandler(async (event) => {
   const req = await readBody(event);
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
 const SALT = "GO GO GO!";
 
-export const hashPassword = (password: string) => {
+export const hashPassword = (password?: string) => {
   if (!password) return undefined;
   return createHash("sha512")
     .update(password + SALT)

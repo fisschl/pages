@@ -4,7 +4,8 @@ import { user } from "@prisma/client";
 import type { EventHandlerRequest, H3Event } from "h3";
 import { addDays } from "date-fns";
 import { nanoid } from "nanoid";
-import { prisma, redis } from "./session.get";
+import { isString } from "lodash-es";
+import { prisma, redis } from "~/server/api/user.get";
 
 export default defineEventHandler(async (event) => {
   const { name, password } = await readBody(event);
@@ -20,10 +21,19 @@ export default defineEventHandler(async (event) => {
   return { message: "登陆成功" };
 });
 
+export const getToken = (event: H3Event<EventHandlerRequest>) => {
+  const cookie = getCookie(event, "token");
+  if (cookie) return cookie;
+  const query = getQuery(event);
+  if (isString(query.token)) return query.token;
+  return undefined;
+};
+
 export const checkUser = async (event: H3Event<EventHandlerRequest>) => {
-  const token = getCookie(event, "token");
+  const token = getToken(event);
   if (!token) throw createError({ status: 401 });
-  const user = await redis.json.get(token);
+  const user: any = await redis.json.get(token);
   if (!user) throw createError({ status: 403 });
-  return user as user;
+  user.token = token;
+  return user as user & { token: string };
 };

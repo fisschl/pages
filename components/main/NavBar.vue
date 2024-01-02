@@ -68,11 +68,19 @@ const user = useUserStore();
         <UVerticalNavigation :links="group.children" />
       </template>
     </div>
-    <UButton v-if="user.u" to="/main/user" color="gray" variant="ghost">
-      {{ user.u?.name }}
+    <UButton v-if="user.user" to="/main/user" color="gray" variant="ghost">
+      <template #leading>
+        <UAvatar v-if="user.user?.profile" size="xs" src="/api/profile" />
+        <UAvatar v-else size="xs" icon="i-tabler-user" />
+      </template>
+      <span class="ml-2">
+        {{ user.user?.name }}
+      </span>
     </UButton>
     <UButton v-else :to="loginPath" variant="ghost" color="gray">
-      <UAvatar icon="i-tabler-user" size="sm" />
+      <template #leading>
+        <UAvatar icon="i-tabler-user" size="sm" />
+      </template>
       <span class="ml-2"> 登录 </span>
     </UButton>
   </nav>

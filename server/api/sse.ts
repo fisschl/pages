@@ -1,4 +1,4 @@
-import { redis } from "./session.get";
+import { redis } from "~/server/api/user.get";
 
 const createPubSub = () => {
   const publisher = redis.duplicate();
