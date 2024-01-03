@@ -17,7 +17,11 @@ dialog.onChange(async (files) => {
     body: file,
   });
   if (!user.user) return;
-  user.user.profile = file.name;
+  const res = await $fetch("/api/user", {
+    method: "PUT",
+    body: pick(user.user, ["profile"]),
+  });
+  user.user = res;
 });
 
 const handleChangeAvatar = () => {
