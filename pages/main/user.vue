@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
+import { useUserStore } from "#imports";
 
 const user = useUserStore();
 
@@ -32,7 +33,7 @@ const handleChangeAvatar = () => {
 <template>
   <div class="mx-4 py-4">
     <button title="更改头像" @click="handleChangeAvatar">
-      <UAvatar v-if="user.user?.profile" size="lg" src="/api/profile" />
+      <UAvatar v-if="user.avatar" size="lg" :src="user.avatar" />
       <UAvatar v-else size="lg" icon="i-tabler-user" />
     </button>
   </div>

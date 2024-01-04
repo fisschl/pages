@@ -9,8 +9,9 @@ datasource db {
 }
 
 model user {
-  id       String  @id @default(cuid())
-  name     String  @unique
-  password String
-  profile  String?
+  id        String   @id @default(cuid())
+  name      String   @unique
+  password  String
+  profile   String?
+  update_at DateTime @default(now()) @updatedAt
 }
