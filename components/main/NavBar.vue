@@ -15,6 +15,16 @@ const links = computed(() => [
         icon: "i-tabler-indent-increase",
         to: "/main/format",
       },
+      {
+        label: "变量名转换",
+        icon: "i-tabler-letter-case",
+        to: "/main/case",
+      },
+      {
+        label: "二维码生成",
+        icon: "i-tabler-qrcode",
+        to: "/main/qrcode",
+      },
     ],
   },
   {

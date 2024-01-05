@@ -23,30 +23,29 @@ const submit = debounce(async () => {
   });
   highlightHtml.value = code;
 }, 500);
-
-const { copy, copied } = useClipboard();
 </script>
 
 <template>
-  <UForm :state="params" class="mx-3 mb-3 mt-5" @submit.prevent>
+  <UForm :state="params" class="mb-4 px-4 pt-5" @submit.prevent>
     <UFormGroup label="扩展名" name="extension" class="mb-3 max-w-xs">
       <USelectMenu
         v-model="params.extension"
         :options="extensions"
+        size="lg"
         @update:model-value="submit"
       />
     </UFormGroup>
     <UFormGroup label="文本" name="text">
-      <UTextarea v-model="params.text" :rows="5" @update:model-value="submit" />
+      <UTextarea
+        v-model="params.text"
+        size="lg"
+        :rows="5"
+        @update:model-value="submit"
+      />
     </UFormGroup>
   </UForm>
   <div v-if="params.text && highlightHtml" class="relative mx-3">
-    <UButton
-      class="absolute right-2 top-2"
-      variant="link"
-      :icon="copied ? 'i-tabler-checks' : 'i-tabler-copy'"
-      @click="copy(params.text)"
-    />
+    <CopyButton class="absolute right-2 top-2" :text="params.text" />
     <article
       class="prose max-w-none dark:prose-invert"
       v-html="highlightHtml"
