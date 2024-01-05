@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
-import { useUserStore } from "#imports";
+import { type User, useUserStore } from "#imports";
 
 const user = useUserStore();
 
@@ -18,11 +18,10 @@ dialog.onChange(async (files) => {
     body: file,
   });
   if (!user.user) return;
-  const res = await $fetch("/api/user", {
+  user.user = await $fetch<User>("/api/user", {
     method: "PUT",
     body: pick(user.user, ["profile"]),
   });
-  user.user = res;
 });
 
 const handleChangeAvatar = () => {

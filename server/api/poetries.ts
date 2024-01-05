@@ -21,11 +21,11 @@ export default defineEventHandler(async (event) => {
   const { keyword, offset, library } = QuerySchema.parse(query);
   const filter = getOptionsQueryFilter("library", library);
   const res = await poetriesIndex.search(keyword, {
-    limit: 24,
+    limit: 64,
     offset,
     filter,
     attributesToCrop: ["content"],
-    cropLength: 50,
+    cropLength: 64,
     attributesToHighlight: ["content"],
   });
   return res.hits.map((item) => {
