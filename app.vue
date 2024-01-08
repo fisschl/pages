@@ -8,7 +8,7 @@ store.user = data.value || undefined;
 <template>
   <Html lang="zh-CN">
     <Head>
-      <Title> My Site </Title>
+      <Title> 沅有茝兮醴有兰 </Title>
       <Link rel="preconnect" href="https://cdn.fisschl.world" />
       <Link rel="stylesheet" href="https://cdn.fisschl.world/MiSans/font.css" />
     </Head>
