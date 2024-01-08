@@ -12,14 +12,14 @@ const highlightHtml = ref<string>();
 
 const submit = debounce(async () => {
   if (!params.value.text) return;
-  const res = await $fetch("/api/format", {
+  const { text } = await $fetch("/api/format", {
     method: "POST",
     body: params.value,
   });
-  params.value.text = res;
+  params.value.text = text;
   const { code } = await $fetch("/api/highlight", {
     method: "POST",
-    body: { text: res, lang: params.value.extension },
+    body: { text, lang: params.value.extension },
   });
   highlightHtml.value = code;
 }, 500);
