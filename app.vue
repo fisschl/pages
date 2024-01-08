@@ -6,7 +6,7 @@ store.user = data.value || undefined;
 </script>
 
 <template>
-  <Html lang="zh">
+  <Html lang="zh-CN">
     <Head>
       <Title> My Site </Title>
       <Link rel="preconnect" href="https://cdn.fisschl.world" />
