@@ -7,6 +7,7 @@ import {
   pathCase,
   snakeCase,
 } from "change-case";
+import { useLocalStorage } from "#imports";
 
 const types = [
   {
@@ -34,8 +35,8 @@ const types = [
     name: "hello_world",
   },
 ];
-const input = ref("hello world");
-const type = ref("helloWorld");
+const input = useLocalStorage("case-input", "hello world");
+const type = useLocalStorage("case-type", "helloWorld");
 
 const result = computed(() => {
   const item = types.find((item) => item.name === type.value);

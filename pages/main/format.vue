@@ -8,7 +8,7 @@ const params = useLocalStorage("format-params", {
 
 const extensions = ["json", "yaml", "md", "vue", "html", "js", "ts", "css"];
 
-const highlightHtml = ref<string>();
+const highlightHtml = useLocalStorage("format-highlight-html", "");
 
 const submit = debounce(async () => {
   if (!params.value.text) return;
