@@ -13,7 +13,7 @@
     "docker:push": "docker push registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest"
   },
   "dependencies": {
-    "@iconify-json/tabler": "^1.1.102",
+    "@iconify-json/tabler": "^1.1.103",
     "@nuxt/content": "^2.10.0",
     "@nuxt/devtools": "^1.0.6",
     "@nuxt/image": "^1.1.0",
@@ -33,20 +33,20 @@
     "ali-oss": "^6.19.0",
     "change-case": "^5.3.0",
     "clsx": "^2.1.0",
-    "date-fns": "^3.0.6",
-    "dompurify": "^3.0.6",
+    "date-fns": "^3.1.0",
+    "dompurify": "^3.0.8",
     "lodash-es": "^4.17.21",
     "marked": "^11.1.1",
     "meilisearch": "^0.36.0",
     "nanoid": "^5.0.4",
-    "nuxt": "^3.9.0",
+    "nuxt": "^3.9.1",
     "pinia": "^2.1.7",
     "prettier": "^3.1.1",
     "prisma": "^5.7.1",
     "qrcode": "^1.5.3",
     "redis": "^4.6.12",
     "shiki": "^0.14.7",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^3.4.1",
     "typeid-js": "^0.3.0",
     "zod": "^3.22.4"
   },
@@ -59,7 +59,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
-    "prettier-plugin-tailwindcss": "^0.5.10",
+    "prettier-plugin-tailwindcss": "^0.5.11",
     "typescript": "^5.3.3"
   },
   "prettier": {

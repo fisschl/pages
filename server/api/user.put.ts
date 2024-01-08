@@ -1,6 +1,7 @@
 import { hashPassword } from "./user.post";
-import { checkUser, setUserCache } from "./session.post";
-import { prisma } from "~/server/api/user.get";
+import { checkUser } from "./session.post";
+import { prisma } from "~/server/utils/db";
+import { redis } from "~/server/utils/redis";
 
 export default defineEventHandler(async (event) => {
   const { id } = await checkUser(event);
@@ -10,6 +11,6 @@ export default defineEventHandler(async (event) => {
     where: { id },
     data: { ...req, password },
   });
-  await setUserCache(user);
+  await redis.del(user.id);
   return user;
 });

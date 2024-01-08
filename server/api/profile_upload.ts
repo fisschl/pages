@@ -1,14 +1,6 @@
-import OSS from "ali-oss";
 import { checkUser } from "~/server/api/session.post";
 import { z } from "zod";
-
-export const oss = new OSS({
-  region: process.env.OSS_REGION,
-  accessKeyId: process.env.OSS_ACCESSKEY_ID!,
-  accessKeySecret: process.env.OSS_ACCESSKEY_SECRET!,
-  bucket: process.env.OSS_BUCKET,
-  secure: true,
-});
+import { oss } from "~/server/utils/oss";
 
 const QuerySchema = z.object({
   name: z.string(),

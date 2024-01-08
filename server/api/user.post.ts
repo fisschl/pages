@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 
-import { prisma } from "~/server/api/user.get";
+
+import { prisma } from "~/server/utils/db";
 
 export default defineEventHandler(async (event) => {
   const req = await readBody(event);

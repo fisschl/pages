@@ -1,17 +1,12 @@
-import { MeiliSearch } from "meilisearch";
 import { z } from "zod";
 import { pick } from "lodash-es";
 import { getOptionsQueryFilter, OptionsQuerySchema } from "~/utils/query";
+import { meilisearch } from "~/server/utils/meilisearch";
 
 const QuerySchema = z.object({
   keyword: z.string().default(""),
   offset: z.number().default(0),
   library: OptionsQuerySchema,
-});
-
-export const meilisearch = new MeiliSearch({
-  host: process.env.MEILISEARCH_HOST || "http://localhost:7700",
-  apiKey: process.env.MEILISEARCH_API_KEY,
 });
 
 export const poetriesIndex = meilisearch.index("poetries");

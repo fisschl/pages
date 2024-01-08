@@ -1,4 +1,4 @@
-import { redis } from "~/server/api/user.get";
+import { redis } from "~/server/utils/redis";
 
 const createPubSub = () => {
   const publisher = redis.duplicate();

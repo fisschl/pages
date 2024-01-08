@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
     "@nuxt/devtools",
@@ -8,9 +7,14 @@ export default defineNuxtConfig({
     "@nuxt/content",
     "@pinia/nuxt",
   ],
-  app: {},
-  devtools: { enabled: true },
   ui: {
     icons: ["tabler"],
+  },
+  nitro: {
+    esbuild: {
+      options: {
+        target: "ESNext",
+      },
+    },
   },
 });
