@@ -2,13 +2,13 @@
 import { parse } from "marked";
 
 const route = useRoute();
-const { data } = await useFetch<Record<string, string>>("/api/poetry", {
+const data = await $fetch<Record<string, string>>("/api/poetry", {
   query: route.query,
 });
 
 const content = computedAsync(() => {
-  if (!data.value?.content) return;
-  return parse(data.value.content);
+  if (!data?.content) return;
+  return parse(data.content);
 });
 </script>
 
