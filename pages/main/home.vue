@@ -49,7 +49,7 @@ whenever(isBottom, debounce(loadMore, 200));
 </script>
 
 <template>
-  <div class="mx-4 pb-3 pt-4">
+  <div class="mx-6 pb-3 pt-4">
     <UInput v-model="keyword" class="mb-4" />
     <div class="mb-3 flex flex-wrap gap-x-5 gap-y-3">
       <UCheckbox
