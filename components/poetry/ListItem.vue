@@ -14,6 +14,7 @@ const to = computed(() => {
     <p class="mb-1 flex items-center gap-3 text-base">
       <span class="flex-1 truncate font-bold"> {{ item.title }} </span>
       <span class="text-sm text-gray-400"> {{ item.author }} </span>
+      <span class="text-sm italic text-green-400"> {{ item.library }} </span>
     </p>
     <NuxtLink :to="to">
       <p

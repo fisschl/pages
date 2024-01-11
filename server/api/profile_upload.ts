@@ -13,8 +13,7 @@ export const profileKey = (userId: string, name: string) => {
 
 export default defineEventHandler(async (event) => {
   const { id } = await checkUser(event);
-  const query = getQuery(event);
-  const { name, type } = QuerySchema.parse(query);
+  const { name, type } = await getValidatedQuery(event, QuerySchema.parse);
   const url = oss.signatureUrl(profileKey(id, name), {
     method: "PUT",
     "Content-Type": type,

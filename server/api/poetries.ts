@@ -5,19 +5,21 @@ import { meilisearch } from "~/server/utils/meilisearch";
 
 const QuerySchema = z.object({
   keyword: z.string().default(""),
-  offset: z.number().default(0),
+  offset: z.string().default("0"),
   library: OptionsQuerySchema,
 });
 
 export const poetriesIndex = meilisearch.index("poetries");
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event);
-  const { keyword, offset, library } = QuerySchema.parse(query);
+  const { keyword, offset, library } = await getValidatedQuery(
+    event,
+    QuerySchema.parse,
+  );
   const filter = getOptionsQueryFilter("library", library);
   const res = await poetriesIndex.search(keyword, {
     limit: 64,
-    offset,
+    offset: parseInt(offset),
     filter,
     attributesToCrop: ["content"],
     cropLength: 64,
