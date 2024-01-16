@@ -9,7 +9,7 @@
     "cz": "git add . && czg",
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate:pg",
-    "db:merge": "tsx ./server/utils/db.ts db:merge",
+    "db:push": "drizzle-kit push:pg",
     "docker:build": "docker build -t registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest .",
     "docker:push": "docker push registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest"
   },

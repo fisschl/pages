@@ -5,7 +5,8 @@ const nav = useNavStore();
 const isLargeScreen = useMediaQuery(`(min-width: 768px)`);
 
 onMounted(() => {
-  nav.visible = isLargeScreen.value;
+  if (nav.cookie) return;
+  nav.cookie = isLargeScreen.value.toString();
 });
 </script>
 

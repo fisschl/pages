@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
 
 export const useNavStore = defineStore("nav", () => {
-  const visible = ref(false);
+  const cookie = useCookie("pages-nav-visible");
 
-  return { visible };
+  const visible = computed(() => {
+    return cookie.value?.toString() === "true";
+  });
+
+  return { cookie, visible };
 });

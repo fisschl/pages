@@ -2,6 +2,10 @@
 import { useNavStore } from "~/composables/nav";
 
 const nav = useNavStore();
+
+const handleToggleNav = (visible: boolean) => {
+  nav.cookie = visible.toString();
+};
 </script>
 
 <template>
@@ -11,9 +15,10 @@ const nav = useNavStore();
   >
     <h1 class="flex-1">大道之行也 天下为公</h1>
     <UToggle
-      v-model="nav.visible"
+      :model-value="nav.visible"
       on-icon="i-tabler-menu"
       off-icon="i-tabler-minimize"
+      @update:model-value="handleToggleNav"
     />
   </header>
 </template>

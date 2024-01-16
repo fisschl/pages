@@ -1,4 +1,4 @@
-import { pgTable, text, time, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
 
@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 256 }).unique().notNull(),
   password: varchar("password", { length: 256 }).notNull(),
   profile: text("profile"),
-  update_at: time("update_at").defaultNow().notNull(),
+  update_at: timestamp("update_at").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;

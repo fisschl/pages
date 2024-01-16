@@ -1,10 +1,10 @@
-import { argon2id, argon2Verify } from "hash-wasm";
-import type { EventHandlerRequest, H3Event } from "h3";
-import { User } from "~/server/utils/schema";
-import { DAY, redis } from "~/server/utils/redis";
 import { parseISO } from "date-fns";
 import { eq } from "drizzle-orm";
+import type { EventHandlerRequest, H3Event } from "h3";
+import { argon2id, argon2Verify } from "hash-wasm";
 import { isString } from "lodash-es";
+import { DAY, redis } from "~/server/utils/redis";
+import { User } from "~/server/utils/schema";
 
 export const hashPassword = async (password: string) => {
   const salt = new Uint8Array(16);
@@ -44,6 +44,7 @@ export const checkUser = async (
   const str = await redis.get(id);
   if (str) {
     const user = JSON.parse(str);
+    // 将 ISO 字符串解析为 Date 对象
     user.update_at = parseISO(user.update_at);
     return user;
   }

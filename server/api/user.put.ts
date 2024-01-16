@@ -20,5 +20,6 @@ export default defineEventHandler(async (event) => {
   const item = first(list);
   if (!item) throw createError({ status: 400 });
   await redis.del(item.id);
+  item.password = "******";
   return item;
 });

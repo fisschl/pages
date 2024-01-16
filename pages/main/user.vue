@@ -18,10 +18,11 @@ dialog.onChange(async (files) => {
     method: "PUT",
     body: file,
   });
-  if (!user.user) return;
   user.user = await $fetch<User>("/api/user", {
     method: "PUT",
-    body: pick(user.user, ["profile"]),
+    body: {
+      profile: file.name,
+    },
   });
 });
 
