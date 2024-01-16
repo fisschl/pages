@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
-import { type User, useUserStore } from "#imports";
+import { useUserStore } from "#imports";
+import type { User } from "~/server/utils/schema";
 
 const user = useUserStore();
 

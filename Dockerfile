@@ -5,7 +5,6 @@ RUN npm install -g pnpm
 COPY .npmrc .
 COPY package.json .
 COPY pnpm-lock.yaml .
-COPY prisma prisma
 RUN pnpm install --prod
 COPY . .
 RUN pnpm build

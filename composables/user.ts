@@ -1,6 +1,4 @@
-import type { user } from "@prisma/client";
-
-export type User = Omit<user, "password" | "update_at">;
+import type { User } from "~/server/utils/schema";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User>();

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { user } from "@prisma/client";
 import { isEmpty } from "lodash-es";
+import type { User } from "~/server/utils/schema";
 
-const state = reactive<Partial<user>>({});
+const state = reactive<Partial<User>>({});
 const errors = ref<Partial<Record<keyof typeof state, string>>>({});
 
 const validate = () => {
@@ -39,7 +39,7 @@ const onSubmit = async () => {
     errors.value.password = "用户名或密码错误";
     return;
   }
-  store.user = await $fetch<user>("/api/user");
+  store.user = await $fetch("/api/user");
   const { from } = route.query;
   if (typeof from !== "string") return;
   await router.push(from);
