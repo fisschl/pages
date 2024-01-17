@@ -12,7 +12,7 @@ const handleLibraryChange = (value: string, checked: boolean) => {
   const set = new Set(library.value);
   if (checked) set.add(value);
   else set.delete(value);
-  return setLibrary(Array.from(set));
+  return setLibrary(set);
 };
 
 const query = computed(() => ({

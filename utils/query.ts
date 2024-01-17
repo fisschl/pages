@@ -1,16 +1,17 @@
-import { z, type TypeOf } from "zod";
-import { isArray, isString } from "lodash-es";
+import { isString } from "lodash-es";
 import type { ComputedRef } from "vue";
+import { z } from "zod";
 
 export const OptionsQuerySchema = z
   .union([z.string(), z.array(z.string())])
   .optional();
 
-export type UseOptionsQueryReturn<T> = [ComputedRef<T>, (value: T) => void];
+export type UseOptionsQueryReturn = [
+  ComputedRef<string[]>,
+  (value: Iterable<string>) => void,
+];
 
-export const useOptionsQuery = (
-  key: string,
-): UseOptionsQueryReturn<string[]> => {
+export const useOptionsQuery = (key: string): UseOptionsQueryReturn => {
   const route = useRoute();
   const options = computed(() => {
     const item = route.query[key];
@@ -22,20 +23,12 @@ export const useOptionsQuery = (
     return data;
   });
   const router = useRouter();
-  const setOptions = (options: string[]) => {
+  const setOptions: UseOptionsQueryReturn[1] = (options) => {
     return router.replace({
-      query: { ...route.query, [key]: options },
+      query: { ...route.query, [key]: Array.from(options) },
     });
   };
   return [options, setOptions];
 };
 
-export const getOptionsQueryFilter = (
-  key: string,
-  item: TypeOf<typeof OptionsQuerySchema>,
-) => {
-  if (!item || !item.length) return undefined;
-  if (isString(item)) return `${key} = ${item}`;
-  if (isArray(item)) return `${key} IN [${item.join()}]`;
-  return undefined;
-};
+export type Nullable<T> = T | null | undefined;
