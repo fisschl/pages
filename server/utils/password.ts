@@ -1,7 +1,6 @@
-import { parseISO } from "date-fns";
 import { eq } from "drizzle-orm";
 import type { EventHandlerRequest, H3Event } from "h3";
-import { argon2id, argon2Verify } from "hash-wasm";
+import { argon2Verify, argon2id } from "hash-wasm";
 import { isString } from "lodash-es";
 import { DAY, redis } from "~/server/utils/redis";
 import { User } from "~/server/utils/schema";
@@ -42,12 +41,7 @@ export const checkUser = async (
   const id = await redis.get(token);
   if (!id) throw createError({ status: 403 });
   const str = await redis.get(id);
-  if (str) {
-    const user = JSON.parse(str);
-    // 将 ISO 字符串解析为 Date 对象
-    user.update_at = parseISO(user.update_at);
-    return user;
-  }
+  if (str) return JSON.parse(str);
   const user = await db.query.users.findFirst({ where: eq(users.id, id) });
   if (!user) throw createError({ status: 404 });
   await redis.set(user.id, JSON.stringify(user), {

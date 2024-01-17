@@ -33,7 +33,7 @@ const links = computed(() => [
       {
         label: "AI",
         icon: "i-tabler-brand-openai",
-        to: "https://gpt.fisschl.world",
+        to: "https://lobechat.fisschl.world",
         target: "_blank",
       },
       {

@@ -2,7 +2,7 @@
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { useLocalStorage } from "#imports";
 
-const text = useLocalStorage("qrcode-text", "text_to_encode");
+const text = useLocalStorage("qrcode-text", "https://fisschl.world");
 const qrcode = useQRCode(text);
 </script>
 
@@ -11,6 +11,6 @@ const qrcode = useQRCode(text);
     <div class="mb-8 flex">
       <UInput v-model="text" size="lg" class="flex-1" />
     </div>
-    <img class="mx-auto size-40" :src="qrcode" alt="QR Code" />
+    <img v-if="qrcode" class="mx-auto size-40" :src="qrcode" alt="QR Code" />
   </UContainer>
 </template>

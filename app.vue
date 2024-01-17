@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const store = useUserStore();
+
 const headers = useRequestHeaders(["cookie"]);
 const { data } = await useFetch("/api/user", { headers });
-store.user = data.value || undefined;
+
+if (data.value) store.user = data.value;
 </script>
 
 <template>

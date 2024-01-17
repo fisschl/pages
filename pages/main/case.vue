@@ -12,31 +12,33 @@ import { useLocalStorage } from "#imports";
 const types = [
   {
     func: camelCase,
-    name: "helloWorld",
+    name: "camelCase",
   },
   {
     func: constantCase,
-    name: "HELLO_WORLD",
+    name: "CONSTANT_CASE",
   },
   {
     func: kebabCase,
-    name: "hello-world",
+    name: "kebab-case",
   },
   {
     func: pascalCase,
-    name: "HelloWorld",
+    name: "PascalCase",
   },
   {
     func: pathCase,
-    name: "hello/world",
+    name: "path/case",
   },
   {
     func: snakeCase,
-    name: "hello_world",
+    name: "snake_case",
   },
 ];
+
 const input = useLocalStorage("case-input", "hello world");
-const type = useLocalStorage("case-type", "helloWorld");
+
+const type = useLocalStorage("case-type", "camelCase");
 
 const result = computed(() => {
   const item = types.find((item) => item.name === type.value);

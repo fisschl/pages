@@ -9,9 +9,10 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 256 }).unique().notNull(),
   password: varchar("password", { length: 256 }).notNull(),
   profile: text("profile"),
-  update_at: timestamp("update_at").defaultNow().notNull(),
+  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
 
 export const UserInsertSchema = createInsertSchema(users);
+export const UserUpdateSchema = UserInsertSchema.partial();

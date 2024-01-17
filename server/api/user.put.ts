@@ -1,14 +1,12 @@
 import { redis } from "~/server/utils/redis";
 import { checkUser, hashPassword } from "~/server/utils/password";
-import { UserInsertSchema } from "~/server/utils/schema";
 import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
-
-const BodySchema = UserInsertSchema.partial();
+import { UserUpdateSchema } from "../utils/schema";
 
 export default defineEventHandler(async (event) => {
   const { id } = await checkUser(event);
-  const body = await readValidatedBody(event, BodySchema.parse);
+  const body = await readValidatedBody(event, UserUpdateSchema.parse);
   if (body.password) {
     body.password = await hashPassword(body.password);
   }
