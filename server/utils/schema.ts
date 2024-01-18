@@ -3,11 +3,11 @@ import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
-  id: varchar("id", { length: 256 })
+  id: varchar("id")
     .primaryKey()
     .$default(() => typeid().toString()),
-  name: varchar("name", { length: 256 }).unique().notNull(),
-  password: varchar("password", { length: 256 }).notNull(),
+  name: varchar("name").unique().notNull(),
+  password: varchar("password").notNull(),
   profile: text("profile"),
   update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
 });
