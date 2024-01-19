@@ -25,6 +25,7 @@ export const verifyPassword = async (password: string, hash: string) => {
     hash,
   });
 };
+
 export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
   const cookie = getCookie(event, "token");
   if (cookie) return cookie;
@@ -33,19 +34,28 @@ export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
   return undefined;
 };
 
-export const checkUser = async (
+export const checkUserSafe = async (
   event: H3Event<EventHandlerRequest>,
-): Promise<User> => {
+): Promise<User | number> => {
   const token = tokenFromContext(event);
-  if (!token) throw createError({ status: 401 });
+  if (!token) return 401;
+  if (!redis.isOpen) await redis.connect();
   const id = await redis.get(token);
-  if (!id) throw createError({ status: 403 });
-  const str = await redis.get(id);
-  if (str) return JSON.parse(str);
+  if (!id) return 403;
+  const userJson = await redis.get(id);
+  if (userJson) return JSON.parse(userJson);
   const user = await db.query.users.findFirst({ where: eq(users.id, id) });
   if (!user) throw createError({ status: 404 });
   await redis.set(user.id, JSON.stringify(user), {
     EX: 60 * DAY,
   });
   return user;
+};
+
+export const checkUser = async (
+  event: H3Event<EventHandlerRequest>,
+): Promise<User> => {
+  const res = await checkUserSafe(event);
+  if (typeof res === "number") throw createError({ status: res });
+  return res;
 };

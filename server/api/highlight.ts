@@ -1,10 +1,10 @@
 import { getHighlighter } from "shiki";
 
-const highlighter = await getHighlighter({});
+const highlighter = getHighlighter({});
 
 export default defineEventHandler(async (event) => {
   const { text, lang } = await readBody(event);
-  return {
-    code: highlighter.codeToHtml(text, { lang }),
-  };
+  const { codeToHtml } = await highlighter;
+  const code = codeToHtml(text, { lang });
+  return { code };
 });

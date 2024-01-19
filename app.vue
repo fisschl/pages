@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { useUserStore } from "./composables/user";
+import { useSseStore } from "./composables/sse";
+
 const store = useUserStore();
 
 const headers = useRequestHeaders(["cookie"]);
 const { data } = await useFetch("/api/user", { headers });
-
 if (data.value) store.user = data.value;
+
+const { create } = useSseStore();
+onMounted(create);
 </script>
 
 <template>

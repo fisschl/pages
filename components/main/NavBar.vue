@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const route = useRoute();
-
 const links = computed(() => [
   {
     label: "工具",
@@ -58,10 +56,10 @@ const links = computed(() => [
   },
 ]);
 
-const loginPath = computed(() => {
-  const qs = new URLSearchParams({ from: route.fullPath });
-  return `/login?${qs}`;
-});
+const handleClickLogin = () => {
+  const qs = new URLSearchParams({ from: location.href });
+  location.href = `/login?${qs}`;
+};
 
 const user = useUserStore();
 </script>
@@ -87,7 +85,7 @@ const user = useUserStore();
         {{ user.user?.name }}
       </span>
     </UButton>
-    <UButton v-else :to="loginPath" variant="ghost" color="gray">
+    <UButton v-else variant="ghost" color="gray" @click="handleClickLogin">
       <template #leading>
         <UAvatar icon="i-tabler-user" size="sm" />
       </template>

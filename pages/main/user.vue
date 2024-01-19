@@ -17,12 +17,13 @@ dialog.onChange(async (files) => {
     method: "PUT",
     body: file,
   });
-  store.user = await $fetch("/api/user", {
+  const res = await $fetch("/api/user", {
     method: "PUT",
     body: {
       profile: file.name,
     },
   });
+  store.user = res;
 });
 
 const handleChangeAvatar = () => {

@@ -6,6 +6,9 @@ export const redis = createClient({
   url: REDIS_URL,
 });
 
-await redis.connect();
 export const HOUR = 60 * 60;
 export const DAY = 24 * HOUR;
+
+export const publisher = redis.duplicate();
+
+export const subscriber = redis.duplicate();
