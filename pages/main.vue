@@ -35,7 +35,6 @@ onMounted(() => {
 }
 
 .main {
-  min-height: 100vh;
   margin-top: var(--main-header-height);
 }
 

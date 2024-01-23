@@ -39,7 +39,6 @@ export const checkUserSafe = async (
 ): Promise<User | number> => {
   const token = tokenFromContext(event);
   if (!token) return 401;
-  if (!redis.isOpen) await redis.connect();
   const id = await redis.get(token);
   if (!id) return 403;
   const userJson = await redis.get(id);

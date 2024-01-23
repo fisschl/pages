@@ -9,6 +9,7 @@ import { UserInsertSchema } from "~/server/utils/schema";
 const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 
 export default defineEventHandler(async (event) => {
+  if (!redis.isOpen) await redis.connect();
   const body = await readValidatedBody(event, BodySchema.parse);
   const user = await db.query.users.findFirst({
     where: eq(users.name, body.name),
