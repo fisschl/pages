@@ -36,7 +36,6 @@
     "dompurify": "^3.0.8",
     "drizzle-orm": "^0.29.3",
     "drizzle-zod": "^0.5.1",
-    "echarts": "^5.4.3",
     "filesize": "^10.1.0",
     "h3": "^1.10.0",
     "hash-wasm": "^4.11.0",
