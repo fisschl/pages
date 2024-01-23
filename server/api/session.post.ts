@@ -5,6 +5,7 @@ import { typeid } from "typeid-js";
 import { verifyPassword } from "~/server/utils/password";
 import { DAY, redis } from "~/server/utils/redis";
 import { UserInsertSchema } from "~/server/utils/schema";
+import { db } from "~/server/utils/db";
 
 const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 

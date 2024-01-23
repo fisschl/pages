@@ -4,6 +4,7 @@ import { argon2Verify, argon2id } from "hash-wasm";
 import { isString } from "lodash-es";
 import { DAY, redis } from "~/server/utils/redis";
 import { User } from "~/server/utils/schema";
+import { db } from "~/server/utils/db";
 
 export const hashPassword = async (password: string) => {
   const salt = new Uint8Array(16);

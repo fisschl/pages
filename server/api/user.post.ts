@@ -1,6 +1,7 @@
 import { hashPassword } from "~/server/utils/password";
 import { UserInsertSchema } from "~/server/utils/schema";
 import { redis } from "~/server/utils/redis";
+import { db } from "~/server/utils/db";
 
 export default defineEventHandler(async (event) => {
   if (!redis.isOpen) await redis.connect();
