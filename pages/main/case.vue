@@ -7,7 +7,7 @@ import {
   pathCase,
   snakeCase,
 } from "change-case";
-import { useLocalStorage } from "#imports";
+import { useLocalStorage } from "@vueuse/core";
 
 const types = [
   {
