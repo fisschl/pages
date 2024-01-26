@@ -9,5 +9,5 @@ export default defineEventHandler(async (event) => {
     where: eq(short_links.id, id),
   });
   if (!res) throw createError({ status: 404 });
-  return sendRedirect(event, res.url, 301);
+  return sendRedirect(event, res.url);
 });

@@ -23,6 +23,11 @@ const links = computed(() => [
         icon: "i-tabler-qrcode",
         to: "/main/qrcode",
       },
+      {
+        label: "短链接",
+        icon: "i-tabler-link",
+        to: "/main/short",
+      },
     ],
   },
   {

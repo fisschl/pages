@@ -2,7 +2,7 @@ import { redis } from "~/server/utils/redis";
 import { checkUser, hashPassword } from "~/server/utils/password";
 import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
-import { UserUpdateSchema } from "../utils/schema";
+import { UserUpdateSchema } from "../../utils/schema";
 
 export default defineEventHandler(async (event) => {
   const { id } = await checkUser(event);

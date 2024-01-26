@@ -6,13 +6,13 @@ import { useOptionsQuery } from "~/utils/query";
 const { data: libraryOptions } = await useFetch("/api/poetry_facets");
 
 const keyword = useRouteQuery("keyword", "");
-const [library, setLibrary] = useOptionsQuery("library");
+const library = useOptionsQuery("library");
 
 const handleLibraryChange = (value: string, checked: boolean) => {
   const set = new Set(library.value);
   if (checked) set.add(value);
   else set.delete(value);
-  return setLibrary(set);
+  library.value = [...set];
 };
 
 const query = computed(() => ({
