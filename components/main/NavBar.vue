@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useUserStore } from "@/composables/user";
+
 const links = computed(() => [
   {
     label: "工具",
