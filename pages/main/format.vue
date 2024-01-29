@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
+import { codeToHtml } from "shiki";
 
 const params = useLocalStorage("format-params", {
   text: "",
@@ -17,11 +18,10 @@ const submit = debounce(async () => {
     body: params.value,
   });
   params.value.text = text;
-  const { code } = await $fetch("/api/highlight", {
-    method: "POST",
-    body: { text, lang: params.value.extension },
+  highlightHtml.value = await codeToHtml(text, {
+    lang: params.value.extension,
+    theme: "vitesse-dark",
   });
-  highlightHtml.value = code;
 }, 500);
 </script>
 

@@ -3,7 +3,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { debounce } from "lodash-es";
 import { useOptionsQuery } from "~/utils/query";
 
-const { data: libraryOptions } = await useFetch("/api/poetry_facets");
+const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
 const keyword = useRouteQuery("keyword", "");
 const library = useOptionsQuery("library");
@@ -20,7 +20,7 @@ const query = computed(() => ({
   library: library.value,
 }));
 
-const { data } = useFetch<Record<string, string>[]>("/api/poetries", {
+const { data } = useFetch<Record<string, string>[]>("/api/poetry/poetries", {
   query: refDebounced(query, 200),
 });
 
@@ -29,7 +29,7 @@ const isAll = ref(false);
 const loadMore = async () => {
   const offset = data.value?.length;
   if (!offset) return;
-  const res = await $fetch("/api/poetries", {
+  const res = await $fetch("/api/poetry/poetries", {
     query: {
       ...query.value,
       offset,
