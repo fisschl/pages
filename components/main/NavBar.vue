@@ -90,7 +90,11 @@ const user = useUserStore();
     </div>
     <UButton v-if="user.user" to="/main/user" color="gray" variant="ghost">
       <template #leading>
-        <UAvatar v-if="user.avatar" size="xs" :src="user.avatar" />
+        <UAvatar
+          v-if="user.user.avatar"
+          size="xs"
+          :src="`https://cdn.fisschl.world/server/avatar/${user.user.avatar}`"
+        />
         <UAvatar v-else size="xs" icon="i-tabler-user" />
       </template>
       <span class="ml-2">

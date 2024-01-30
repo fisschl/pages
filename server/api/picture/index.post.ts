@@ -1,9 +1,8 @@
+import { first } from "lodash-es";
 import { z } from "zod";
+import { db } from "~/server/utils/db";
 import { oss } from "~/server/utils/oss";
 import { checkUser } from "~/server/utils/password";
-import { first } from "lodash-es";
-import { db } from "~/server/utils/db";
-import { picture_key } from "~/utils/image";
 
 const QuerySchema = z.object({
   name: z.string(),
@@ -19,7 +18,7 @@ export default defineEventHandler(async (event) => {
     .returning();
   const item = first(items);
   if (!item) throw createError({ status: 500 });
-  const url = oss.signatureUrl(picture_key(item.id), {
+  const url = oss.signatureUrl(`server/picture/${item.id}`, {
     method: "PUT",
     "Content-Type": type,
   });

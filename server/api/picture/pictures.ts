@@ -1,6 +1,20 @@
 import { count, desc, eq } from "drizzle-orm";
 import { first } from "lodash-es";
 import { db, PageQuerySchema, limitOffset } from "~/server/utils/db";
+import { basename, extname } from "node:path";
+import { Picture } from "~/server/utils/schema";
+
+const pictureToWebp = async (item: Picture) => {
+  await toWebp(`server/picture/${item.id}`);
+  const { name } = item;
+  await db
+    .update(pictures)
+    .set({
+      name: basename(name, extname(name)) + ".webp",
+      content_type: "image/webp",
+    })
+    .where(eq(pictures.id, item.id));
+};
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -15,5 +29,8 @@ export default defineEventHandler(async (event) => {
     ...limitOffset(query),
     orderBy: desc(pictures.update_at),
   });
+  list
+    .filter((item) => item.content_type !== "image/webp")
+    .forEach(pictureToWebp);
   return { total: first(counts)?.total, list };
 });

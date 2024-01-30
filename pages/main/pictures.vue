@@ -2,7 +2,6 @@
 import { pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { Picture } from "~/server/utils/schema";
-import { picture_cdn } from "~/utils/image";
 
 const store = useUserStore();
 await store.checkLogin();
@@ -83,7 +82,7 @@ const handleDeleteItem = async () => {
       >
         <img
           class="aspect-1 object-cover transition hover:scale-105"
-          :src="picture_cdn(item.id)"
+          :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
           :alt="item.name"
         />
       </div>
@@ -93,7 +92,10 @@ const handleDeleteItem = async () => {
         <template #header>
           <p class="truncate">{{ viewItem.name }}</p>
         </template>
-        <img :src="picture_cdn(viewItem.id)" :alt="viewItem.name" />
+        <img
+          :src="`https://cdn.fisschl.world/server/picture/${viewItem.id}`"
+          :alt="viewItem.name"
+        />
         <template #footer>
           <UButton color="red" @click="handleDeleteItem">
             <UIcon name="i-tabler-trash" style="font-size: 1.1rem" />

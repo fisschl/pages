@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cloneDeep, first, pick } from "lodash-es";
+import { cloneDeep, first } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 
 const store = useUserStore();
@@ -9,17 +9,17 @@ const dialog = useFileDialog({ accept: "image/*" });
 dialog.onChange(async (files) => {
   const file = first(files);
   if (!file) return;
-  const { url, id } = await $fetch("/api/picture", {
+  const { URL, avatar } = await $fetch("/api/user/avatar", {
     method: "POST",
-    body: pick(file, ["name", "type"]),
+    body: { type: file.type },
   });
-  await $fetch(url, {
+  await $fetch(URL, {
     method: "PUT",
     body: file,
   });
   const res = await $fetch("/api/user", {
     method: "PUT",
-    body: { avatar_id: id },
+    body: { avatar },
   });
   store.user = res;
 });
@@ -70,9 +70,13 @@ const submitPassword = async () => {
           </UButton>
         </div>
       </UFormGroup>
-      <UFormGroup label="头像" name="avatar_id">
+      <UFormGroup label="头像" name="avatar">
         <div class="relative flex w-max">
-          <UAvatar v-if="store.avatar" size="2xl" :src="store.avatar" />
+          <UAvatar
+            v-if="store.user?.avatar"
+            size="2xl"
+            :src="`https://cdn.fisschl.world/server/avatar/${store.user.avatar}`"
+          />
           <UAvatar v-else size="2xl" icon="i-tabler-user" />
           <button
             title="更改头像"

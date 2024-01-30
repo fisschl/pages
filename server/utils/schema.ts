@@ -3,24 +3,23 @@ import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
-export const id = () => typeid().toString();
+const id = () => typeid().toString();
+const dateTime = (name: string) => {
+  return timestamp(name, { mode: "string" }).defaultNow();
+};
 
 /**
  * 用户
  */
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().$default(id),
-  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
+  update_at: dateTime("update_at").notNull(),
   name: varchar("name").unique().notNull(),
   password: varchar("password").notNull(),
-  avatar_id: varchar("avatar_id"),
+  avatar: varchar("avatar"),
 });
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-  avatar: one(pictures, {
-    fields: [users.avatar_id],
-    references: [pictures.id],
-  }),
+export const usersRelations = relations(users, ({ many }) => ({
   pictures: many(pictures),
 }));
 
@@ -33,7 +32,7 @@ export const UserUpdateSchema = UserInsertSchema.partial();
  */
 export const short_links = pgTable("short_links", {
   id: varchar("id").primaryKey().$default(id),
-  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
+  update_at: dateTime("update_at").notNull(),
   url: varchar("url").notNull(),
 });
 
@@ -46,10 +45,12 @@ export const ShortLinkUpdateSchema = ShortLinkInsertSchema.partial();
  */
 export const pictures = pgTable("pictures", {
   id: varchar("id").primaryKey().$default(id),
-  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
+  update_at: dateTime("update_at").notNull(),
   name: varchar("name").notNull(),
   content_type: varchar("content_type").notNull(),
-  user_id: varchar("user_id").notNull(),
+  user_id: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
 });
 
 export const picturesRelations = relations(pictures, ({ one }) => ({
