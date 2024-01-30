@@ -20,9 +20,10 @@ const query = computed(() => ({
   library: library.value,
 }));
 
-const { data } = useFetch<Record<string, string>[]>("/api/poetry/poetries", {
-  query: refDebounced(query, 200),
-});
+const { data } = await useFetch<Record<string, string>[]>(
+  "/api/poetry/poetries",
+  { query: refDebounced(query, 200) },
+);
 
 const isAll = ref(false);
 

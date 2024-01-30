@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const route = useRoute();
 const { data } = await useFetch<Record<string, string>>("/api/poetry", {
-  params: { id: route.query.id },
+  query: { id: route.query.id },
 });
 </script>
 

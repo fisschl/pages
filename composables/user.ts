@@ -1,4 +1,5 @@
 import type { User } from "~/server/utils/schema";
+import { picture_cdn } from "~/utils/image";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User>();
@@ -11,10 +12,9 @@ export const useUserStore = defineStore("user", () => {
     });
   };
   const avatar = computed(() => {
-    if (!user.value) return undefined;
-    const { id, profile } = user.value;
-    if (!profile) return undefined;
-    return `https://cdn.fisschl.world/server/profile/${id}/${profile}`;
+    const id = user.value?.avatar_id;
+    if (!id) return undefined;
+    return picture_cdn(id);
   });
   return { user, checkLogin, avatar };
 });

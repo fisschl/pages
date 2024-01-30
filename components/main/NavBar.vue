@@ -30,6 +30,11 @@ const links = computed(() => [
         icon: "i-tabler-link",
         to: "/main/short",
       },
+      {
+        label: "图床",
+        icon: "i-tabler-photo",
+        to: "/main/pictures",
+      },
     ],
   },
   {

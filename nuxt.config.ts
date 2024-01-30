@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/content",
     "@pinia/nuxt",
+    "@nuxt/image",
   ],
   ui: {
     icons: ["tabler"],

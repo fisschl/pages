@@ -3,18 +3,14 @@ import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
-const defaultSchema = {
-  id: varchar("id")
-    .primaryKey()
-    .$default(() => typeid().toString()),
-  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
-};
+export const id = () => typeid().toString();
 
 /**
  * 用户
  */
 export const users = pgTable("users", {
-  ...defaultSchema,
+  id: varchar("id").primaryKey().$default(id),
+  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
   name: varchar("name").unique().notNull(),
   password: varchar("password").notNull(),
   avatar_id: varchar("avatar_id"),
@@ -36,7 +32,8 @@ export const UserUpdateSchema = UserInsertSchema.partial();
  * 短链接
  */
 export const short_links = pgTable("short_links", {
-  ...defaultSchema,
+  id: varchar("id").primaryKey().$default(id),
+  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
   url: varchar("url").notNull(),
 });
 
@@ -48,7 +45,8 @@ export const ShortLinkUpdateSchema = ShortLinkInsertSchema.partial();
  * 图片
  */
 export const pictures = pgTable("pictures", {
-  ...defaultSchema,
+  id: varchar("id").primaryKey().$default(id),
+  update_at: timestamp("update_at", { mode: "string" }).defaultNow().notNull(),
   name: varchar("name").notNull(),
   content_type: varchar("content_type").notNull(),
   user_id: varchar("user_id").notNull(),
