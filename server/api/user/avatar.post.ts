@@ -1,6 +1,5 @@
 import { typeid } from "typeid-js";
 import { z } from "zod";
-import { oss } from "~/server/utils/oss";
 import { checkUser } from "~/server/utils/password";
 
 const QuerySchema = z.object({
