@@ -63,6 +63,13 @@ const handleDeleteItem = async () => {
   data.value?.list.splice(index, 1);
   isViewModalVisible.value = false;
 };
+
+const download = async () => {
+  if (!viewItem.value) return;
+  const { id } = viewItem.value;
+  const qs = new URLSearchParams({ id });
+  window.open(`/api/picture/download?${qs}`);
+};
 </script>
 
 <template>
@@ -101,6 +108,10 @@ const handleDeleteItem = async () => {
           :alt="viewItem.name"
         />
         <template #footer>
+          <UButton class="mr-3 px-4" @click="download">
+            <UIcon name="i-tabler-download" style="font-size: 1.1rem" />
+            下载
+          </UButton>
           <UButton color="red" @click="handleDeleteItem">
             <UIcon name="i-tabler-trash" style="font-size: 1.1rem" />
             删除

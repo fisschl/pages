@@ -14,9 +14,10 @@ export default defineEventHandler(async (event) => {
   });
   if (!picture) throw createError({ status: 404 });
   const NAME = encodeURIComponent(picture.name);
+  const ContentDisposition = `attachment; filename="${NAME}"`;
   const URL = oss.signatureUrl(KEY, {
     response: {
-      "content-disposition": `attachment; filename=${NAME}`,
+      "content-disposition": ContentDisposition,
     },
   });
   return sendRedirect(event, URL);
