@@ -1,7 +1,6 @@
 import { first } from "lodash-es";
 import { z } from "zod";
 import { db } from "~/server/utils/db";
-import { oss } from "~/server/utils/oss";
 import { checkUser } from "~/server/utils/password";
 
 const QuerySchema = z.object({

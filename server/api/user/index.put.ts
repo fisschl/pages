@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
 import { sanitize } from "~/server/utils/db";
-import { toWebp } from "~/server/utils/oss";
 import { checkUser, hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/utils/redis";
 import { UserUpdateSchema } from "~/server/utils/schema";
@@ -20,13 +19,6 @@ export default defineEventHandler(async (event) => {
     body.name = sanitize(body.name);
   } else {
     body.name = undefined;
-  }
-  // 头像上传后，将图片转换为 webp
-  if (body.avatar) {
-    const { avatar } = body;
-    await toWebp(`server/avatar/${avatar}`);
-  } else {
-    body.avatar = undefined;
   }
   const list = await db
     .update(users)
