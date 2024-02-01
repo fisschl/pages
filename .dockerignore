@@ -2,3 +2,5 @@
 .nuxt
 node_modules
 .env
+.idea
+pnpm-lock.yaml

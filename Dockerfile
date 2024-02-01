@@ -4,7 +4,6 @@ RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g pnpm
 COPY .npmrc .
 COPY package.json .
-COPY pnpm-lock.yaml .
 RUN pnpm install --prod
 COPY . .
 RUN pnpm build
