@@ -19,7 +19,7 @@ onMounted(create);
       <Link rel="preconnect" href="https://cdn.fisschl.world" />
       <Link rel="stylesheet" href="https://cdn.fisschl.world/MiSans/font.css" />
     </Head>
-    <Body :class="$style.root">
+    <Body :class="$style.root" class="bg-neutral-50 dark:bg-neutral-900">
       <NuxtPage />
       <UNotifications />
     </Body>

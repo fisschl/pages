@@ -2,6 +2,9 @@ import { first } from "lodash-es";
 import { z } from "zod";
 import { db } from "~/server/utils/db";
 import { checkUser } from "~/server/utils/password";
+import { typeid } from "typeid-js";
+import { counselor } from "~/server/api/picture/download";
+import { extname } from "node:path";
 
 const QuerySchema = z.object({
   name: z.string(),
@@ -11,15 +14,20 @@ const QuerySchema = z.object({
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const { name, type } = await readValidatedBody(event, QuerySchema.parse);
+  const id = typeid().toString() + extname(name);
   const items = await db
     .insert(pictures)
-    .values({ content_type: type, name: name, user_id: user.id })
+    .values({
+      id,
+      content_type: type,
+      name: name,
+      user_id: user.id,
+    })
     .returning();
   const item = first(items);
   if (!item) throw createError({ status: 500 });
-  const url = oss.signatureUrl(`server/picture/${item.id}`, {
-    method: "PUT",
-    "Content-Type": type,
+  const url = await counselor<string>(`/oss/upload`, {
+    query: { key: `server/picture/${item.id}`, type: type },
   });
   return { url, ...item };
 });

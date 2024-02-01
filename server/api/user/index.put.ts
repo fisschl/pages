@@ -4,9 +4,10 @@ import { sanitize } from "~/server/utils/db";
 import { checkUser, hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/utils/redis";
 import { UserUpdateSchema } from "~/server/utils/schema";
+import { counselor } from "../picture/download";
 
 export default defineEventHandler(async (event) => {
-  const { id } = await checkUser(event);
+  const user = await checkUser(event);
   const body = await readValidatedBody(event, UserUpdateSchema.parse);
   // 密码应被散列
   if (body.password) {
@@ -20,10 +21,19 @@ export default defineEventHandler(async (event) => {
   } else {
     body.name = undefined;
   }
+  // 删除原头像
+  if (body.avatar && body.avatar !== user.avatar) {
+    await counselor(`/oss/delete`, {
+      method: "DELETE",
+      query: { key: `server/avatar/${user.avatar}` },
+    });
+  } else {
+    body.avatar = undefined;
+  }
   const list = await db
     .update(users)
     .set(body)
-    .where(eq(users.id, id))
+    .where(eq(users.id, user.id))
     .returning();
   const item = first(list);
   if (!item) throw createError({ status: 400 });

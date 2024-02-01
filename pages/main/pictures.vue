@@ -31,10 +31,6 @@ dialog.onChange(async (files) => {
       method: "PUT",
       body: file,
     });
-    await $fetch("/api/picture/complete", {
-      method: "POST",
-      body: { id: item.id },
-    });
     data.value?.list.unshift(item);
   }
 });

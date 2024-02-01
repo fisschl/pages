@@ -4,6 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
 const id = () => typeid().toString();
+
 const dateTime = (name: string) => {
   return timestamp(name, { mode: "string" }).defaultNow();
 };
@@ -44,7 +45,7 @@ export const ShortLinkUpdateSchema = ShortLinkInsertSchema.partial();
  * 图片
  */
 export const pictures = pgTable("pictures", {
-  id: varchar("id").primaryKey().$default(id),
+  id: varchar("id").primaryKey(),
   update_at: dateTime("update_at").notNull(),
   name: varchar("name").notNull(),
   content_type: varchar("content_type").notNull(),

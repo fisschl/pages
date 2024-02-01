@@ -9,11 +9,11 @@ const dialog = useFileDialog({ accept: "image/*" });
 dialog.onChange(async (files) => {
   const file = first(files);
   if (!file) return;
-  const { URL, avatar } = await $fetch("/api/user/avatar", {
+  const { url, avatar } = await $fetch("/api/user/avatar", {
     method: "POST",
-    body: { type: file.type },
+    body: { type: file.type, name: file.name },
   });
-  await $fetch(URL, {
+  await $fetch(url, {
     method: "PUT",
     body: file,
   });

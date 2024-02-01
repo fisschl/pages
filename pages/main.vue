@@ -1,50 +1,54 @@
 <script setup lang="ts">
-import { useNavStore } from "~/composables/nav";
-
-const nav = useNavStore();
+const navbar = useCookie("pages-nav-visible");
 const isLargeScreen = useMediaQuery(`(min-width: 768px)`);
 
+const handleUpdateNavbar = (value: boolean) => {
+  navbar.value = value ? "true" : undefined;
+};
+
 onMounted(() => {
-  if (nav.cookie) return;
-  nav.cookie = isLargeScreen.value.toString();
+  handleUpdateNavbar(isLargeScreen.value);
 });
 </script>
 
 <template>
-  <MainHeaderBar :class="$style.header" />
-  <MainNavBar v-if="nav.visible" :class="$style.navbar" />
-  <main :class="{ [$style.main]: true, [$style.mainWithNav]: nav.visible }">
-    <NuxtPage />
+  <div class="relative flex h-dvh w-screen flex-col overflow-auto">
+    <MainHeaderBar
+      :navbar="!!navbar"
+      class="sticky top-0 z-20"
+      @update:navbar="handleUpdateNavbar"
+    />
+    <div class="flex flex-1" :class="$style.mainContainer">
+      <MainNavBar v-if="navbar" :class="$style.navbar" />
+      <main :class="$style.main" class="flex-1">
+        <NuxtPage />
+      </main>
+    </div>
     <MainFooterBar />
-  </main>
+  </div>
 </template>
 
 <style module>
-.header {
-  position: fixed;
-  top: 0;
-  z-index: 20;
+.mainContainer {
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .mainContainer {
+    flex-direction: row;
+  }
 }
 
 .navbar {
-  height: calc(100vh - var(--main-header-height));
+  height: calc(100dvh - var(--main-header-height));
   top: var(--main-header-height);
-  position: fixed;
-  width: 100%;
+  position: sticky;
   z-index: 10;
-}
-
-.main {
-  margin-top: var(--main-header-height);
 }
 
 @media (min-width: 768px) {
   .navbar {
     width: var(--main-navbar-width);
-  }
-
-  .mainWithNav {
-    margin-left: var(--main-navbar-width);
   }
 }
 </style>
