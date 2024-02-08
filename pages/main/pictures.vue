@@ -23,7 +23,7 @@ const dialog = useFileDialog({ accept: "image/*", multiple: true });
 dialog.onChange(async (files) => {
   if (!files) return;
   for (const file of files) {
-    const item = await $fetch("/api/picture", {
+    const item = await $fetch<any>("/api/picture", {
       method: "POST",
       body: pick(file, ["name", "type"]),
     });
@@ -60,11 +60,15 @@ const handleDeleteItem = async () => {
   isViewModalVisible.value = false;
 };
 
-const download = async () => {
+const downloadURL = () => {
   if (!viewItem.value) return;
   const { id } = viewItem.value;
   const qs = new URLSearchParams({ id });
-  window.open(`/api/picture/download?${qs}`);
+  return `/api/picture/download?${qs}`;
+};
+
+const download = () => {
+  window.open(downloadURL());
 };
 </script>
 
@@ -99,10 +103,7 @@ const download = async () => {
         <template #header>
           <p class="truncate">{{ viewItem.name }}</p>
         </template>
-        <img
-          :src="`https://cdn.fisschl.world/server/picture/${viewItem.id}`"
-          :alt="viewItem.name"
-        />
+        <img :src="downloadURL()" :alt="viewItem.name" />
         <template #footer>
           <UButton class="mr-3 px-4" @click="download">
             <UIcon name="i-tabler-download" style="font-size: 1.1rem" />
