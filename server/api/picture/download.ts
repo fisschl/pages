@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
     where: eq(pictures.id, id),
   });
   if (!picture) throw createError({ status: 404 });
-  const res = await counselor(`/oss/download`, {
+  const { url } = await counselor(`/storage/download`, {
     query: { key: `server/picture/${id}`, name: picture.name },
   });
-  return sendRedirect(event, res);
+  return sendRedirect(event, url);
 });

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   }
   // 删除原头像
   if (body.avatar && body.avatar !== user.avatar) {
-    await counselor(`/oss/delete`, {
+    await counselor(`/storage/delete`, {
       method: "DELETE",
       query: { key: `server/avatar/${user.avatar}` },
     });

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     .returning();
   const item = first(items);
   if (!item) throw createError({ status: 500 });
-  const url = await counselor<string>(`/oss/upload`, {
+  const { url } = await counselor(`/storage/upload`, {
     query: { key: `server/picture/${item.id}`, type: type },
   });
   return { url, ...item };
