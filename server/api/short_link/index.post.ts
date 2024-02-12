@@ -13,6 +13,6 @@ export default defineEventHandler(async (event) => {
     const items = await db.insert(short_links).values(body).returning();
     return first(items);
   });
-  if(!item) throw createError({status:500})
+  if (!item) throw createError({ status: 500 });
   return { url: `https://fisschl.world/u/${item.id}` };
 });

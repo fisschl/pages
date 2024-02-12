@@ -27,9 +27,13 @@ dialog.onChange(async (files) => {
       method: "POST",
       body: pick(file, ["name", "type"]),
     });
+    const filename = encodeURIComponent(file.name);
     await $fetch(item.url, {
       method: "PUT",
       body: file,
+      headers: {
+        "Content-Disposition": `attachment; filename="${filename}"`,
+      },
     });
     data.value?.list.unshift(item);
   }

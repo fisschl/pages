@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
 import { codeToHtml } from "shiki";
+import { useLocalStorage } from "@vueuse/core";
 
 const params = useLocalStorage("format-params", {
   text: "",
