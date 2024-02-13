@@ -4,6 +4,7 @@ import * as schema from "./schema";
 import { TypeOf, z } from "zod";
 import { JSDOM } from "jsdom";
 import DOMPurify from "dompurify";
+import { MongoClient } from "mongodb";
 
 export const connection = postgres(process.env.DATABASE_URL!);
 
@@ -27,3 +28,6 @@ const purify = DOMPurify(window);
 export const sanitize = (html: string) => {
   return purify.sanitize(html);
 };
+
+export const mongoClient = new MongoClient(process.env.MONGODB_URL!);
+export const mongodb = mongoClient.db("default");
