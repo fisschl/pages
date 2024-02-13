@@ -46,36 +46,17 @@ dialog.onChange(async (files) => {
   }
 });
 
-const viewItem = ref<Picture>();
+const currentPicture = ref<Picture>();
 const isViewModalVisible = ref(false);
 
 const handleClickItem = (e: Picture) => {
-  viewItem.value = e;
+  currentPicture.value = e;
   isViewModalVisible.value = true;
 };
-
-const handleDeleteItem = async () => {
-  await $fetch("/api/picture", {
-    method: "DELETE",
-    query: { id: viewItem.value?.id },
-  });
-  const index = data.value?.list.findIndex(
-    (item) => item.id === viewItem.value?.id,
-  );
+const handleDeleteOne = (e: Picture) => {
+  const index = data.value?.list.findIndex((item) => item.id === e.id);
   if (index === undefined || index === -1) return;
   data.value?.list.splice(index, 1);
-  isViewModalVisible.value = false;
-};
-
-const downloadURL = computed(() => {
-  if (!viewItem.value) return;
-  const { id } = viewItem.value;
-  const qs = new URLSearchParams({ id });
-  return `/api/picture/download?${qs}`;
-});
-
-const download = () => {
-  window.open(downloadURL.value);
 };
 </script>
 
@@ -96,13 +77,13 @@ const download = () => {
         v-for="item in data?.list"
         :key="item.id"
         class="relative overflow-hidden rounded"
+        @click="handleClickItem(item)"
       >
         <img
           v-if="item.content_type.startsWith('image/')"
           class="aspect-1 object-cover transition hover:scale-105"
           :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
           :alt="item.name"
-          @click="handleClickItem(item)"
         />
         <video
           v-else-if="item.content_type.startsWith('video/')"
@@ -111,45 +92,15 @@ const download = () => {
           :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
           loop
           muted
-          @click="handleClickItem(item)"
         />
         <UIcon
           v-else
           class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
           name="i-tabler-box-seam"
-          style="font-size: 1.8rem"
+          style="font-size: 1.6rem"
         />
       </div>
     </section>
-    <UModal v-if="viewItem" v-model="isViewModalVisible">
-      <UCard>
-        <template #header>
-          <p class="truncate">{{ viewItem.name }}</p>
-        </template>
-        <img
-          v-if="viewItem.content_type.startsWith('image/')"
-          :src="downloadURL"
-          :alt="viewItem.name"
-        />
-        <video
-          v-else-if="viewItem.content_type.startsWith('video/')"
-          autoplay
-          :src="downloadURL"
-          loop
-          controls
-        />
-        <template #footer>
-          <UButton class="mr-3 px-4" @click="download">
-            <UIcon name="i-tabler-download" style="font-size: 1.1rem" />
-            下载
-          </UButton>
-          <UButton color="red" @click="handleDeleteItem">
-            <UIcon name="i-tabler-trash" style="font-size: 1.1rem" />
-            删除
-          </UButton>
-        </template>
-      </UCard>
-    </UModal>
     <UPagination
       v-if="data?.total"
       v-model="page.page"
@@ -158,6 +109,11 @@ const download = () => {
       :total="data.total"
       show-last
       show-first
+    />
+    <PictureDetailModel
+      v-model:visible="isViewModalVisible"
+      v-model:item="currentPicture"
+      @delete="handleDeleteOne"
     />
   </UContainer>
 </template>
