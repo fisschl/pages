@@ -78,9 +78,10 @@ const user = useUserStore();
 
 <template>
   <nav
-    class="flex flex-col bg-zinc-100 px-3 pb-2 pt-4 backdrop-blur dark:bg-zinc-700/30"
+    class="bg-zinc-100 px-3 pb-2 pt-4 backdrop-blur dark:bg-zinc-700/30"
+    :class="$style.navContainer"
   >
-    <div class="flex-1">
+    <div class="mb-3 flex-1">
       <template v-for="group in links" :key="group.label">
         <b class="mx-1 mb-2 mt-3 block text-sm">
           {{ group.label }}
@@ -109,3 +110,11 @@ const user = useUserStore();
     </UButton>
   </nav>
 </template>
+
+<style module>
+.navContainer {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+</style>

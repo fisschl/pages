@@ -19,10 +19,16 @@ const { data } = await useFetch("/api/picture/pictures", {
   headers,
 });
 
-const dialog = useFileDialog({ accept: "image/*", multiple: true });
+const waitList = reactive(new Map<File, string>());
+
+const dialog = useFileDialog({ multiple: true });
 dialog.onChange(async (files) => {
   if (!files) return;
   for (const file of files) {
+    waitList.set(file, "waiting");
+  }
+  for (const file of files) {
+    waitList.set(file, "uploading");
     const item = await $fetch<any>("/api/picture", {
       method: "POST",
       body: pick(file, ["name", "type"]),
@@ -36,18 +42,15 @@ dialog.onChange(async (files) => {
       },
     });
     data.value?.list.unshift(item);
+    waitList.delete(file);
   }
 });
 
 const viewItem = ref<Picture>();
 const isViewModalVisible = ref(false);
 
-const handleClickItem = (e: Event) => {
-  const target = e.currentTarget;
-  if (!(target instanceof HTMLElement)) return;
-  const { id } = target.dataset;
-  if (!id) return;
-  viewItem.value = data.value?.list?.find((item) => item.id === id);
+const handleClickItem = (e: Picture) => {
+  viewItem.value = e;
   isViewModalVisible.value = true;
 };
 
@@ -64,15 +67,15 @@ const handleDeleteItem = async () => {
   isViewModalVisible.value = false;
 };
 
-const downloadURL = () => {
+const downloadURL = computed(() => {
   if (!viewItem.value) return;
   const { id } = viewItem.value;
   const qs = new URLSearchParams({ id });
   return `/api/picture/download?${qs}`;
-};
+});
 
 const download = () => {
-  window.open(downloadURL());
+  window.open(downloadURL.value);
 };
 </script>
 
@@ -83,6 +86,7 @@ const download = () => {
       <UButton class="px-6" @click="dialog.open">
         <UIcon name="i-tabler-upload" style="font-size: 1.1rem" />
         上传
+        <span v-if="waitList.size"> （ {{ waitList.size }} ） </span>
       </UButton>
     </section>
     <section
@@ -91,14 +95,29 @@ const download = () => {
       <div
         v-for="item in data?.list"
         :key="item.id"
-        class="overflow-hidden rounded"
-        :data-id="item.id"
-        @click="handleClickItem"
+        class="relative overflow-hidden rounded"
       >
         <img
+          v-if="item.content_type.startsWith('image/')"
           class="aspect-1 object-cover transition hover:scale-105"
           :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
           :alt="item.name"
+          @click="handleClickItem(item)"
+        />
+        <video
+          v-else-if="item.content_type.startsWith('video/')"
+          class="aspect-1 object-cover transition hover:scale-105"
+          autoplay
+          :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
+          loop
+          muted
+          @click="handleClickItem(item)"
+        />
+        <UIcon
+          v-else
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          name="i-tabler-box-seam"
+          style="font-size: 1.8rem"
         />
       </div>
     </section>
@@ -107,7 +126,18 @@ const download = () => {
         <template #header>
           <p class="truncate">{{ viewItem.name }}</p>
         </template>
-        <img :src="downloadURL()" :alt="viewItem.name" />
+        <img
+          v-if="viewItem.content_type.startsWith('image/')"
+          :src="downloadURL"
+          :alt="viewItem.name"
+        />
+        <video
+          v-else-if="viewItem.content_type.startsWith('video/')"
+          autoplay
+          :src="downloadURL"
+          loop
+          controls
+        />
         <template #footer>
           <UButton class="mr-3 px-4" @click="download">
             <UIcon name="i-tabler-download" style="font-size: 1.1rem" />
