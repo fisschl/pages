@@ -27,18 +27,27 @@ export const verifyPassword = async (password: string, hash: string) => {
   });
 };
 
+/**
+ * 从请求中获取 token
+ */
 export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
   const cookie = getCookie(event, "token");
   if (cookie) return cookie;
+  const header = getHeader(event, "token");
+  if (header) return header;
   const query = getQuery(event);
   if (isString(query.token)) return query.token;
   return undefined;
 };
 
+/**
+ * 校验 token 是否正确
+ */
 export const checkUserSafe = async (
   event: H3Event<EventHandlerRequest>,
+  token?: string,
 ): Promise<User | number> => {
-  const token = tokenFromContext(event);
+  if (!token) token = tokenFromContext(event);
   if (!token) return 401;
   const id = await redis.get(token);
   if (!id) return 403;
@@ -52,6 +61,9 @@ export const checkUserSafe = async (
   return user;
 };
 
+/**
+ * 获取当前用户
+ */
 export const checkUser = async (
   event: H3Event<EventHandlerRequest>,
 ): Promise<User> => {

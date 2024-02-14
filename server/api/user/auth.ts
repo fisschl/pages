@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { typeid } from "typeid-js";
-import { verifyPassword } from "~/server/utils/password";
+import { checkUser, verifyPassword } from "~/server/utils/password";
 import { DAY, redis } from "~/server/utils/redis";
 import { UserInsertSchema } from "~/server/utils/schema";
 import { db } from "~/server/utils/db";
@@ -11,6 +11,11 @@ const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 
 export default defineEventHandler(async (event) => {
   if (!redis.isOpen) await redis.connect();
+  if (event.method === "GET") {
+    const user = await checkUser(event);
+    user.password = "******";
+    return user;
+  }
   const body = await readValidatedBody(event, BodySchema.parse);
   const user = await db.query.users.findFirst({
     where: eq(users.name, body.name),
@@ -26,5 +31,6 @@ export default defineEventHandler(async (event) => {
   setCookie(event, "token", token, { expires, httpOnly: true });
   await redis.set(token, user.id);
   await redis.expireAt(token, expires);
-  return { message: "登陆成功" };
+  user.password = "******";
+  return user;
 });

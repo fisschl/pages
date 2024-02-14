@@ -30,18 +30,18 @@ const onSubmit = async () => {
     }
   }
   try {
-    await $fetch("/api/session", {
+    const user = await $fetch("/api/user/auth", {
       method: "POST",
       body: state,
     });
+    store.user = user;
+    const { from } = route.query;
+    if (!from || typeof from !== "string") return;
+    location.href = from;
   } catch (e) {
     errors.value.password = "用户名或密码错误";
     return;
   }
-  store.user = await $fetch("/api/user");
-  const { from } = route.query;
-  if (!from || typeof from !== "string") return;
-  location.href = from;
 };
 </script>
 

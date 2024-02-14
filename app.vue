@@ -5,7 +5,7 @@ import { useSseStore } from "./composables/sse";
 const store = useUserStore();
 
 const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch("/api/user", { headers });
+const { data } = await useFetch("/api/user/auth", { headers });
 if (data.value) store.user = data.value;
 
 const { create } = useSseStore();
