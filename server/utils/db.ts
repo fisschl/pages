@@ -29,5 +29,5 @@ export const sanitize = (html: string) => {
   return purify.sanitize(html);
 };
 
-export const mongoClient = new MongoClient(process.env.MONGODB_URL!);
+const mongoClient = new MongoClient(process.env.MONGODB_URL!);
 export const mongodb = mongoClient.db("default");
