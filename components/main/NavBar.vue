@@ -47,12 +47,6 @@ const links = computed(() => [
         target: "_blank",
       },
       {
-        label: "博客",
-        icon: "i-tabler-brand-blogger",
-        to: "https://memos.fisschl.world",
-        target: "_blank",
-      },
-      {
         label: "共享文件",
         icon: "i-tabler-device-floppy",
         to: "https://store.fisschl.world",
