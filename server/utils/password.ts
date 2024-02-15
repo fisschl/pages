@@ -46,11 +46,12 @@ export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
 export const checkUserSafe = async (
   event: H3Event<EventHandlerRequest>,
   token?: string,
-): Promise<User | number> => {
+): Promise<User | undefined> => {
+  if (!redis.isOpen) await redis.connect();
   if (!token) token = tokenFromContext(event);
-  if (!token) return 401;
+  if (!token) return;
   const id = await redis.get(token);
-  if (!id) return 403;
+  if (!id) return;
   const userJson = await redis.get(id);
   if (userJson) return JSON.parse(userJson);
   const user = await db.query.users.findFirst({ where: eq(users.id, id) });
@@ -68,6 +69,6 @@ export const checkUser = async (
   event: H3Event<EventHandlerRequest>,
 ): Promise<User> => {
   const res = await checkUserSafe(event);
-  if (typeof res === "number") throw createError({ status: res });
+  if (!res) throw createError({ status: 403 });
   return res;
 };

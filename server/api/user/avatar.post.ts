@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   await checkUser(event);
   const { type, name } = await readValidatedBody(event, QuerySchema.parse);
   const avatar = typeid().toString() + extname(name);
-  const { url } = await counselor(`/storage/upload`, {
+  const { url } = await counselor<Record<string, string>>(`/storage/upload`, {
     query: { key: `server/avatar/${avatar}`, type: type },
   });
   return { avatar, url };

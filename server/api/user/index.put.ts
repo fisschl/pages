@@ -30,6 +30,9 @@ export default defineEventHandler(async (event) => {
   } else {
     body.avatar = undefined;
   }
+  if (user.role !== "admin") {
+    body.role = undefined;
+  }
   const list = await db
     .update(users)
     .set(body)

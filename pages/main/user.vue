@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { cloneDeep, first } from "lodash-es";
+import { first } from "lodash-es";
 import { useUserStore } from "~/composables/user";
+import { useFormState } from "~/utils/object";
 
 const store = useUserStore();
 await store.checkLogin();
@@ -24,13 +25,16 @@ dialog.onChange(async (files) => {
   store.user = res;
 });
 
-const state = ref(cloneDeep(store.user));
+const { state } = useFormState(store.user);
 
-const submitUserName = async () => {
-  if (!state.value?.name) return;
+const submit = async (key: string) => {
+  const value = state[key];
+  if (typeof value === "string") {
+    state[key] = value.trim();
+  }
   const res = await $fetch("/api/user", {
     method: "PUT",
-    body: { name: state.value.name.trim() },
+    body: { [key]: state[key] },
   });
   store.user = res;
 };
@@ -38,16 +42,8 @@ const submitUserName = async () => {
 const isPasswordEditing = ref(false);
 const handleEditPassword = () => {
   if (!state.value) return;
-  state.value.password = "";
+  state.password = "";
   isPasswordEditing.value = true;
-};
-const submitPassword = async () => {
-  if (!state.value?.password) return;
-  const res = await $fetch("/api/user", {
-    method: "PUT",
-    body: { password: state.value.password.trim() },
-  });
-  store.user = res;
 };
 </script>
 
@@ -64,7 +60,7 @@ const submitPassword = async () => {
           <UButton
             v-if="state.name !== store.user?.name"
             type="button"
-            @click="submitUserName"
+            @click="submit('name')"
           >
             确认
           </UButton>
@@ -108,7 +104,19 @@ const submitPassword = async () => {
           <UButton
             v-else-if="state.password"
             type="button"
-            @click="submitPassword"
+            @click="submit('password')"
+          >
+            确认
+          </UButton>
+        </div>
+      </UFormGroup>
+      <UFormGroup label="角色" name="role">
+        <div class="flex gap-3">
+          <UInput v-model="state.role" style="width: 12rem" />
+          <UButton
+            v-if="state.role !== store.user?.role"
+            type="button"
+            @click="submit('role')"
           >
             确认
           </UButton>
