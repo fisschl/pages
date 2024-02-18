@@ -72,7 +72,7 @@ const user = useUserStore();
 
 <template>
   <nav
-    class="bg-zinc-100 px-3 pb-2 pt-4 backdrop-blur dark:bg-zinc-700/30"
+    class="flex-shrink-0 bg-zinc-100 px-3 pb-2 pt-4 backdrop-blur dark:bg-zinc-700/30"
     :class="$style.navContainer"
   >
     <div class="mb-3 flex-1">

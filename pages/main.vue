@@ -20,7 +20,7 @@ onMounted(() => {
     />
     <div class="flex flex-1" :class="$style.mainContainer">
       <MainNavBar v-if="navbar" :class="$style.navbar" />
-      <main :class="$style.main" class="flex-1">
+      <main class="flex-1 overflow-hidden">
         <NuxtPage />
       </main>
     </div>
