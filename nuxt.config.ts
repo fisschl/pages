@@ -5,9 +5,9 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/content",
     "@pinia/nuxt",
-    "@nuxt/image"
+    "@pinia-plugin-persistedstate/nuxt",
   ],
   ui: {
-    icons: ["tabler"]
+    icons: ["tabler"],
   },
 });

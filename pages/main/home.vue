@@ -1,24 +1,34 @@
+<script lang="ts">
+export const useLibraryStore = defineStore("library", () => {
+  const state = reactive<{
+    keyword?: string;
+    library?: string[];
+  }>({});
+
+  return { state };
+});
+</script>
+
 <script setup lang="ts">
-import { useRouteQuery } from "@vueuse/router";
 import { debounce } from "lodash-es";
-import { useOptionsQuery } from "~/utils/query";
 
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
-const keyword = useRouteQuery("keyword", "");
-const library = useOptionsQuery("library");
+const { state } = useLibraryStore();
 
 const handleLibraryChange = (value: string, checked: boolean) => {
-  const set = new Set(library.value);
+  const set = new Set(state.library);
   if (checked) set.add(value);
   else set.delete(value);
-  library.value = [...set];
+  state.library = [...set];
 };
 
-const query = computed(() => ({
-  keyword: keyword.value,
-  library: library.value,
-}));
+const query = computed(() => {
+  return {
+    ...state,
+    library: state.library?.join(),
+  };
+});
 
 const { data } = await useFetch<Record<string, string>[]>(
   "/api/poetry/poetries",
@@ -52,7 +62,7 @@ whenever(isBottom, debounce(loadMore, 200));
 <template>
   <div class="mx-6 pb-3 pt-4">
     <UInput
-      v-model="keyword"
+      v-model="state.keyword"
       placeholder="搜索"
       icon="i-tabler-search"
       class="mb-4"
@@ -61,7 +71,7 @@ whenever(isBottom, debounce(loadMore, 200));
       <UCheckbox
         v-for="item in libraryOptions"
         :key="item.value"
-        :model-value="library.includes(item.value)"
+        :model-value="state.library?.includes(item.value)"
         name="library"
         :label="item.value"
         @update:model-value="handleLibraryChange(item.value, $event)"

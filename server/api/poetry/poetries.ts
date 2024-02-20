@@ -1,36 +1,30 @@
-import { type TypeOf, z } from "zod";
-import { isArray, isString, pick } from "lodash-es";
-import { OptionsQuerySchema } from "~/utils/query";
+import { z } from "zod";
+import { pick } from "lodash-es";
 import { meilisearch } from "~/server/utils/meilisearch";
-
-const QuerySchema = z.object({
-  keyword: z.string().default(""),
-  offset: z.string().default("0"),
-  library: OptionsQuerySchema,
-});
 
 export const poetriesIndex = meilisearch.index("poetries");
 
-export const optionsQueryFilter = (
-  key: string,
-  item: TypeOf<typeof OptionsQuerySchema>,
-) => {
-  if (!item || !item.length) return undefined;
-  if (isString(item)) return `${key} = ${item}`;
-  if (isArray(item)) return `${key} IN [${item.join()}]`;
-  return undefined;
+export const meilisearchQueryFilter = (key: string, items?: string[]) => {
+  const res = items?.filter(Boolean);
+  if (!res || !res.length) return undefined;
+  return `${key} IN [${res.join()}]`;
 };
+
+const RequestSchema = z.object({
+  keyword: z.string().default(""),
+  offset: z.string().default("0"),
+  library: z.string().optional(),
+});
 
 export default defineEventHandler(async (event) => {
   const { keyword, offset, library } = await getValidatedQuery(
     event,
-    QuerySchema.parse,
+    RequestSchema.parse,
   );
-  const filter = optionsQueryFilter("library", library);
   const res = await poetriesIndex.search(keyword, {
     limit: 64,
-    offset: parseInt(offset),
-    filter,
+    offset: parseInt(offset) || 0,
+    filter: meilisearchQueryFilter("library", library?.split(",")),
     attributesToCrop: ["content"],
     cropLength: 64,
     attributesToHighlight: ["content"],

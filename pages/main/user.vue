@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { first } from "lodash-es";
 import { useUserStore } from "~/composables/user";
-import { useFormState } from "~/utils/object";
+import type { FormError } from "#ui/types";
 
 const store = useUserStore();
 await store.checkLogin();
@@ -18,30 +18,48 @@ dialog.onChange(async (files) => {
     method: "PUT",
     body: file,
   });
-  const res = await $fetch("/api/user", {
+  store.user = await $fetch("/api/user", {
     method: "PUT",
     body: { avatar },
   });
-  store.user = res;
 });
 
-const { state } = useFormState(store.user);
+const state = reactive({
+  name: store.user?.name,
+  password: "******",
+  role: store.user?.role,
+});
 
-const submit = async (key: string) => {
-  const value = state[key];
-  if (typeof value === "string") {
-    state[key] = value.trim();
+const errors = ref<FormError[]>([]);
+
+const validate = (data: typeof state) => {
+  errors.value = [];
+  if (!data.name) {
+    errors.value.push({
+      path: "name",
+      message: "请填写用户名",
+    });
   }
-  const res = await $fetch("/api/user", {
+  if (!data.password) {
+    errors.value.push({
+      path: "password",
+      message: "请填写密码",
+    });
+  }
+  return errors.value;
+};
+
+const submit = async (key: keyof typeof state) => {
+  const value = state[key];
+  if (value) state[key] = value.trim();
+  store.user = await $fetch("/api/user", {
     method: "PUT",
     body: { [key]: state[key] },
   });
-  store.user = res;
 };
 
 const isPasswordEditing = ref(false);
 const handleEditPassword = () => {
-  if (!state.value) return;
   state.password = "";
   isPasswordEditing.value = true;
 };
@@ -49,78 +67,85 @@ const handleEditPassword = () => {
 
 <template>
   <UContainer class="py-6">
-    <UForm v-if="state" :state="state" class="space-y-6">
+    <div class="relative mb-5 flex w-max">
+      <UAvatar
+        v-if="store.user?.avatar"
+        size="2xl"
+        :src="`https://cdn.fisschl.world/server/avatar/${store.user.avatar}`"
+      />
+      <UAvatar v-else size="2xl" icon="i-tabler-user" />
+      <button
+        title="更改头像"
+        type="button"
+        class="rounded-full bg-gray-700/40 transition"
+        :class="$style.avatarButtonIcon"
+        @click="dialog.open"
+      >
+        <UIcon name="i-tabler-edit" style="font-size: 1.2rem" />
+      </button>
+    </div>
+    <UForm
+      v-if="state"
+      :validate="validate"
+      :state="state"
+      class="mb-5"
+      @submit="submit('name')"
+    >
       <UFormGroup label="用户名" name="name">
-        <div class="flex gap-3">
-          <UInput
-            v-model="state.name"
-            style="width: 12rem"
-            placeholder="请输入用户名"
-          />
-          <UButton
-            v-if="state.name !== store.user?.name"
-            type="button"
-            @click="submit('name')"
-          >
-            确认
-          </UButton>
-        </div>
+        <UInput
+          v-model="state.name"
+          style="width: 12rem"
+          class="mr-4 inline-block"
+          placeholder="请输入用户名"
+        />
+        <UButton v-if="state.name !== store.user?.name" type="submit">
+          确认
+        </UButton>
       </UFormGroup>
-      <UFormGroup label="头像" name="avatar">
-        <div class="relative flex w-max">
-          <UAvatar
-            v-if="store.user?.avatar"
-            size="2xl"
-            :src="`https://cdn.fisschl.world/server/avatar/${store.user.avatar}`"
-          />
-          <UAvatar v-else size="2xl" icon="i-tabler-user" />
-          <button
-            title="更改头像"
-            type="button"
-            class="rounded-full bg-gray-700/40 transition"
-            :class="$style.avatarButtonIcon"
-            @click="dialog.open"
-          >
-            <UIcon name="i-tabler-edit" style="font-size: 1.2rem" />
-          </button>
-        </div>
-      </UFormGroup>
+    </UForm>
+    <UForm
+      v-if="state"
+      :validate="validate"
+      :state="state"
+      class="mb-5"
+      @submit="submit('password')"
+    >
       <UFormGroup label="密码" name="password">
-        <div class="flex gap-3">
-          <UInput
-            v-model="state.password"
-            style="width: 12rem"
-            :disabled="!isPasswordEditing"
-            type="password"
-            placeholder="请输入密码"
-          />
-          <UButton
-            v-if="!isPasswordEditing"
-            type="button"
-            @click="handleEditPassword"
-          >
-            修改密码
-          </UButton>
-          <UButton
-            v-else-if="state.password"
-            type="button"
-            @click="submit('password')"
-          >
-            确认
-          </UButton>
-        </div>
+        <UInput
+          v-model="state.password"
+          style="width: 12rem"
+          :disabled="!isPasswordEditing"
+          type="password"
+          class="mr-4 inline-block"
+          placeholder="请输入密码"
+        />
+        <UButton
+          v-if="!isPasswordEditing"
+          type="button"
+          color="blue"
+          @click="handleEditPassword"
+        >
+          修改密码
+        </UButton>
+        <UButton v-else-if="state.password" type="submit"> 确认 </UButton>
       </UFormGroup>
-      <UFormGroup label="角色" name="role">
-        <div class="flex gap-3">
-          <UInput v-model="state.role" style="width: 12rem" />
-          <UButton
-            v-if="state.role !== store.user?.role"
-            type="button"
-            @click="submit('role')"
-          >
-            确认
-          </UButton>
-        </div>
+    </UForm>
+    <UForm
+      v-if="state"
+      :validate="validate"
+      :state="state"
+      class="mb-5"
+      @submit="submit('role')"
+    >
+      <UFormGroup v-if="store.user?.role === 'admin'" label="角色" name="role">
+        <UInput
+          v-model="state.role"
+          class="mr-4 inline-block"
+          style="width: 12rem"
+        />
+        <UButton v-if="state.role !== store.user?.role" type="submit">
+          确认
+        </UButton>
       </UFormGroup>
     </UForm>
   </UContainer>
