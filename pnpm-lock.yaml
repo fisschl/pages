@@ -71,9 +71,6 @@ dependencies:
   hash-wasm:
     specifier: ^4.11.0
     version: 4.11.0
-  immer:
-    specifier: ^10.0.3
-    version: 10.0.3
   jsdom:
     specifier: ^24.0.0
     version: 24.0.0
@@ -5541,10 +5538,6 @@ packages:
   /image-meta@0.2.0:
     resolution: {integrity: sha512-ZBGjl0ZMEMeOC3Ns0wUF/5UdUmr3qQhBSCniT0LxOgGGIRHiNFOkMtIHB7EOznRU47V2AxPgiVP+s+0/UCU0Hg==}
     requiresBuild: true
-    dev: false
-
-  /immer@10.0.3:
-    resolution: {integrity: sha512-pwupu3eWfouuaowscykeckFmVTpqbzW+rXFCX8rQLkZzM9ftBmU/++Ra+o+L27mz03zJTlyV4UUr+fdKNffo4A==}
     dev: false
 
   /import-fresh@3.3.0:
