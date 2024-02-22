@@ -1,4 +1,4 @@
-import type { User } from "~/server/utils/schema";
+import type { User } from "~/server/database/schema";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User>();

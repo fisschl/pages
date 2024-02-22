@@ -3,9 +3,10 @@ import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { typeid } from "typeid-js";
 import { checkUser, verifyPassword } from "~/server/utils/password";
-import { DAY, redis } from "~/server/utils/redis";
-import { UserInsertSchema } from "~/server/utils/schema";
-import { db } from "~/server/utils/db";
+import { DAY, redis } from "~/server/database/redis";
+import { UserInsertSchema } from "~/server/database/schema";
+
+import { database } from "~/server/database/postgres";
 
 const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
     return user;
   }
   const body = await readValidatedBody(event, BodySchema.parse);
-  const user = await db.query.users.findFirst({
+  const user = await database.query.users.findFirst({
     where: eq(users.name, body.name),
   });
   if (!user) throw createError({ status: 401 });

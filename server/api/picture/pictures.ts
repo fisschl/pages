@@ -1,16 +1,17 @@
 import { count, desc, eq } from "drizzle-orm";
 import { first } from "lodash-es";
-import { PageQuerySchema, db, limitOffset } from "~/server/utils/db";
+import { limitOffset, PageQuerySchema } from "~/server/database/page";
+import { database } from "~/server/database/postgres";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const query = await getValidatedQuery(event, PageQuerySchema.parse);
   const where = eq(pictures.user_id, user.id);
-  const counts = await db
+  const counts = await database
     .select({ total: count() })
     .from(pictures)
     .where(where);
-  const list = await db.query.pictures.findMany({
+  const list = await database.query.pictures.findMany({
     where,
     ...limitOffset(query),
     orderBy: desc(pictures.update_at),

@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
-import { db } from "~/server/utils/db";
-import { short_links } from "~/server/utils/schema";
+import { short_links } from "~/server/database/schema";
+import { database } from "~/server/database/postgres";
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
   if (!id) throw createError({ status: 400 });
-  const res = await db.query.short_links.findFirst({
+  const res = await database.query.short_links.findFirst({
     where: eq(short_links.id, id),
   });
   if (!res) throw createError({ status: 404 });

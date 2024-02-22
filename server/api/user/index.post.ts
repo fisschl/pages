@@ -1,7 +1,8 @@
 import { hashPassword } from "~/server/utils/password";
-import { UserInsertSchema } from "~/server/utils/schema";
-import { redis } from "~/server/utils/redis";
-import { db, sanitize } from "~/server/utils/db";
+import { UserInsertSchema } from "~/server/database/schema";
+import { redis } from "~/server/database/redis";
+import { database } from "~/server/database/postgres";
+import { sanitize } from "~/server/utils/purify";
 
 export default defineEventHandler(async (event) => {
   if (!redis.isOpen) await redis.connect();
@@ -15,6 +16,6 @@ export default defineEventHandler(async (event) => {
   const password = await hashPassword(body.password);
   if (!password) throw createError({ status: 400 });
   body.password = password;
-  await db.insert(users).values(body);
+  await database.insert(users).values(body);
   return { message: "注册成功" };
 });

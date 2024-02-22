@@ -2,9 +2,9 @@ import { eq } from "drizzle-orm";
 import type { EventHandlerRequest, H3Event } from "h3";
 import { argon2Verify, argon2id } from "hash-wasm";
 import { isString } from "lodash-es";
-import { DAY, redis } from "~/server/utils/redis";
-import { User } from "~/server/utils/schema";
-import { db } from "~/server/utils/db";
+import { DAY, redis } from "~/server/database/redis";
+import { User } from "~/server/database/schema";
+import { database } from "~/server/database/postgres";
 
 export const hashPassword = async (password: string) => {
   const salt = new Uint8Array(16);
@@ -54,7 +54,9 @@ export const checkUserSafe = async (
   if (!id) return;
   const userJson = await redis.get(id);
   if (userJson) return JSON.parse(userJson);
-  const user = await db.query.users.findFirst({ where: eq(users.id, id) });
+  const user = await database.query.users.findFirst({
+    where: eq(users.id, id),
+  });
   if (!user) throw createError({ status: 404 });
   await redis.set(user.id, JSON.stringify(user), {
     EX: 60 * DAY,

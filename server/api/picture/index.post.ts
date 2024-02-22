@@ -1,10 +1,10 @@
 import { first } from "lodash-es";
 import { z } from "zod";
-import { db } from "~/server/utils/db";
 import { checkUser } from "~/server/utils/password";
 import { typeid } from "typeid-js";
 import { counselor } from "~/server/api/picture/download";
 import { extname } from "node:path";
+import { database } from "~/server/database/postgres";
 
 const QuerySchema = z.object({
   name: z.string(),
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const { name, type } = await readValidatedBody(event, QuerySchema.parse);
   const id = typeid().toString() + extname(name);
-  const items = await db
+  const items = await database
     .insert(pictures)
     .values({
       id,

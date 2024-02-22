@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
-import type { Picture } from "~/server/utils/schema";
+import type { Picture } from "~/server/database/schema";
 
 const store = useUserStore();
 await store.checkLogin();

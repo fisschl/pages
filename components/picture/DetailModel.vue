@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Picture } from "~/server/utils/schema";
+import type { Picture } from "~/server/database/schema";
 
 const visible = defineModel<boolean>("visible");
 const item = defineModel<Picture>("item");

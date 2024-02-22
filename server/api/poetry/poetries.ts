@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { pick } from "lodash-es";
-import { meilisearch } from "~/server/utils/meilisearch";
+import { meilisearch } from "~/server/database/meilisearch";
 
 export const poetriesIndex = meilisearch.index("poetries");
 

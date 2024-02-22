@@ -1,6 +1,6 @@
 import type { EventHandlerRequest, H3Event } from "h3";
 import { checkUserSafe } from "../utils/password";
-import { subscriber } from "../utils/redis";
+import { subscriber } from "../database/redis";
 
 export const useSseKey = async (event: H3Event<EventHandlerRequest>) => {
   const user = await checkUserSafe(event);
