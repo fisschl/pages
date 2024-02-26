@@ -4,8 +4,7 @@ import { nanoid } from "nanoid";
 import { typeid } from "typeid-js";
 import { checkUser, verifyPassword } from "~/server/utils/password";
 import { DAY, redis } from "~/server/database/redis";
-import { UserInsertSchema } from "~/server/database/schema";
-
+import { UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 
 const BodySchema = UserInsertSchema.pick({ name: true, password: true });

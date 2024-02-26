@@ -3,6 +3,7 @@ import { z } from "zod";
 import { counselor } from "~/server/api/picture/download";
 import { checkUser } from "~/server/utils/password";
 import { database } from "~/server/database/postgres";
+import { pictures } from "~/server/database/schema";
 
 const QuerySchema = z.object({
   id: z.string(),

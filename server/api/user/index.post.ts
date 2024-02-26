@@ -1,5 +1,5 @@
 import { hashPassword } from "~/server/utils/password";
-import { UserInsertSchema } from "~/server/database/schema";
+import { UserInsertSchema, users } from "~/server/database/schema";
 import { redis } from "~/server/database/redis";
 import { database } from "~/server/database/postgres";
 import { sanitize } from "~/server/utils/purify";

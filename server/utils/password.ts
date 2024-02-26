@@ -3,7 +3,7 @@ import type { EventHandlerRequest, H3Event } from "h3";
 import { argon2Verify, argon2id } from "hash-wasm";
 import { isString } from "lodash-es";
 import { DAY, redis } from "~/server/database/redis";
-import { User } from "~/server/database/schema";
+import { User, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 
 export const hashPassword = async (password: string) => {

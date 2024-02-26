@@ -2,9 +2,10 @@ import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
 import { checkUser, hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/database/redis";
-import { UserUpdateSchema } from "~/server/database/schema";
+import { UserUpdateSchema, users } from "~/server/database/schema";
 import { counselor } from "../picture/download";
 import { sanitize } from "~/server/utils/purify";
+import { database } from "~/server/database/postgres";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
   if (user.role !== "admin") {
     body.role = undefined;
   }
-  const list = await db
+  const list = await database
     .update(users)
     .set(body)
     .where(eq(users.id, user.id))

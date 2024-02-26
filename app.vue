@@ -16,7 +16,6 @@ onMounted(create);
   <Html lang="zh-CN">
     <Head>
       <Title> 沅有茝兮醴有兰 </Title>
-      <Link rel="preconnect" href="https://cdn.fisschl.world" />
       <Link rel="stylesheet" href="https://cdn.fisschl.world/MiSans/font.css" />
     </Head>
     <Body :class="$style.root" class="bg-neutral-50 dark:bg-neutral-900">

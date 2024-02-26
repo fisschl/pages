@@ -2,6 +2,7 @@ import { count, desc, eq } from "drizzle-orm";
 import { first } from "lodash-es";
 import { limitOffset, PageQuerySchema } from "~/server/database/page";
 import { database } from "~/server/database/postgres";
+import { pictures } from "~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);

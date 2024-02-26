@@ -4,7 +4,7 @@ import { subscriber } from "../database/redis";
 
 export const useSseKey = async (event: H3Event<EventHandlerRequest>) => {
   const user = await checkUserSafe(event);
-  if (typeof user === "number") return `sse:guest`;
+  if (!user) return `sse:guest`;
   return `sse:${user.id}`;
 };
 

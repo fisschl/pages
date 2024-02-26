@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { ofetch } from "ofetch";
+import { pictures } from "~/server/database/schema";
+import { database } from "~/server/database/postgres";
 
 export const counselor = ofetch.create({
   baseURL: process.env.COUNSELOR_HOST,
@@ -13,7 +15,7 @@ const QuerySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedQuery(event, QuerySchema.parse);
   // 下载文件，需要指定下载文件名
-  const picture = await db.query.pictures.findFirst({
+  const picture = await database.query.pictures.findFirst({
     where: eq(pictures.id, id),
   });
   if (!picture) throw createError({ status: 404 });

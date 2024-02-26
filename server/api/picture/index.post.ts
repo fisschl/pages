@@ -5,6 +5,7 @@ import { typeid } from "typeid-js";
 import { counselor } from "~/server/api/picture/download";
 import { extname } from "node:path";
 import { database } from "~/server/database/postgres";
+import { pictures } from "~/server/database/schema";
 
 const QuerySchema = z.object({
   name: z.string(),
