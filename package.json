@@ -28,6 +28,7 @@
     "@vueuse/integrations": "^10.7.2",
     "@vueuse/nuxt": "^10.7.2",
     "@vueuse/router": "^10.7.2",
+    "bullmq": "^5.3.3",
     "change-case": "^5.4.3",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",

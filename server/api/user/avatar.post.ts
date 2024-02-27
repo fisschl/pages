@@ -1,8 +1,8 @@
 import { typeid } from "typeid-js";
 import { z } from "zod";
 import { checkUser } from "~/server/utils/password";
-import { counselor } from "~/server/api/picture/download";
 import { extname } from "node:path";
+import { counselor } from "~/server/utils/counselor";
 
 const QuerySchema = z.object({
   type: z.string(),

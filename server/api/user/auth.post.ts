@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { typeid } from "typeid-js";
-import { checkUser, verifyPassword } from "~/server/utils/password";
+import { verifyPassword } from "~/server/utils/password";
 import { DAY, redis } from "~/server/database/redis";
 import { UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
@@ -11,11 +11,6 @@ const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 
 export default defineEventHandler(async (event) => {
   if (!redis.isOpen) await redis.connect();
-  if (event.method === "GET") {
-    const user = await checkUser(event);
-    user.password = "******";
-    return user;
-  }
   const body = await readValidatedBody(event, BodySchema.parse);
   const user = await database.query.users.findFirst({
     where: eq(users.name, body.name),
@@ -28,7 +23,7 @@ export default defineEventHandler(async (event) => {
   });
   const token = typeid().toString() + nanoid(24);
   const expires = addDays(new Date(), 30);
-  setCookie(event, "token", token, { expires, httpOnly: true });
+  setCookie(event, "token", token, { expires });
   await redis.set(token, user.id);
   await redis.expireAt(token, expires);
   user.password = "******";

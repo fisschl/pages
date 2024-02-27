@@ -3,9 +3,9 @@ import { first } from "lodash-es";
 import { checkUser, hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/database/redis";
 import { UserUpdateSchema, users } from "~/server/database/schema";
-import { counselor } from "../picture/download";
 import { sanitize } from "~/server/utils/purify";
 import { database } from "~/server/database/postgres";
+import { counselor } from "~/server/utils/counselor";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);

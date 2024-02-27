@@ -1,12 +1,8 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { ofetch } from "ofetch";
 import { pictures } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
-
-export const counselor = ofetch.create({
-  baseURL: process.env.COUNSELOR_HOST,
-});
+import { counselor } from "~/server/utils/counselor";
 
 const QuerySchema = z.object({
   id: z.string(),
