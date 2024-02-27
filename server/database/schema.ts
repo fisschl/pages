@@ -1,7 +1,6 @@
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
-import { relations } from "drizzle-orm";
 
 const id = () => typeid().toString();
 
@@ -20,10 +19,6 @@ export const users = pgTable("users", {
   avatar: varchar("avatar"),
   role: varchar("role"),
 });
-
-export const usersRelations = relations(users, ({ many }) => ({
-  pictures: many(pictures),
-}));
 
 export type User = typeof users.$inferSelect;
 export const UserInsertSchema = createInsertSchema(users);
@@ -54,13 +49,6 @@ export const pictures = pgTable("pictures", {
     .notNull()
     .references(() => users.id),
 });
-
-export const picturesRelations = relations(pictures, ({ one }) => ({
-  user: one(users, {
-    fields: [pictures.user_id],
-    references: [users.id],
-  }),
-}));
 
 export type Picture = typeof pictures.$inferSelect;
 export const PictureInsertSchema = createInsertSchema(pictures);
