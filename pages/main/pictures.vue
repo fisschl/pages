@@ -2,6 +2,10 @@
 import { pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { Picture } from "~/server/database/schema";
+import axios from "axios";
+import { partial } from "filesize";
+
+const size = partial({ standard: "jedec" });
 
 const store = useUserStore();
 await store.checkLogin();
@@ -19,31 +23,54 @@ const { data } = await useFetch("/api/picture/pictures", {
   headers,
 });
 
-const waitList = reactive(new Map<File, string>());
+interface Uploading {
+  /**
+   * 0 - 1
+   */
+  progress: number;
+  /**
+   * byte
+   */
+  loaded: string;
+  total: string;
+  status: "waiting" | "uploading";
+}
+
+const uploading = reactive(new Map<File, Uploading>());
 
 const dialog = useFileDialog({ multiple: true });
 dialog.onChange(async (files) => {
   if (!files) return;
   for (const file of files) {
-    waitList.set(file, "waiting");
+    uploading.set(file, {
+      progress: 0,
+      loaded: "",
+      total: size(file.size),
+      status: "waiting",
+    });
   }
   for (const file of files) {
-    waitList.set(file, "uploading");
-    const item = await $fetch<any>("/api/picture", {
+    const item = await $fetch("/api/picture", {
       method: "POST",
       body: pick(file, ["name", "type"]),
     });
     const filename = encodeURIComponent(file.name);
-    await $fetch(item.url, {
-      method: "PUT",
-      body: file,
+    await axios.put(item.url, file, {
       headers: {
         "Content-Disposition": `attachment; filename="${filename}"`,
         "Content-Type": file.type,
       },
+      onUploadProgress: (e) => {
+        uploading.set(file, {
+          progress: Math.floor((e.progress || 0) * 100),
+          loaded: size(e.loaded),
+          total: size(e.total || 0),
+          status: "uploading",
+        });
+      },
     });
     data.value?.list.unshift(item);
-    waitList.delete(file);
+    uploading.delete(file);
   }
 });
 
@@ -63,22 +90,28 @@ const handleDeleteOne = (e: Picture) => {
 
 <template>
   <UContainer class="py-6">
+    <section v-if="uploading.size > 0">
+      <div v-for="[file, state] in uploading" :key="file.name">
+        <p class="flex items-end">
+          <span class="flex-1 truncate text-gray-600">{{ file.name }}</span>
+          <span class="ml-2 text-gray-400">
+            {{ state.loaded }}
+            /
+            {{ state.total }}
+          </span>
+        </p>
+        <UProgress :value="state.progress" />
+      </div>
+    </section>
     <section class="mb-6 flex">
       <span class="flex-1"></span>
-      <UButton class="px-6" @click="dialog.open">
-        <UIcon
-          v-if="!waitList.size"
-          name="i-tabler-upload"
-          style="font-size: 1.1rem"
-        />
-        <UIcon
-          v-else
-          name="i-tabler-loader-2"
-          class="animate-spin"
-          style="font-size: 1.1rem"
-        />
-        上传
-      </UButton>
+      <UChip :show="uploading.size > 0">
+        <UButton class="px-6" @click="dialog.open">
+          <UIcon name="i-tabler-upload" style="font-size: 1.1rem" />
+
+          上传
+        </UButton>
+      </UChip>
     </section>
     <section
       class="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"

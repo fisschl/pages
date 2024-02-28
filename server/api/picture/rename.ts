@@ -18,10 +18,12 @@ export default defineEventHandler(async (event) => {
     .set({ name, update_at: new Date().toISOString() })
     .where(eq(pictures.id, id));
   const filename = encodeURIComponent(name);
-  const meta = { "Content-Disposition": `attachment; filename="${filename}"` };
   await counselor(`/storage/update`, {
     method: "PUT",
-    body: { key: `server/picture/${id}`, meta },
+    body: {
+      key: `server/picture/${id}`,
+      content_disposition: `attachment; filename="${filename}"`,
+    },
   });
   return { message: "更新成功" };
 });
