@@ -39,6 +39,7 @@ dialog.onChange(async (files) => {
       body: file,
       headers: {
         "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Type": file.type,
       },
     });
     data.value?.list.unshift(item);
@@ -65,9 +66,18 @@ const handleDeleteOne = (e: Picture) => {
     <section class="mb-6 flex">
       <span class="flex-1"></span>
       <UButton class="px-6" @click="dialog.open">
-        <UIcon name="i-tabler-upload" style="font-size: 1.1rem" />
+        <UIcon
+          v-if="!waitList.size"
+          name="i-tabler-upload"
+          style="font-size: 1.1rem"
+        />
+        <UIcon
+          v-else
+          name="i-tabler-loader-2"
+          class="animate-spin"
+          style="font-size: 1.1rem"
+        />
         上传
-        <span v-if="waitList.size"> （ {{ waitList.size }} ） </span>
       </UButton>
     </section>
     <section

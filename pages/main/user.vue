@@ -10,6 +10,7 @@ const dialog = useFileDialog({ accept: "image/*" });
 dialog.onChange(async (files) => {
   const file = first(files);
   if (!file) return;
+  if (!store.user) return;
   const { url, avatar } = await $fetch("/api/user/avatar", {
     method: "POST",
     body: { type: file.type, name: file.name },
@@ -18,10 +19,7 @@ dialog.onChange(async (files) => {
     method: "PUT",
     body: file,
   });
-  store.user = await $fetch("/api/user", {
-    method: "PUT",
-    body: { avatar },
-  });
+  store.user.avatar = avatar;
 });
 
 const state = reactive({

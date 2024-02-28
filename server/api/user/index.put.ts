@@ -5,7 +5,6 @@ import { redis } from "~/server/database/redis";
 import { UserUpdateSchema, users } from "~/server/database/schema";
 import { sanitize } from "~/server/utils/purify";
 import { database } from "~/server/database/postgres";
-import { counselor } from "~/server/utils/counselor";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -22,15 +21,7 @@ export default defineEventHandler(async (event) => {
   } else {
     body.name = undefined;
   }
-  // 删除原头像
-  if (body.avatar && body.avatar !== user.avatar) {
-    await counselor(`/storage/delete`, {
-      method: "DELETE",
-      query: { key: `server/avatar/${user.avatar}` },
-    });
-  } else {
-    body.avatar = undefined;
-  }
+  body.avatar = undefined;
   if (user.role !== "admin") {
     body.role = undefined;
   }
