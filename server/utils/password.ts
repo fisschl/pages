@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { EventHandlerRequest, H3Event } from "h3";
+import type { H3Event } from "h3";
 import { argon2Verify, argon2id } from "hash-wasm";
 import { isString } from "lodash-es";
 import { DAY, redis } from "~/server/database/redis";
@@ -30,7 +30,7 @@ export const verifyPassword = async (password: string, hash: string) => {
 /**
  * 从请求中获取 token
  */
-export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
+export const tokenFromContext = (event: H3Event) => {
   const cookie = getCookie(event, "token");
   if (cookie) return cookie;
   const header = getHeader(event, "token");
@@ -44,7 +44,7 @@ export const tokenFromContext = (event: H3Event<EventHandlerRequest>) => {
  * 校验 token 是否正确
  */
 export const checkUserSafe = async (
-  event: H3Event<EventHandlerRequest>,
+  event: H3Event,
   token?: string,
 ): Promise<User | undefined> => {
   if (!redis.isOpen) await redis.connect();
@@ -67,9 +67,7 @@ export const checkUserSafe = async (
 /**
  * 获取当前用户
  */
-export const checkUser = async (
-  event: H3Event<EventHandlerRequest>,
-): Promise<User> => {
+export const checkUser = async (event: H3Event): Promise<User> => {
   const res = await checkUserSafe(event);
   if (!res) throw createError({ status: 403 });
   return res;

@@ -2,8 +2,8 @@
 import { pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { Picture } from "~/server/database/schema";
-import axios from "axios";
 import { partial } from "filesize";
+import { delete_file, upload_file } from "~/server/utils/oss";
 
 const size = partial({ standard: "jedec" });
 
@@ -50,25 +50,11 @@ dialog.onChange(async (files) => {
     });
   }
   for (const file of files) {
-    const item = await $fetch("/api/picture", {
+    const { item, token } = await $fetch("/api/picture", {
       method: "POST",
       body: pick(file, ["name", "type"]),
     });
-    const filename = encodeURIComponent(file.name);
-    await axios.put(item.url, file, {
-      headers: {
-        "Content-Disposition": `attachment; filename="${filename}"`,
-        "Content-Type": file.type,
-      },
-      onUploadProgress: (e) => {
-        uploading.set(file, {
-          progress: Math.floor((e.progress || 0) * 100),
-          loaded: size(e.loaded),
-          total: size(e.total || 0),
-          status: "uploading",
-        });
-      },
-    });
+    await upload_file(token, `server/picture/${item.id}`, file);
     data.value?.list.unshift(item);
     uploading.delete(file);
   }
@@ -81,8 +67,13 @@ const handleClickItem = (e: Picture) => {
   currentPicture.value = e;
   isViewModalVisible.value = true;
 };
-const handleDeleteOne = (e: Picture) => {
-  const index = data.value?.list.findIndex((item) => item.id === e.id);
+const handleDeleteOne = async ({ id }: Picture) => {
+  const { token } = await $fetch("/api/picture", {
+    method: "DELETE",
+    query: { id },
+  });
+  await delete_file(token, `server/picture/${id}`);
+  const index = data.value?.list.findIndex((item) => item.id === id);
   if (index === undefined || index === -1) return;
   data.value?.list.splice(index, 1);
 };

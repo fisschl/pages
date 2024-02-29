@@ -10,4 +10,20 @@ export default defineNuxtConfig({
   ui: {
     icons: ["tabler"],
   },
+  app: {
+    head: {
+      link: [
+        {
+          rel: "stylesheet",
+          href: "https://cdn.fisschl.world/MiSans/font.css",
+        },
+      ],
+      script: [
+        {
+          src: "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.18.1.min.js",
+          async: true,
+        },
+      ],
+    },
+  },
 });

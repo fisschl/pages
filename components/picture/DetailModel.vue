@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Picture } from "~/server/database/schema";
+import { download_file } from "~/server/utils/oss";
 
 const visible = defineModel<boolean>("visible");
 const item = defineModel<Picture>("item");
@@ -9,11 +10,6 @@ const emit = defineEmits<{
 
 const handleDeleteItem = async () => {
   if (!item.value) return;
-  const { id } = item.value;
-  await $fetch("/api/picture", {
-    method: "DELETE",
-    query: { id },
-  });
   emit("delete", item.value);
   visible.value = false;
 };
@@ -21,36 +17,8 @@ const handleDeleteItem = async () => {
 const download = () => {
   if (!item.value) return;
   const { id } = item.value;
-  const qs = new URLSearchParams({ id });
-  window.open(`/api/picture/download?${qs}`);
+  return download_file(id);
 };
-
-const nameEditor = reactive({
-  name: item.value?.name,
-  visible: false,
-  submit: async () => {
-    if (!item.value) return;
-    const { id } = item.value;
-    const name = nameEditor.name?.trim();
-    if (!name) return;
-    await $fetch("/api/picture/rename", {
-      method: "PUT",
-      body: { id, name },
-    });
-    item.value.name = name;
-  },
-  changeVisible: async () => {
-    if (!item.value) return;
-    nameEditor.visible = !nameEditor.visible;
-    if (nameEditor.visible) {
-      // 进入编辑状态
-      nameEditor.name = item.value.name;
-    } else {
-      // 退出编辑状态，保存
-      await nameEditor.submit();
-    }
-  },
-});
 
 const { copied, copy } = useClipboard();
 
@@ -64,18 +32,7 @@ const handleCopy = () => {
     <UCard>
       <template #header>
         <div class="flex items-center gap-3">
-          <p v-if="!nameEditor.visible" class="truncate">{{ item.name }}</p>
-          <UInput
-            v-else
-            v-model="nameEditor.name"
-            @keydown.enter="nameEditor.changeVisible"
-          />
-          <UButton
-            size="xs"
-            variant="soft"
-            :icon="nameEditor.visible ? 'i-tabler-checks' : 'i-tabler-edit'"
-            @click="nameEditor.changeVisible"
-          />
+          <p class="truncate">{{ item.name }}</p>
         </div>
       </template>
       <img
@@ -113,5 +70,3 @@ const handleCopy = () => {
     </UCard>
   </UModal>
 </template>
-
-<style module></style>

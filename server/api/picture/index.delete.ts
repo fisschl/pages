@@ -3,7 +3,8 @@ import { z } from "zod";
 import { checkUser } from "~/server/utils/password";
 import { database } from "~/server/database/postgres";
 import { pictures } from "~/server/database/schema";
-import { counselor } from "~/server/utils/counselor";
+import { nanoid } from "nanoid";
+import { redis } from "~/server/database/redis";
 
 const QuerySchema = z.object({
   id: z.string(),
@@ -12,12 +13,16 @@ const QuerySchema = z.object({
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   const { id } = await getValidatedQuery(event, QuerySchema.parse);
-  await counselor(`/storage/delete`, {
-    method: "DELETE",
-    query: { key: `server/picture/${id}` },
-  });
   await database
     .delete(pictures)
     .where(and(eq(pictures.user_id, user.id), eq(pictures.id, id)));
-  return { message: "删除成功" };
+  const token = nanoid();
+  await redis.set(
+    token,
+    JSON.stringify({
+      key: `server/picture/${id}`,
+    }),
+    { EX: 10 },
+  );
+  return { token };
 });

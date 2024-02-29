@@ -5,7 +5,8 @@ import { typeid } from "typeid-js";
 import { extname } from "node:path";
 import { database } from "~/server/database/postgres";
 import { pictures } from "~/server/database/schema";
-import { counselor } from "~/server/utils/counselor";
+import { nanoid } from "nanoid";
+import { redis } from "~/server/database/redis";
 
 const QuerySchema = z.object({
   name: z.string(),
@@ -27,8 +28,13 @@ export default defineEventHandler(async (event) => {
     .returning();
   const item = first(items);
   if (!item) throw createError({ status: 500 });
-  const res = await counselor<{ url: string }>(`/storage/upload`, {
-    query: { key: `server/picture/${item.id}`, type: type },
-  });
-  return { ...res, ...item };
+  const token = nanoid();
+  await redis.set(
+    token,
+    JSON.stringify({
+      key: `server/picture/${id}`,
+    }),
+    { EX: 10 },
+  );
+  return { item, token };
 });

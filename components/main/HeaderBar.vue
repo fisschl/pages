@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DropdownItem } from "#ui/types";
 import { Howl } from "howler";
-import { first, once, sample } from "lodash-es";
+import { first, sample } from "lodash-es";
 
 const navbar = defineModel<boolean>("navbar");
 
@@ -20,6 +20,7 @@ const stopMusic = () => {
   sound.value?.off().stop();
   sound.value = undefined;
 };
+onUnmounted(stopMusic);
 
 const playMusic = (music?: (typeof musics)[number]) => {
   if (!music) music = sample(musics);
@@ -51,17 +52,6 @@ const handleClickPlayMusic = () => {
   if (sound.value) stopMusic();
   else playMusic();
 };
-
-const initPlayMusic = once(() => {
-  playMusic();
-});
-
-useEventListener("mousedown", initPlayMusic, { once: true });
-useEventListener("touchmove", initPlayMusic, { once: true });
-
-onUnmounted(() => {
-  stopMusic();
-});
 </script>
 
 <template>
