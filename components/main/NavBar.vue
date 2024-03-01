@@ -41,12 +41,6 @@ const links = computed(() => [
     label: "页面",
     children: [
       {
-        label: "AI",
-        icon: "i-tabler-brand-openai",
-        to: "https://lobechat.fisschl.world",
-        target: "_blank",
-      },
-      {
         label: "共享文件",
         icon: "i-tabler-device-floppy",
         to: "https://store.fisschl.world",
@@ -55,7 +49,7 @@ const links = computed(() => [
       {
         label: "代码仓库",
         icon: "i-tabler-brand-git",
-        to: "https://git.fisschl.world",
+        to: "https://gitea.fisschl.world",
         target: "_blank",
       },
     ],
