@@ -17,7 +17,7 @@ const handleDeleteItem = async () => {
 const download = () => {
   if (!item.value) return;
   const { id } = item.value;
-  return download_file(id);
+  return download_file(`server/picture/${id}`);
 };
 
 const { copied, copy } = useClipboard();

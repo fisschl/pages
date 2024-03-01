@@ -10,8 +10,6 @@ export const useLibraryStore = defineStore("library", () => {
 </script>
 
 <script setup lang="ts">
-import { debounce } from "lodash-es";
-
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
 const { state } = useLibraryStore();
@@ -53,10 +51,6 @@ const loadMore = async () => {
   if (!data.value) return;
   data.value = [...data.value, ...res];
 };
-
-const loadingElement = ref<HTMLDivElement>();
-const isBottom = useElementVisibility(loadingElement);
-whenever(isBottom, debounce(loadMore, 200));
 </script>
 
 <template>
@@ -92,12 +86,15 @@ whenever(isBottom, debounce(loadMore, 200));
         class="py-3"
       />
     </ul>
-    <div v-if="!isAll" ref="loadingElement" class="my-8 flex justify-center">
-      <UIcon
-        name="i-tabler-loader-2"
-        style="font-size: 1.5rem"
-        class="animate-spin text-gray-400"
-      />
+    <div v-if="!isAll" class="my-4 flex justify-center">
+      <UButton
+        icon="i-tabler-loader-3"
+        color="gray"
+        class="!px-6"
+        @click="loadMore"
+      >
+        加载更多
+      </UButton>
     </div>
   </div>
 </template>
