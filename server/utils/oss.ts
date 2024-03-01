@@ -1,7 +1,7 @@
 import { ofetch } from "ofetch";
 
 export const use_oss = async (token?: string) => {
-  const res = await ofetch("https://fisschl.world/oss/sts", {
+  const res = await ofetch("https://bronya.world/oss/sts", {
     query: { token },
   });
   const { OSS } = window as any;
