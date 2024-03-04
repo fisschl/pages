@@ -1,56 +1,34 @@
 <script setup lang="ts">
 import type { DropdownItem } from "#ui/types";
-import { Howl } from "howler";
-import { first, sample } from "lodash-es";
+import { useMusicStore } from "~/composables/musics";
 
 const navbar = defineModel<boolean>("navbar");
-
-const sound = shallowRef<Howl>();
-
-const musics = [
-  {
-    label: "赴大荒",
-    src: "https://cdn.fisschl.world/static/赴大荒.webm",
-  },
-];
-
-const currentMusic = ref(first(musics)!);
-
-const stopMusic = () => {
-  sound.value?.off().stop();
-  sound.value = undefined;
-};
-onUnmounted(stopMusic);
-
-const playMusic = (music?: (typeof musics)[number]) => {
-  if (!music) music = sample(musics);
-  currentMusic.value = music!;
-  if (sound.value) stopMusic();
-  sound.value = new Howl({
-    src: [music!.src],
-    html5: true,
-    autoplay: true,
-    onend: () => playMusic(),
-    onloaderror: () => stopMusic(),
-    onplayerror: () => stopMusic(),
-  });
-};
+const music = useMusicStore();
 
 const musicOptions = computed(() => {
-  const options = musics.map((music) => {
-    const item: DropdownItem = {
-      label: music.label,
-      click: () => playMusic(music),
-      icon: music.src === currentMusic.value.src ? "i-tabler-music" : undefined,
+  const options = music.musics.map((item, index) => {
+    const option: DropdownItem = {
+      label: item.label,
+      click: () => music.play(index),
+      icon: item.src === music.current?.src ? "i-tabler-music" : undefined,
     };
-    return item;
+    return option;
   });
   return [options];
 });
 
-const handleClickPlayMusic = () => {
-  if (sound.value) stopMusic();
-  else playMusic();
+const handlePlay = () => {
+  if (music.isPlaying) {
+    music.sound?.stop();
+    music.isPlaying = false;
+    return;
+  }
+  if (music.sound) {
+    music.sound.play();
+    music.isPlaying = true;
+    return;
+  }
+  music.planRandom();
 };
 </script>
 
@@ -65,9 +43,9 @@ const handleClickPlayMusic = () => {
         square
         icon="i-tabler-brand-netease-music"
         style="border-radius: 50%"
-        :class="{ 'animate-pulse': sound }"
-        :color="sound ? 'violet' : 'primary'"
-        @click="handleClickPlayMusic"
+        :class="{ 'animate-pulse': music.isPlaying }"
+        :color="music.isPlaying ? 'violet' : 'primary'"
+        @click="handlePlay"
       />
     </UDropdown>
     <UToggle
