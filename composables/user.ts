@@ -1,6 +1,6 @@
 import type { User } from "~/server/database/schema";
 
-export const useUserStore = defineStore("user", () => {
+export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
   const route = useRoute();
   const checkLogin = async () => {
@@ -10,5 +10,6 @@ export const useUserStore = defineStore("user", () => {
       query: { from: route.fullPath },
     });
   };
-  return { user, checkLogin };
+  const token = useCookie("token");
+  return { user, checkLogin, token };
 });

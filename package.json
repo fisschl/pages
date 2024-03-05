@@ -16,7 +16,7 @@
     "docker:push": "docker push registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest"
   },
   "dependencies": {
-    "@iconify-json/tabler": "^1.1.105",
+    "@iconify-json/tabler": "^1.1.106",
     "@nuxt/content": "^2.12.0",
     "@nuxt/devtools": "^1.0.8",
     "@nuxt/ui": "^2.14.1",
@@ -42,7 +42,7 @@
     "lodash-es": "^4.17.21",
     "marked": "^12.0.0",
     "meilisearch": "^0.37.0",
-    "mongodb": "^6.3.0",
+    "mongodb": "^6.4.0",
     "nanoid": "^5.0.6",
     "nuxt": "^3.10.3",
     "ofetch": "^1.3.3",
@@ -58,11 +58,12 @@
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.2.0",
+    "@types/ali-oss": "^6.16.11",
     "@types/dompurify": "^3.0.5",
     "@types/howler": "^2.2.11",
     "@types/jsdom": "^21.1.6",
     "@types/lodash-es": "^4.17.12",
-    "czg": "^1.8.0",
+    "czg": "^1.9.0",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.20.14",
     "eslint": "^8.57.0",

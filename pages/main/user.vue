@@ -2,23 +2,25 @@
 import { first } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { FormError } from "#ui/types";
+import { useOssStore } from "~/composables/oss";
 
 const store = useUserStore();
 await store.checkLogin();
 
+const oss = useOssStore();
+onMounted(oss.init);
+
 const dialog = useFileDialog({ accept: "image/*" });
 dialog.onChange(async (files) => {
+  if (!store.user) return;
   const file = first(files);
   if (!file) return;
-  if (!store.user) return;
-  const { url, avatar } = await $fetch("/api/user/avatar", {
+  const { avatar } = await $fetch("/api/user/avatar", {
     method: "POST",
     body: { type: file.type, name: file.name },
   });
-  await $fetch(url, {
-    method: "PUT",
-    body: file,
-  });
+  await oss.delete_file(`home/${store.user.id}/avatar/${store.user.avatar}`);
+  await oss.upload_file(`home/${store.user.id}/avatar/${avatar}`, file);
   store.user.avatar = avatar;
 });
 
@@ -69,7 +71,7 @@ const handleEditPassword = () => {
       <UAvatar
         v-if="store.user?.avatar"
         size="2xl"
-        :src="`https://cdn.fisschl.world/server/avatar/${store.user.avatar}`"
+        :src="`https://cdn.fisschl.world/home/${store.user.id}/avatar/${store.user.avatar}`"
       />
       <UAvatar v-else size="2xl" icon="i-tabler-user" />
       <button

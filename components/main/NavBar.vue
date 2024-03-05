@@ -26,11 +26,6 @@ const links = computed(() => [
         to: "/main/qrcode",
       },
       {
-        label: "短链接",
-        icon: "i-tabler-link",
-        to: "/main/short",
-      },
-      {
         label: "图床",
         icon: "i-tabler-photo",
         to: "/main/pictures",
@@ -41,15 +36,9 @@ const links = computed(() => [
     label: "页面",
     children: [
       {
-        label: "共享文件",
-        icon: "i-tabler-device-floppy",
-        to: "https://store.fisschl.world",
-        target: "_blank",
-      },
-      {
         label: "代码仓库",
         icon: "i-tabler-brand-git",
-        to: "https://gitea.fisschl.world",
+        to: "https://gitea.bronya.world",
         target: "_blank",
       },
     ],
@@ -82,7 +71,7 @@ const user = useUserStore();
         <UAvatar
           v-if="user.user.avatar"
           size="xs"
-          :src="`https://cdn.fisschl.world/server/avatar/${user.user.avatar}`"
+          :src="`https://cdn.fisschl.world/home/${user.user.id}/avatar/${user.user.avatar}`"
         />
         <UAvatar v-else size="xs" icon="i-tabler-user" />
       </template>

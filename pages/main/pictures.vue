@@ -2,7 +2,6 @@
 import { pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { Picture } from "~/server/database/schema";
-import { delete_file, upload_file } from "~/server/utils/oss";
 
 const store = useUserStore();
 await store.checkLogin();

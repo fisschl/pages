@@ -25,19 +25,6 @@ export const UserInsertSchema = createInsertSchema(users);
 export const UserUpdateSchema = UserInsertSchema.partial();
 
 /**
- * 短链接
- */
-export const short_links = pgTable("short_links", {
-  id: varchar("id").primaryKey().$default($id),
-  update_at: dateTime("update_at").notNull(),
-  url: varchar("url").notNull(),
-});
-
-export type ShortLink = typeof short_links.$inferSelect;
-export const ShortLinkInsertSchema = createInsertSchema(short_links);
-export const ShortLinkUpdateSchema = ShortLinkInsertSchema.partial();
-
-/**
  * 图片
  */
 export const pictures = pgTable("pictures", {
