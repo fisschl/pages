@@ -48,10 +48,12 @@ const handleUpload = async () => {
 
 <template>
   <UContainer class="py-6">
+    <div class="mb-3">
+      <UButton title="上传" @click="handleUpload">
+        <UIcon name="i-tabler-plus" style="font-size: 1.2rem" />
+      </UButton>
+    </div>
     <UVerticalNavigation :links="links"> </UVerticalNavigation>
-    <UButton title="上传" @click="handleUpload">
-      <UIcon name="i-tabler-plus" style="font-size: 1.1rem" />
-    </UButton>
   </UContainer>
 </template>
 
