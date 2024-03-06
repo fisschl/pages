@@ -22,9 +22,7 @@ export default defineEventHandler(async (event) => {
     body.name = undefined;
   }
   body.avatar = undefined;
-  if (user.role !== "admin") {
-    body.role = undefined;
-  }
+  body.role = undefined;
   const list = await database
     .update(users)
     .set(body)

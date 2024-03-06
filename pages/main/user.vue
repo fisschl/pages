@@ -2,13 +2,10 @@
 import { first } from "lodash-es";
 import { useUserStore } from "~/composables/user";
 import type { FormError } from "#ui/types";
-import { useOssStore } from "~/composables/oss";
+import { ofetch } from "ofetch";
 
 const store = useUserStore();
 await store.checkLogin();
-
-const oss = useOssStore();
-onMounted(oss.init);
 
 const dialog = useFileDialog({ accept: "image/*" });
 dialog.onChange(async (files) => {
@@ -19,8 +16,17 @@ dialog.onChange(async (files) => {
     method: "POST",
     body: { type: file.type, name: file.name },
   });
-  await oss.delete_file(`home/${store.user.id}/avatar/${store.user.avatar}`);
-  await oss.upload_file(`home/${store.user.id}/avatar/${avatar}`, file);
+  await ofetch("/oss/delete", {
+    baseURL: "https://bronya.world",
+    method: "DELETE",
+    query: {
+      key: `home/${store.user.id}/avatar/${store.user.avatar}`,
+    },
+    headers: {
+      token: store.token || "",
+    },
+  });
+  await upload_file(`home/${store.user.id}/avatar/${avatar}`, file);
   store.user.avatar = avatar;
 });
 
@@ -52,10 +58,11 @@ const validate = (data: typeof state) => {
 const submit = async (key: keyof typeof state) => {
   const value = state[key];
   if (value) state[key] = value.trim();
-  store.user = await $fetch("/api/user", {
+  const res = await $fetch("/api/user", {
     method: "PUT",
     body: { [key]: state[key] },
   });
+  store.user = res;
 };
 
 const isPasswordEditing = ref(false);
@@ -128,24 +135,6 @@ const handleEditPassword = () => {
           修改密码
         </UButton>
         <UButton v-else-if="state.password" type="submit"> 确认 </UButton>
-      </UFormGroup>
-    </UForm>
-    <UForm
-      v-if="state"
-      :validate="validate"
-      :state="state"
-      class="mb-5"
-      @submit="submit('role')"
-    >
-      <UFormGroup v-if="store.user?.role === 'admin'" label="角色" name="role">
-        <UInput
-          v-model="state.role"
-          class="mr-4 inline-block"
-          style="width: 12rem"
-        />
-        <UButton v-if="state.role !== store.user?.role" type="submit">
-          确认
-        </UButton>
       </UFormGroup>
     </UForm>
   </UContainer>

@@ -1,36 +1,22 @@
 <script setup lang="ts">
 import { useUserStore } from "~/composables/user";
-import { baseName, useOssStore } from "~/composables/oss";
+import { join, basename } from "pathe";
+import { ofetch } from "ofetch";
 
 const user = useUserStore();
 await user.checkLogin();
 
-const oss = useOssStore();
 const prefix = `home/${user.user?.id}/store`;
-
 const path = ref("/");
-const links = ref<Record<string, string>[]>([]);
 
-const fetchList = async () => {
-  const res = await oss.list_dir(prefix + path.value);
-  const prefixes = res.prefixes.map((item) => {
-    return {
-      label: baseName(item),
-      icon: "i-tabler-folder",
-    };
-  });
-  const files = res.objects.map((item) => {
-    return {
-      label: baseName(item.name),
-      icon: "i-tabler-file",
-    };
-  });
-  links.value = [...prefixes, ...files];
-};
-
-onMounted(async () => {
-  await oss.init();
-  await fetchList();
+const { data, refresh } = await useFetch<any>("/oss/list", {
+  baseURL: "https://bronya.world",
+  query: computed(() => ({
+    prefix: join(prefix, path.value),
+  })),
+  headers: {
+    token: user.token || "",
+  },
 });
 
 const router = useRouter();
@@ -44,16 +30,78 @@ const handleUpload = async () => {
     },
   });
 };
+
+const options = [
+  [
+    {
+      label: "删除",
+      icon: "i-tabler-trash",
+      click: async (e: MouseEvent) => {
+        if (!(e.target instanceof Element)) return;
+        const li = e.target.closest(`[data-name]`);
+        if (!(li instanceof HTMLElement)) return;
+        const { name } = li.dataset;
+        await ofetch("/oss/delete", {
+          baseURL: "https://bronya.world",
+          method: "DELETE",
+          query: {
+            key: name,
+          },
+          headers: {
+            token: user.token || "",
+          },
+        });
+        await refresh();
+      },
+    },
+  ],
+];
 </script>
 
 <template>
   <UContainer class="py-6">
-    <div class="mb-3">
-      <UButton title="上传" @click="handleUpload">
-        <UIcon name="i-tabler-plus" style="font-size: 1.2rem" />
-      </UButton>
+    <div class="mb-4">
+      <UButton icon="i-tabler-plus" @click="handleUpload"> 上传文件 </UButton>
     </div>
-    <UVerticalNavigation :links="links"> </UVerticalNavigation>
+    <ul v-if="data" class="space-y-1">
+      <li
+        v-for="item in data.prefixes"
+        :key="item"
+        class="flex cursor-pointer items-center rounded bg-zinc-50 px-3 py-1 transition hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+      >
+        <UIcon
+          name="i-tabler-folder"
+          class="mr-2 text-yellow-500"
+          style="font-size: 1.2rem"
+        />
+        <span class="flex-1 truncate">
+          {{ basename(item) }}
+        </span>
+      </li>
+      <li
+        v-for="item in data.objects"
+        :key="item.name"
+        class="flex cursor-pointer items-center rounded bg-zinc-50 px-3 py-1 transition hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+        :data-name="item.name"
+      >
+        <UIcon
+          name="i-tabler-file-filled"
+          class="mr-2 text-blue-500"
+          style="font-size: 1.2rem"
+        />
+        <span class="flex-1 truncate">
+          {{ basename(item.name) }}
+        </span>
+        <UDropdown :items="options">
+          <UButton
+            color="gray"
+            icon="i-tabler-dots-vertical"
+            size="xs"
+            variant="ghost"
+          />
+        </UDropdown>
+      </li>
+    </ul>
   </UContainer>
 </template>
 

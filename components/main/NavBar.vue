@@ -26,9 +26,9 @@ const links = computed(() => [
         to: "/main/qrcode",
       },
       {
-        label: "图床",
+        label: "文件",
         icon: "i-tabler-photo",
-        to: "/main/pictures",
+        to: "/main/store",
       },
     ],
   },
