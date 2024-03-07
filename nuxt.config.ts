@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "@nuxt/content",
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
+    "@element-plus/nuxt",
   ],
   ui: {
     icons: ["tabler"],
@@ -15,7 +16,7 @@ export default defineNuxtConfig({
       link: [
         {
           rel: "stylesheet",
-          href: "https://cdn.fisschl.world/MiSans/font.css",
+          href: "https://cdn.fisschl.world/static/MiSans/font.css",
         },
       ],
       script: [
@@ -25,5 +26,8 @@ export default defineNuxtConfig({
         },
       ],
     },
+  },
+  elementPlus: {
+    themes: ["dark"],
   },
 });
