@@ -10,7 +10,6 @@ import { database } from "~/server/database/postgres";
 const BodySchema = UserInsertSchema.pick({ name: true, password: true });
 
 export default defineEventHandler(async (event) => {
-  if (!redis.isOpen) await redis.connect();
   const body = await readValidatedBody(event, BodySchema.parse);
   const user = await database.query.users.findFirst({
     where: eq(users.name, body.name),

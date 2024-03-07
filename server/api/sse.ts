@@ -9,7 +9,6 @@ export const useSseKey = async (event: H3Event<EventHandlerRequest>) => {
 };
 
 export default defineEventHandler(async (event) => {
-  if (!subscriber.isOpen) await subscriber.connect();
   const sseKey = await useSseKey(event);
 
   setHeader(event, "Transfer-Encoding", "chunked");

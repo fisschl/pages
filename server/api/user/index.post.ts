@@ -1,11 +1,9 @@
 import { hashPassword } from "~/server/utils/password";
 import { UserInsertSchema, users } from "~/server/database/schema";
-import { redis } from "~/server/database/redis";
 import { database } from "~/server/database/postgres";
 import { sanitize } from "~/server/utils/purify";
 
 export default defineEventHandler(async (event) => {
-  if (!redis.isOpen) await redis.connect();
   const body = await readValidatedBody(event, UserInsertSchema.parse);
   body.name = sanitize(body.name);
   const user = await checkUserSafe(event);

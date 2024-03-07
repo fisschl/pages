@@ -47,7 +47,6 @@ export const checkUserSafe = async (
   event: H3Event,
   token?: string,
 ): Promise<User | undefined> => {
-  if (!redis.isOpen) await redis.connect();
   if (!token) token = tokenFromContext(event);
   if (!token) return;
   const id = await redis.get(token);
