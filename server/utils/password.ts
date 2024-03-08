@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 import type { H3Event } from "h3";
-import { argon2Verify, argon2id } from "hash-wasm";
-import { isString } from "lodash-es";
+import { argon2id, argon2Verify } from "hash-wasm";
 import { DAY, redis } from "~/server/database/redis";
 import { User, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
+import { tokenFromContext } from "~/server/api/session";
 
 export const hashPassword = async (password: string) => {
   const salt = new Uint8Array(16);
@@ -25,19 +25,6 @@ export const verifyPassword = async (password: string, hash: string) => {
     password,
     hash,
   });
-};
-
-/**
- * 从请求中获取 token
- */
-export const tokenFromContext = (event: H3Event) => {
-  const cookie = getCookie(event, "token");
-  if (cookie) return cookie;
-  const header = getHeader(event, "token");
-  if (header) return header;
-  const query = getQuery(event);
-  if (isString(query.token)) return query.token;
-  return undefined;
 };
 
 /**

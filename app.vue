@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useUserStore } from "./composables/user";
 import { useSseStore } from "./composables/sse";
+// @ts-ignore
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 const store = useUserStore();
 
@@ -18,8 +20,10 @@ onMounted(create);
       <Title> 沅有茝兮醴有兰 </Title>
     </Head>
     <Body :class="$style.root" class="bg-neutral-50 dark:bg-neutral-900">
-      <NuxtPage />
-      <UNotifications />
+      <ElConfigProvider :locale="zhCn">
+        <NuxtPage />
+        <UNotifications />
+      </ElConfigProvider>
     </Body>
   </Html>
 </template>

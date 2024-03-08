@@ -11,5 +11,10 @@ export const useUserStore = defineStore("pages-user", () => {
     });
   };
   const token = useCookie("token");
-  return { user, checkLogin, token };
+
+  const avatar = computed(() => {
+    if (!user.value?.avatar) return;
+    return `https://cdn.fisschl.world/home/${user.value.id}/avatar/${user.value.avatar}`;
+  });
+  return { user, checkLogin, token, avatar };
 });

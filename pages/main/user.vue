@@ -1,17 +1,42 @@
 <script setup lang="ts">
-import { first } from "lodash-es";
+import { isEmpty } from "lodash-es";
 import { useUserStore } from "~/composables/user";
-import type { FormError } from "#ui/types";
 import { ofetch } from "ofetch";
+import type {
+  FormInstance,
+  FormRules,
+  UploadRequestHandler,
+} from "element-plus";
+import { changed } from "~/utils/util";
 
 const store = useUserStore();
 await store.checkLogin();
 
-const dialog = useFileDialog({ accept: "image/*" });
-dialog.onChange(async (files) => {
+const form = ref<FormInstance>();
+
+const state = reactive({
+  name: store.user?.name,
+  password: store.user?.password,
+});
+
+const rules = reactive<FormRules<typeof state>>({
+  name: [{ required: true, message: "请输入用户名" }],
+  password: [{ required: true, message: "请输入密码" }],
+});
+
+const submit = async () => {
+  await form.value?.validate();
+  const param = changed(state, store.user);
+  if (isEmpty(param)) return;
+  const res = await $fetch("/api/user", {
+    method: "PUT",
+    body: param,
+  });
+  store.user = res;
+};
+
+const handleUpload: UploadRequestHandler = async ({ file }) => {
   if (!store.user) return;
-  const file = first(files);
-  if (!file) return;
   const { avatar } = await $fetch("/api/user/avatar", {
     method: "POST",
     body: { type: file.type, name: file.name },
@@ -28,115 +53,47 @@ dialog.onChange(async (files) => {
   });
   await upload_file(`home/${store.user.id}/avatar/${avatar}`, file);
   store.user.avatar = avatar;
-});
-
-const state = reactive({
-  name: store.user?.name,
-  password: "******",
-  role: store.user?.role,
-});
-
-const errors = ref<FormError[]>([]);
-
-const validate = (data: typeof state) => {
-  errors.value = [];
-  if (!data.name) {
-    errors.value.push({
-      path: "name",
-      message: "请填写用户名",
-    });
-  }
-  if (!data.password) {
-    errors.value.push({
-      path: "password",
-      message: "请填写密码",
-    });
-  }
-  return errors.value;
-};
-
-const submit = async (key: keyof typeof state) => {
-  const value = state[key];
-  if (value) state[key] = value.trim();
-  const res = await $fetch("/api/user", {
-    method: "PUT",
-    body: { [key]: state[key] },
-  });
-  store.user = res;
-};
-
-const isPasswordEditing = ref(false);
-const handleEditPassword = () => {
-  state.password = "";
-  isPasswordEditing.value = true;
 };
 </script>
 
 <template>
   <UContainer class="py-6">
-    <div class="relative mb-5 flex w-max">
-      <UAvatar
-        v-if="store.user?.avatar"
-        size="2xl"
-        :src="`https://cdn.fisschl.world/home/${store.user.id}/avatar/${store.user.avatar}`"
-      />
-      <UAvatar v-else size="2xl" icon="i-tabler-user" />
-      <button
-        title="更改头像"
-        type="button"
-        class="rounded-full bg-gray-700/40 transition"
-        :class="$style.avatarButtonIcon"
-        @click="dialog.open"
-      >
-        <UIcon name="i-tabler-edit" style="font-size: 1.2rem" />
-      </button>
-    </div>
-    <UForm
-      v-if="state"
-      :validate="validate"
-      :state="state"
-      class="mb-5"
-      @submit="submit('name')"
-    >
-      <UFormGroup label="用户名" name="name">
-        <UInput
-          v-model="state.name"
-          style="width: 12rem"
-          class="mr-4 inline-block"
-          placeholder="请输入用户名"
-        />
-        <UButton v-if="state.name !== store.user?.name" type="submit">
-          确认
-        </UButton>
-      </UFormGroup>
-    </UForm>
-    <UForm
-      v-if="state"
-      :validate="validate"
-      :state="state"
-      class="mb-5"
-      @submit="submit('password')"
-    >
-      <UFormGroup label="密码" name="password">
-        <UInput
-          v-model="state.password"
-          style="width: 12rem"
-          :disabled="!isPasswordEditing"
-          type="password"
-          class="mr-4 inline-block"
-          placeholder="请输入密码"
-        />
-        <UButton
-          v-if="!isPasswordEditing"
-          type="button"
-          color="blue"
-          @click="handleEditPassword"
+    <ElForm ref="form" :model="state" :rules="rules" @submit.prevent="submit">
+      <ElFormItem label="头像" label-width="80">
+        <ElUpload
+          accept="image/*"
+          class="relative"
+          :http-request="handleUpload"
+          style="width: 6rem; height: 6rem"
         >
-          修改密码
-        </UButton>
-        <UButton v-else-if="state.password" type="submit"> 确认 </UButton>
-      </UFormGroup>
-    </UForm>
+          <ElAvatar :src="store.avatar" style="width: 6rem; height: 6rem" />
+          <button
+            class="absolute flex h-full w-full items-center justify-center rounded-full bg-gray-800/30 opacity-0 transition hover:opacity-100"
+          >
+            <UIcon name="i-tabler-edit" style="font-size: 1.5rem" />
+          </button>
+        </ElUpload>
+      </ElFormItem>
+      <ElFormItem label="用户名" label-width="80" prop="name">
+        <ElInput v-model="state.name" placeholder="请输入用户名" />
+      </ElFormItem>
+      <ElFormItem label="密码" label-width="80" prop="password">
+        <ElInput
+          v-model="state.password"
+          placeholder="请输入密码"
+          type="password"
+          show-password
+        />
+      </ElFormItem>
+      <ElButton
+        native-type="submit"
+        style="margin-left: 80px"
+        type="primary"
+        class="!px-8"
+      >
+        保 存
+      </ElButton>
+    </ElForm>
   </UContainer>
 </template>
 

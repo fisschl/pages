@@ -1,15 +1,16 @@
-import { addDays } from "date-fns";
 import { eq } from "drizzle-orm";
-import { nanoid } from "nanoid";
-import { typeid } from "typeid-js";
 import { verifyPassword } from "~/server/utils/password";
 import { DAY, redis } from "~/server/database/redis";
 import { UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
+import { tokenFromContext } from "~/server/api/session";
 
-const BodySchema = UserInsertSchema.pick({ name: true, password: true });
-
+/**
+ * 登录
+ */
 export default defineEventHandler(async (event) => {
+  const token = tokenFromContext(event);
+  if (!token) throw createError({ status: 400 });
   const body = await readValidatedBody(event, BodySchema.parse);
   const user = await database.query.users.findFirst({
     where: eq(users.name, body.name),
@@ -20,11 +21,10 @@ export default defineEventHandler(async (event) => {
   await redis.set(user.id, JSON.stringify(user), {
     EX: 60 * DAY,
   });
-  const token = typeid().toString() + nanoid(24);
-  const expires = addDays(new Date(), 30);
-  setCookie(event, "token", token, { expires });
-  await redis.set(token, user.id);
-  await redis.expireAt(token, expires);
+  await redis.hSet(token, "user", user.id);
+  await redis.expire(token, 30 * DAY);
   user.password = "******";
   return user;
 });
+
+const BodySchema = UserInsertSchema.pick({ name: true, password: true });
