@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
-import { checkUser, hashPassword } from "~/server/utils/password";
+import { hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/database/redis";
 import { UserUpdateSchema, users } from "~/server/database/schema";
 import { sanitize } from "~/server/utils/purify";
 import { database } from "~/server/database/postgres";
+import { checkUser } from "../auth/index.post";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);

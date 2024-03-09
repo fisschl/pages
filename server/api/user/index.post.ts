@@ -2,11 +2,12 @@ import { hashPassword } from "~/server/utils/password";
 import { UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 import { sanitize } from "~/server/utils/purify";
+import { useCurrentUser } from "../auth/index.post";
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, UserInsertSchema.parse);
   body.name = sanitize(body.name);
-  const user = await checkUserSafe(event);
+  const user = await useCurrentUser(event);
   if (!user || user.role !== "admin") {
     body.role = undefined;
   }

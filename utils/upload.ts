@@ -1,13 +1,7 @@
-import { ofetch } from "ofetch";
-import { useUserStore } from "~/composables/user";
+import OSS from "ali-oss";
 
-const refreshSTSToken = async () => {
-  const user = useUserStore();
-  const res = await ofetch("https://bronya.world/oss/sts", {
-    headers: {
-      token: user.token || undefined,
-    },
-  });
+export const refreshSTSToken = async () => {
+  const res = await $fetch("/api/oss/sts");
   return {
     accessKeyId: res.AccessKeyId,
     accessKeySecret: res.AccessKeySecret,
@@ -15,13 +9,16 @@ const refreshSTSToken = async () => {
   };
 };
 
-let oss;
+const oss = useState<OSS>();
 
-export const upload_file = async (key, file, progress) => {
-  if (!oss) {
+export const upload_file = async (
+  key: string,
+  file: File,
+  progress?: (p: number) => void,
+) => {
+  if (!oss.value) {
     const res = await refreshSTSToken();
-    // eslint-disable-next-line no-undef
-    oss = new OSS({
+    oss.value = new OSS({
       region: "oss-cn-shanghai",
       bucket: "fisschl",
       ...res,
@@ -30,7 +27,7 @@ export const upload_file = async (key, file, progress) => {
     });
   }
   const filename = encodeURIComponent(file.name);
-  await oss.multipartUpload(key, file, {
+  await oss.value.multipartUpload(key, file, {
     progress: (e) => {
       if (!progress) return;
       progress(e * 100);

@@ -1,11 +1,11 @@
 import { typeid } from "typeid-js";
 import { z } from "zod";
-import { checkUser } from "~/server/utils/password";
 import { extname } from "node:path";
 import { database } from "~/server/database/postgres";
 import { users } from "~/server/database/schema";
 import { eq } from "drizzle-orm";
 import { redis } from "~/server/database/redis";
+import { checkUser } from "../auth/index.post";
 
 const QuerySchema = z.object({
   name: z.string(),

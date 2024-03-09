@@ -1,10 +1,4 @@
-import { eq } from "drizzle-orm";
-import type { H3Event } from "h3";
 import { argon2id, argon2Verify } from "hash-wasm";
-import { DAY, redis } from "~/server/database/redis";
-import { User, users } from "~/server/database/schema";
-import { database } from "~/server/database/postgres";
-import { tokenFromContext } from "~/server/api/session";
 
 export const hashPassword = async (password: string) => {
   const salt = new Uint8Array(16);
@@ -25,36 +19,4 @@ export const verifyPassword = async (password: string, hash: string) => {
     password,
     hash,
   });
-};
-
-/**
- * 校验 token 是否正确
- */
-export const checkUserSafe = async (
-  event: H3Event,
-  token?: string,
-): Promise<User | undefined> => {
-  if (!token) token = tokenFromContext(event);
-  if (!token) return;
-  const id = await redis.get(token);
-  if (!id) return;
-  const userJson = await redis.get(id);
-  if (userJson) return JSON.parse(userJson);
-  const user = await database.query.users.findFirst({
-    where: eq(users.id, id),
-  });
-  if (!user) throw createError({ status: 404 });
-  await redis.set(user.id, JSON.stringify(user), {
-    EX: 60 * DAY,
-  });
-  return user;
-};
-
-/**
- * 获取当前用户
- */
-export const checkUser = async (event: H3Event): Promise<User> => {
-  const res = await checkUserSafe(event);
-  if (!res) throw createError({ status: 403 });
-  return res;
 };

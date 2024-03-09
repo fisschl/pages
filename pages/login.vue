@@ -45,7 +45,7 @@ const onSubmit = async () => {
     }
   }
   try {
-    store.user = await $fetch("/api/user/auth", {
+    store.user = await $fetch("/api/auth", {
       method: "POST",
       body: pick(state, ["name", "password"]),
     });

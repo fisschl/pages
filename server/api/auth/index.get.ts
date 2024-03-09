@@ -1,7 +1,5 @@
-import { checkUser } from "~/server/utils/password";
+import { useCurrentUser } from "./index.post";
 
 export default defineEventHandler(async (event) => {
-  const user = await checkUser(event);
-  user.password = "******";
-  return user;
+  return useCurrentUser(event);
 });

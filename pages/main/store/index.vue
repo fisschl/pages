@@ -9,14 +9,10 @@ await user.checkLogin();
 const prefix = `home/${user.user?.id}/store`;
 const path = ref("/");
 
-const { data, refresh } = await useFetch<any>("/oss/list", {
-  baseURL: "https://bronya.world",
+const { data, refresh } = await useFetch<any>("/api/oss/list", {
   query: computed(() => ({
     prefix: join(prefix, path.value),
   })),
-  headers: {
-    token: user.token || "",
-  },
 });
 
 const router = useRouter();
@@ -41,8 +37,7 @@ const options = [
         const li = e.target.closest(`[data-name]`);
         if (!(li instanceof HTMLElement)) return;
         const { name } = li.dataset;
-        await ofetch("/oss/delete", {
-          baseURL: "https://bronya.world",
+        await ofetch("/api/oss/delete", {
           method: "DELETE",
           query: {
             key: name,

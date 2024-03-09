@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { useUserStore } from "./composables/user";
-import { useSseStore } from "./composables/sse";
 // @ts-ignore
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 const store = useUserStore();
 
 const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch("/api/user/auth", { headers });
+const { data } = await useFetch("/api/auth", { headers });
 if (data.value) store.user = data.value;
-
-const { create } = useSseStore();
-onMounted(create);
 </script>
 
 <template>

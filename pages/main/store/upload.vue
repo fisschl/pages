@@ -2,6 +2,7 @@
 import { useFileDialog } from "@vueuse/core";
 import { join } from "pathe";
 import { isString } from "lodash-es";
+import { upload_file } from "~/utils/upload";
 
 const route = useRoute();
 const formData = reactive({
