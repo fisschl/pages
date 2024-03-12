@@ -1,29 +1,47 @@
 <script setup lang="ts">
-import type { Picture } from "~/server/database/schema";
+import type { ObjectMeta } from "ali-oss";
+import type { SerializeObject } from "nitropack";
+import { extname } from "pathe";
 
 const visible = defineModel<boolean>("visible");
-const item = defineModel<Picture>("item");
 const emit = defineEmits<{
-  delete: [Picture];
+  delete: [key: string];
+}>();
+const props = defineProps<{
+  path: string;
+  prefix: string;
+  item: SerializeObject<ObjectMeta>;
 }>();
 
 const handleDeleteItem = async () => {
-  if (!item.value) return;
-  emit("delete", item.value);
+  emit("delete", props.item.name);
   visible.value = false;
 };
 
 const download = () => {
-  if (!item.value) return;
-  const { id } = item.value;
-  return download_file(`server/picture/${id}`);
+  const { name } = props.item;
+  const qs = new URLSearchParams({
+    key: name,
+  });
+  window.open(`/api/oss/download?${qs}`);
 };
 
-const { copied, copy } = useClipboard();
+const cdn = computed(() => {
+  return `https://cdn.fisschl.world/${props.item.name}`;
+});
 
-const handleCopy = () => {
-  return copy(`https://cdn.fisschl.world/server/picture/${item.value?.id}`);
-};
+const imageExtensions = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".bmp",
+  ".webp",
+  ".tiff",
+  ".ico",
+  ".svg",
+];
+const videoExtensions = [".mp4", ".webm", ".ogg", ".ogv"];
 </script>
 
 <template>
@@ -35,28 +53,19 @@ const handleCopy = () => {
         </div>
       </template>
       <img
-        v-if="item.content_type.startsWith('image/')"
-        :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
+        v-if="imageExtensions.includes(extname(item.name))"
+        :src="cdn"
         :alt="item.name"
       />
       <video
-        v-else-if="item.content_type.startsWith('video/')"
+        v-else-if="videoExtensions.includes(extname(item.name))"
         autoplay
-        :src="`https://cdn.fisschl.world/server/picture/${item.id}`"
+        :src="cdn"
         loop
         controls
       />
-      <div v-else class="flex justify-center py-6">
-        <UIcon name="i-tabler-box-seam" style="font-size: 1.8rem" />
-      </div>
+      <p v-else class="text-gray-400 dark:text-gray-500">无法预览</p>
       <template #footer>
-        <UButton class="mr-3 px-4" @click="handleCopy">
-          <UIcon
-            :name="copied ? 'i-tabler-checks' : 'i-tabler-copy'"
-            style="font-size: 1.1rem"
-          />
-          复制链接
-        </UButton>
         <UButton class="mr-3 px-4" color="blue" @click="download">
           <UIcon name="i-tabler-download" style="font-size: 1.1rem" />
           下载

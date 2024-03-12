@@ -9,16 +9,20 @@ export const refreshSTSToken = async () => {
   };
 };
 
-const oss = useState<OSS>();
+declare global {
+  interface Window {
+    oss?: OSS;
+  }
+}
 
 export const upload_file = async (
   key: string,
   file: File,
   progress?: (p: number) => void,
 ) => {
-  if (!oss.value) {
+  if (!window.oss) {
     const res = await refreshSTSToken();
-    oss.value = new OSS({
+    window.oss = new OSS({
       region: "oss-cn-shanghai",
       bucket: "fisschl",
       ...res,
@@ -27,7 +31,7 @@ export const upload_file = async (
     });
   }
   const filename = encodeURIComponent(file.name);
-  await oss.value.multipartUpload(key, file, {
+  await window.oss.multipartUpload(key, file, {
     progress: (e) => {
       if (!progress) return;
       progress(e * 100);
