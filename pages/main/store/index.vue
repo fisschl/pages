@@ -66,6 +66,7 @@ const isUploadShow = ref(false);
         v-for="item in data.objects"
         :key="item.name"
         class="flex cursor-pointer items-center rounded bg-zinc-50 px-3 py-1 transition hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+        :data-name="item.name"
         @click="handleClickItem"
       >
         <UIcon
