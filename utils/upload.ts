@@ -32,9 +32,10 @@ export const upload_file = async (
   }
   const filename = encodeURIComponent(file.name);
   await window.oss.multipartUpload(key, file, {
-    progress: (e) => {
+    progress: (...params) => {
+      console.log(params);
       if (!progress) return;
-      progress(e * 100);
+      progress(params[0] * 100);
     },
     headers: {
       "Content-Type": file.type,

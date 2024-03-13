@@ -60,28 +60,32 @@ const handleUpload: UploadRequestHandler = async ({ file }) => {
   <UContainer class="py-6">
     <ElForm ref="form" :model="state" :rules="rules" @submit.prevent="submit">
       <ElFormItem label="头像" label-width="80">
+        <ElAvatar
+          :src="store.avatar"
+          style="width: 5rem; height: 5rem"
+          class="mr-3"
+        />
         <ElUpload
           accept="image/*"
-          class="relative"
+          :show-file-list="false"
           :http-request="handleUpload"
-          style="width: 6rem; height: 6rem"
         >
-          <ElAvatar :src="store.avatar" style="width: 6rem; height: 6rem" />
-          <button
-            class="absolute flex h-full w-full items-center justify-center rounded-full bg-gray-800/30 opacity-0 transition hover:opacity-100"
-          >
-            <UIcon name="i-tabler-edit" style="font-size: 1.5rem" />
-          </button>
+          <ElButton> 修改头像 </ElButton>
         </ElUpload>
       </ElFormItem>
       <ElFormItem label="用户名" label-width="80" prop="name">
-        <ElInput v-model="state.name" placeholder="请输入用户名" />
+        <ElInput
+          v-model="state.name"
+          style="max-width: 20rem"
+          placeholder="请输入用户名"
+        />
       </ElFormItem>
       <ElFormItem label="密码" label-width="80" prop="password">
         <ElInput
           v-model="state.password"
           placeholder="请输入密码"
           type="password"
+          style="max-width: 20rem"
           show-password
         />
       </ElFormItem>
@@ -89,7 +93,7 @@ const handleUpload: UploadRequestHandler = async ({ file }) => {
         native-type="submit"
         style="margin-left: 80px"
         type="primary"
-        class="!px-8"
+        class="mt-3 !px-6"
       >
         保 存
       </ElButton>
@@ -97,18 +101,4 @@ const handleUpload: UploadRequestHandler = async ({ file }) => {
   </UContainer>
 </template>
 
-<style module>
-.avatarButtonIcon {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-}
-.avatarButtonIcon:hover {
-  opacity: 1;
-}
-</style>
+<style module></style>

@@ -26,8 +26,6 @@ if (data.value) store.user = data.value;
 
 <style module>
 .root {
-  --main-header-height: 3.5rem;
-  --main-navbar-width: 12rem;
   --el-font-family: "MiSans", sans-serif;
 }
 </style>

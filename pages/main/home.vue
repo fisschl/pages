@@ -1,31 +1,30 @@
-<script lang="ts">
-export const useLibraryStore = defineStore("library", () => {
-  const state = reactive<{
-    keyword?: string;
-    library?: string[];
-  }>({});
-
-  return { state };
-});
-</script>
-
 <script setup lang="ts">
-const { data: libraryOptions } = await useFetch("/api/poetry/facets");
+import { useRouteQuery } from "@vueuse/router";
+import { objectUnRef } from "~/utils/util";
 
-const { state } = useLibraryStore();
+const { data: libraryOptions } = await useFetch("/api/poetry/facets");
+const keyword = useRouteQuery<string>("keyword", "");
+const library = useRouteQuery<string>("library", "");
+
+const librarySet = computed(() => {
+  return new Set(library.value.split(","));
+});
 
 const handleLibraryChange = (value: string, checked: boolean) => {
-  const set = new Set(state.library);
+  const list = library.value.split(",").filter((item) => {
+    return item.trim();
+  });
+  const set = new Set(list);
   if (checked) set.add(value);
   else set.delete(value);
-  state.library = [...set];
+  library.value = Array.from(set).join();
 };
 
 const query = computed(() => {
-  return {
-    ...state,
-    library: state.library?.join(),
-  };
+  return objectUnRef({
+    keyword,
+    library,
+  });
 });
 
 const { data } = await useFetch<Record<string, string>[]>(
@@ -54,9 +53,9 @@ const loadMore = async () => {
 </script>
 
 <template>
-  <div class="mx-6 pb-3 pt-4">
+  <UContainer>
     <UInput
-      v-model="state.keyword"
+      v-model="keyword"
       placeholder="搜索"
       icon="i-tabler-search"
       class="mb-4"
@@ -65,7 +64,7 @@ const loadMore = async () => {
       <UCheckbox
         v-for="item in libraryOptions"
         :key="item.value"
-        :model-value="state.library?.includes(item.value)"
+        :model-value="librarySet.has(item.value)"
         name="library"
         :label="item.value"
         @update:model-value="handleLibraryChange(item.value, $event)"
@@ -86,15 +85,13 @@ const loadMore = async () => {
         class="py-3"
       />
     </ul>
-    <div v-if="!isAll" class="my-4 flex justify-center">
+    <div v-if="!isAll" class="mb-4 mt-10 flex justify-center">
       <UButton
-        icon="i-tabler-loader-3"
-        color="gray"
-        class="!px-6"
+        icon="i-tabler-arrow-down"
+        variant="soft"
+        style="padding: 0.5rem 2rem"
         @click="loadMore"
-      >
-        加载更多
-      </UButton>
+      />
     </div>
-  </div>
+  </UContainer>
 </template>

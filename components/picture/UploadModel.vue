@@ -54,7 +54,7 @@ onChange(async (files) => {
     <UCard>
       <UForm :state="formData" class="mb-5 space-y-4">
         <UFormGroup label="上传到路径" name="path">
-          <UInput v-model="formData.path" />
+          <UInput v-model="formData.path" style="max-width: 20rem" />
         </UFormGroup>
         <UFormGroup label="上传文件" name="files">
           <UButton type="button" block class="!px-6" @click="open">

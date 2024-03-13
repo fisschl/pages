@@ -12,7 +12,9 @@ const to = computed(() => {
 <template>
   <article class="">
     <p class="mb-1 flex items-center gap-3 text-base">
-      <span class="flex-1 truncate font-bold"> {{ item.title }} </span>
+      <NuxtLink :to="to" class="flex-1 truncate font-bold">
+        {{ item.title }}
+      </NuxtLink>
       <span class="text-sm text-gray-400"> {{ item.author }} </span>
       <span class="text-sm italic text-green-400"> {{ item.library }} </span>
     </p>

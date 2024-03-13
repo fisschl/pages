@@ -1,54 +1,109 @@
 <script setup lang="ts">
-const navbar = useCookie("pages-nav-visible");
-const isLargeScreen = useMediaQuery(`(min-width: 768px)`);
+import { useNav } from "~/composables/nav";
+import { useUserStore } from "@/composables/user";
 
-const handleUpdateNavbar = (value: boolean) => {
-  navbar.value = value ? "true" : undefined;
+const nav = useNav();
+
+const musicOptions = computed(() => {
+  const options = nav.musics.map((item, index) => {
+    return {
+      label: item.label,
+      click: () => nav.playSound(index),
+      icon:
+        item.src === nav.currentMusic?.src
+          ? "i-tabler-circle-arrow-right"
+          : "i-tabler-music",
+    };
+  });
+  return [options];
+});
+
+const handlePlay = () => {
+  if (nav.isPlayingSound) {
+    nav.sound?.stop();
+    nav.isPlayingSound = false;
+    return;
+  }
+  if (nav.sound) {
+    nav.sound.play();
+    nav.isPlayingSound = true;
+    return;
+  }
+  nav.planRandom();
 };
 
-onMounted(() => {
-  handleUpdateNavbar(isLargeScreen.value);
-});
+const handleClickLogin = () => {
+  const qs = new URLSearchParams({ from: location.href });
+  location.href = `/login?${qs}`;
+};
+
+const user = useUserStore();
 </script>
 
 <template>
-  <div class="relative flex h-dvh w-screen flex-col overflow-auto">
-    <MainHeaderBar
-      :navbar="!!navbar"
-      class="sticky top-0 z-20"
-      @update:navbar="handleUpdateNavbar"
+  <header class="flex items-center gap-3 px-4 py-3">
+    <h1 class="flex-1">大道之行也 天下为公</h1>
+    <UDropdown :items="musicOptions" mode="hover">
+      <UButton
+        square
+        variant="soft"
+        icon="i-tabler-brand-netease-music"
+        :class="{ 'animate-pulse': nav.isPlayingSound }"
+        :color="nav.isPlayingSound ? 'violet' : 'primary'"
+        @click="handlePlay"
+      />
+    </UDropdown>
+    <UButton
+      variant="soft"
+      color="indigo"
+      square
+      icon="i-tabler-menu"
+      @click="nav.visible = true"
     />
-    <div class="flex flex-1" :class="$style.mainContainer">
-      <MainNavBar v-if="navbar" :class="$style.navbar" />
-      <main class="flex-1 overflow-hidden">
-        <NuxtPage />
-      </main>
-    </div>
-    <MainFooterBar />
-  </div>
+    <USlideover v-model="nav.visible">
+      <div class="flex flex-1 flex-col overflow-auto">
+        <UButton
+          v-if="user.user"
+          :to="user.user ? '/main/user' : undefined"
+          variant="ghost"
+          color="gray"
+          square
+          class="mb-3 mt-4 self-center"
+          @click="user.user ? undefined : handleClickLogin"
+        >
+          <UAvatar v-if="user.avatar" size="lg" :src="user.avatar" />
+          <UAvatar v-else size="lg" icon="i-tabler-user" />
+        </UButton>
+        <UVerticalNavigation
+          :links="nav.links"
+          class="mx-3 mb-3"
+          @click="nav.visible = false"
+        />
+      </div>
+      <UButton
+        class="absolute right-3 top-3"
+        variant="ghost"
+        color="gray"
+        square
+        icon="i-tabler-x"
+        @click="nav.visible = false"
+      />
+    </USlideover>
+  </header>
+  <main class="overflow-hidden">
+    <NuxtPage />
+  </main>
+  <footer
+    class="bg-zinc-50 py-10 text-center text-sm text-gray-500 dark:bg-zinc-900"
+  >
+    <a
+      href="https://beian.miit.gov.cn/"
+      target="_blank"
+      class="hover:underline"
+    >
+      豫ICP备2023011860号-2
+    </a>
+  </footer>
 </template>
 
-<style module>
-.mainContainer {
-  flex-direction: column;
-}
-
-@media (min-width: 768px) {
-  .mainContainer {
-    flex-direction: row;
-  }
-}
-
-.navbar {
-  height: calc(100dvh - var(--main-header-height));
-  top: var(--main-header-height);
-  position: sticky;
-  z-index: 10;
-}
-
-@media (min-width: 768px) {
-  .navbar {
-    width: var(--main-navbar-width);
-  }
-}
-</style>
+<style module></style>
