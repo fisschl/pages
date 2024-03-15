@@ -3,7 +3,6 @@ export default defineNuxtConfig({
     "@nuxt/devtools",
     "@nuxt/ui",
     "@vueuse/nuxt",
-    "@nuxt/content",
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
     "@element-plus/nuxt",
