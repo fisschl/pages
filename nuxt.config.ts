@@ -18,12 +18,6 @@ export default defineNuxtConfig({
           href: "https://cdn.fisschl.world/static/MiSans/font.css",
         },
       ],
-      script: [
-        {
-          src: "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.18.1.min.js",
-          async: true,
-        },
-      ],
     },
   },
   elementPlus: {
