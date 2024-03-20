@@ -1,8 +1,12 @@
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { typeid } from "typeid-js";
 import { createInsertSchema } from "drizzle-zod";
+import { base58 } from "@scure/base";
 
-const $id = () => typeid().toString();
+const $id = () => {
+  const bytes = typeid().toUUIDBytes();
+  return base58.encode(bytes);
+};
 
 const dateTime = (name: string) => {
   return timestamp(name, { mode: "string" }).defaultNow();
