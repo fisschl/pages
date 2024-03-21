@@ -49,6 +49,7 @@ export const useNav = defineStore("pages-nav", () => {
   };
   const changeMusic = (name: keyof typeof musics) => {
     const item = musics[name];
+    sound.value?.stop();
     sound.value = new Howl({
       src: [item],
       html5: true,
@@ -63,6 +64,6 @@ export const useNav = defineStore("pages-nav", () => {
     visible,
     changeMusic,
     changeMusicOpen,
-    isMusicOpen
+    isMusicOpen,
   };
 });
