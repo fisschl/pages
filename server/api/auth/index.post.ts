@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   await session.set("user", user.id);
   user.password = "******";
   await logs.insertOne({
-    metadata: "登录",
+    metadata: "登录成功",
     timestamp: new Date(),
     user,
   });
