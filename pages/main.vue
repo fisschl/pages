@@ -3,11 +3,7 @@ import { useNav } from "~/composables/nav";
 import { useUserStore } from "@/composables/user";
 
 const nav = useNav();
-const { changeMusicOpen, changeMusic } = nav;
-
-onMounted(() => {
-  changeMusic("赴大荒");
-});
+const { changeMusicOpen } = nav;
 
 const handleClickLogin = () => {
   const qs = new URLSearchParams({ from: location.href });

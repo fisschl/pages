@@ -38,31 +38,42 @@ export const useNav = defineStore("pages-nav", () => {
   const visible = ref(false);
 
   const isMusicOpen = ref(false);
-  const musics = reactive({
-    ["赴大荒"]: "https://cdn.fisschl.world/static/赴大荒.webm",
-  });
+  const musics = reactive([
+    {
+      rule: "/",
+      src: "https://cdn.fisschl.world/static/赴大荒.webm",
+    },
+  ]);
   const sound = shallowRef<Howl>();
-  const changeMusicOpen = () => {
-    isMusicOpen.value = !isMusicOpen.value;
-    if (isMusicOpen.value) sound.value?.play();
-    else sound.value?.pause();
-  };
-  const changeMusic = (name: keyof typeof musics) => {
-    const item = musics[name];
-    sound.value?.stop();
-    sound.value = new Howl({
-      src: [item],
-      html5: true,
-      autoplay: false,
+  const route = useRoute();
+  const newSound = async () => {
+    const music = musics.find((item) => {
+      return route.path.startsWith(item.rule);
+    });
+    if (!music) return;
+    if (sound.value) {
+      const item = sound.value;
+      item.fade(item.volume(), 0, 1000);
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      item.stop();
+    }
+    const item = new Howl({
+      src: [music.src],
       loop: true,
     });
-    if (isMusicOpen.value) sound.value.play();
+    sound.value = item;
+    return item;
+  };
+  const changeMusicOpen = async () => {
+    isMusicOpen.value = !isMusicOpen.value;
+    if (!sound.value) await newSound();
+    if (isMusicOpen.value) sound.value?.play();
+    else sound.value?.pause();
   };
 
   return {
     links,
     visible,
-    changeMusic,
     changeMusicOpen,
     isMusicOpen,
   };

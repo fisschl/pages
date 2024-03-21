@@ -1,4 +1,4 @@
-import { toValue, type MaybeRefOrGetter } from "vue";
+import { type MaybeRefOrGetter, toValue } from "vue";
 
 export type Value<T> = T extends MaybeRefOrGetter<infer U> ? U : T;
 
@@ -10,8 +10,7 @@ export const objectUnRef = <T extends object>(
 ): { [P in keyof T]: Value<T[P]> } => {
   const result: any = {};
   for (const key in param) {
-    const value = toValue(param[key]);
-    result[key] = value;
+    result[key] = toValue(param[key]);
   }
   return result;
 };

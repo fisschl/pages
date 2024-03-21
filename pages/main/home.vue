@@ -84,7 +84,12 @@ const loadMore = async () => {
       />
     </ul>
     <div v-if="!isAll" class="mb-4 mt-10 flex justify-center">
-      <UButton icon="i-tabler-arrow-down" block @click="loadMore" />
+      <UButton
+        variant="soft"
+        icon="i-tabler-arrow-down"
+        block
+        @click="loadMore"
+      />
     </div>
   </UContainer>
 </template>
