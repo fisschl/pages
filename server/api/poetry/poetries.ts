@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     offset: parseInt(offset) || 0,
     filter: meilisearchQueryFilter("library", library?.split(",")),
     attributesToCrop: ["content"],
-    cropLength: 64,
+    cropLength: 32,
     attributesToHighlight: ["content"],
   });
   return res.hits.map((item) => {

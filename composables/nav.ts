@@ -1,5 +1,4 @@
 import { Howl } from "howler";
-import { first, random } from "lodash-es";
 
 export const useNav = defineStore("pages-nav", () => {
   const links = computed(() => [
@@ -38,41 +37,32 @@ export const useNav = defineStore("pages-nav", () => {
 
   const visible = ref(false);
 
-  const musics = reactive([
-    {
-      label: "赴大荒",
-      src: "https://cdn.fisschl.world/static/赴大荒.webm",
-    },
-  ]);
-  const isPlayingSound = ref(false);
+  const isMusicOpen = ref(false);
+  const musics = reactive({
+    ["赴大荒"]: "https://cdn.fisschl.world/static/赴大荒.webm",
+  });
   const sound = shallowRef<Howl>();
-  const currentMusic = ref(first(musics));
-
-  const playSound = (index: number) => {
-    const item = musics[index];
-    sound.value?.stop();
-    sound.value = new Howl({
-      src: [item.src],
-      html5: true,
-      autoplay: true,
-      onend: () => planRandom(),
-    });
-    isPlayingSound.value = true;
+  const changeMusicOpen = () => {
+    isMusicOpen.value = !isMusicOpen.value;
+    if (isMusicOpen.value) sound.value?.play();
+    else sound.value?.pause();
   };
-
-  const planRandom = () => {
-    const index = random(musics.length - 1);
-    playSound(index);
+  const changeMusic = (name: keyof typeof musics) => {
+    const item = musics[name];
+    sound.value = new Howl({
+      src: [item],
+      html5: true,
+      autoplay: false,
+      loop: true,
+    });
+    if (isMusicOpen.value) sound.value.play();
   };
 
   return {
     links,
     visible,
-    musics,
-    sound,
-    currentMusic,
-    playSound,
-    isPlayingSound,
-    planRandom,
+    changeMusic,
+    changeMusicOpen,
+    isMusicOpen
   };
 });
