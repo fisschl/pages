@@ -1,4 +1,5 @@
 import { Howl } from "howler";
+import { reactive } from "vue";
 
 export const useNav = defineStore("pages-nav", () => {
   const links = computed(() => [

@@ -34,7 +34,6 @@ const user = useUserStore();
     <USlideover v-model="nav.visible">
       <div class="flex flex-1 flex-col overflow-auto">
         <UButton
-          v-if="user.user"
           :to="user.user ? '/main/user' : undefined"
           variant="ghost"
           color="gray"
