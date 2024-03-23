@@ -13,7 +13,7 @@
     "work": "powershell ./build.ps1"
   },
   "dependencies": {
-    "@element-plus/nuxt": "^1.0.7",
+    "@element-plus/nuxt": "^1.0.8",
     "@iconify-json/tabler": "^1.1.109",
     "@nuxt/devtools": "^1.1.3",
     "@nuxt/ui": "^2.14.2",
@@ -48,7 +48,7 @@
     "ofetch": "^1.3.4",
     "pathe": "^1.1.2",
     "pinia": "^2.1.7",
-    "pixi.js": "^8.0.3",
+    "pixi.js": "^8.0.4",
     "postgres": "^3.4.4",
     "prettier": "^3.2.5",
     "qrcode": "^1.5.3",
