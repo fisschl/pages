@@ -22,11 +22,11 @@ export default defineEventHandler(async (event) => {
     RequestSchema.parse,
   );
   const res = await poetriesIndex.search(keyword, {
-    limit: 64,
+    limit: 32,
     offset: parseInt(offset) || 0,
     filter: meilisearchQueryFilter("library", library?.split(",")),
     attributesToCrop: ["content"],
-    cropLength: 64,
+    cropLength: 32,
     attributesToHighlight: ["content"],
   });
   return res.hits.map((item) => {

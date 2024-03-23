@@ -3,34 +3,7 @@ import { useNav } from "~/composables/nav";
 import { useUserStore } from "@/composables/user";
 
 const nav = useNav();
-
-const musicOptions = computed(() => {
-  const options = nav.musics.map((item, index) => {
-    return {
-      label: item.label,
-      click: () => nav.playSound(index),
-      icon:
-        item.src === nav.currentMusic?.src
-          ? "i-tabler-circle-arrow-right"
-          : "i-tabler-music",
-    };
-  });
-  return [options];
-});
-
-const handlePlay = () => {
-  if (nav.isPlayingSound) {
-    nav.sound?.stop();
-    nav.isPlayingSound = false;
-    return;
-  }
-  if (nav.sound) {
-    nav.sound.play();
-    nav.isPlayingSound = true;
-    return;
-  }
-  nav.planRandom();
-};
+const { changeMusicOpen } = nav;
 
 const handleClickLogin = () => {
   const qs = new URLSearchParams({ from: location.href });
@@ -43,16 +16,14 @@ const user = useUserStore();
 <template>
   <header class="flex items-center gap-3 px-4 py-3">
     <h1 class="flex-1">大道之行也 天下为公</h1>
-    <UDropdown :items="musicOptions" mode="hover">
-      <UButton
-        square
-        variant="soft"
-        icon="i-tabler-brand-netease-music"
-        :class="{ 'animate-pulse': nav.isPlayingSound }"
-        :color="nav.isPlayingSound ? 'violet' : 'primary'"
-        @click="handlePlay"
-      />
-    </UDropdown>
+    <UButton
+      square
+      variant="soft"
+      icon="i-tabler-brand-netease-music"
+      :class="{ 'animate-pulse': nav.isMusicOpen }"
+      :color="nav.isMusicOpen ? 'violet' : 'primary'"
+      @click="changeMusicOpen"
+    />
     <UButton
       variant="soft"
       color="indigo"
@@ -63,7 +34,6 @@ const user = useUserStore();
     <USlideover v-model="nav.visible">
       <div class="flex flex-1 flex-col overflow-auto">
         <UButton
-          v-if="user.user"
           :to="user.user ? '/main/user' : undefined"
           variant="ghost"
           color="gray"

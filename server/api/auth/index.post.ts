@@ -5,8 +5,8 @@ import { User, UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 import { H3Event } from "h3";
 import { isString } from "lodash-es";
-import { typeid } from "typeid-js";
-import { nanoid } from "nanoid";
+import { $token } from "~/utils/token";
+import { logs } from "~/server/database/mongo";
 
 /**
  * 登录
@@ -25,6 +25,11 @@ export default defineEventHandler(async (event) => {
   const session = useSession(event);
   await session.set("user", user.id);
   user.password = "******";
+  await logs.insertOne({
+    metadata: "登录成功",
+    timestamp: new Date(),
+    user,
+  });
   return user;
 });
 
@@ -40,7 +45,7 @@ export const useToken = (event: H3Event) => {
   if (header) return header;
   const query = getQuery(event);
   if (query.token && isString(query.token)) return query.token;
-  const _token = typeid().toString() + nanoid(24);
+  const _token = $token();
   setCookie(event, "token", _token);
   return _token;
 };

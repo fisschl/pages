@@ -23,4 +23,8 @@ export default defineNuxtConfig({
   elementPlus: {
     themes: ["dark"],
   },
+  routeRules: {
+    "/": { redirect: "/main/home" },
+    "/graph/**": { ssr: false },
+  },
 });

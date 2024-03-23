@@ -53,7 +53,7 @@ const loadMore = async () => {
 </script>
 
 <template>
-  <UContainer>
+  <UContainer class="pt-3">
     <UInput
       v-model="keyword"
       placeholder="搜索"
@@ -65,8 +65,6 @@ const loadMore = async () => {
         v-for="item in libraryOptions"
         :key="item.value"
         :model-value="librarySet.has(item.value)"
-        name="library"
-        :label="item.value"
         @update:model-value="handleLibraryChange(item.value, $event)"
       >
         <template #label>
@@ -87,9 +85,9 @@ const loadMore = async () => {
     </ul>
     <div v-if="!isAll" class="mb-4 mt-10 flex justify-center">
       <UButton
-        icon="i-tabler-arrow-down"
         variant="soft"
-        style="padding: 0.5rem 2rem"
+        icon="i-tabler-arrow-down"
+        block
         @click="loadMore"
       />
     </div>
