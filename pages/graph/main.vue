@@ -35,5 +35,3 @@ onMounted(async () => {
 <template>
   <main ref="mainContainer" class="h-dvh w-screen overflow-hidden"></main>
 </template>
-
-<style module></style>

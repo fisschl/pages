@@ -27,4 +27,5 @@ export default defineNuxtConfig({
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
   },
+  css: ["@/assets/css/global.css"],
 });

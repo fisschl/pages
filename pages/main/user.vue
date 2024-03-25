@@ -100,5 +100,3 @@ const handleUpload: UploadRequestHandler = async ({ file }) => {
     </ElForm>
   </UContainer>
 </template>
-
-<style module></style>

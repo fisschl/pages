@@ -75,5 +75,3 @@ const user = useUserStore();
     </a>
   </footer>
 </template>
-
-<style module></style>

@@ -100,5 +100,3 @@ const isUploadShow = ref(false);
     />
   </UContainer>
 </template>
-
-<style module></style>
