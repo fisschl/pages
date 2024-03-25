@@ -10,9 +10,7 @@
     "postinstall": "nuxt prepare",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "work": "pnpm docker:build && pnpm docker:push",
-    "docker:build": "docker build -t registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest .",
-    "docker:push": "docker push registry.cn-shanghai.aliyuncs.com/fisschl/pages:latest"
+    "work": "powershell ./build.ps1"
   },
   "dependencies": {
     "@element-plus/nuxt": "^1.0.8",
