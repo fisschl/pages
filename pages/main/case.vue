@@ -7,7 +7,6 @@ import {
   pathCase,
   snakeCase,
 } from "change-case";
-import { useLocalStorage } from "@vueuse/core";
 
 const types = [
   {
@@ -36,9 +35,9 @@ const types = [
   },
 ];
 
-const input = useLocalStorage("case-input", "hello world");
+const input = ref("hello world");
 
-const type = useLocalStorage("case-type", "camelCase");
+const type = ref("camelCase");
 
 const result = computed(() => {
   const item = types.find((item) => item.name === type.value);

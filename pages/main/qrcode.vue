@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useQRCode } from "@vueuse/integrations/useQRCode";
-import { useLocalStorage } from "#imports";
 
-const text = useLocalStorage("qrcode-text", "https://fisschl.world");
+const text = ref("https://ys.mihoyo.com");
 const qrcode = useQRCode(text);
 </script>
 

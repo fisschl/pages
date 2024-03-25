@@ -5,10 +5,10 @@ import { useUserStore } from "@/composables/user";
 const nav = useNav();
 const { changeMusicOpen } = nav;
 
-const handleClickLogin = () => {
+const login = computed(() => {
   const qs = new URLSearchParams({ from: location.href });
-  location.href = `/login?${qs}`;
-};
+  return `/login?${qs}`;
+});
 
 const user = useUserStore();
 </script>
@@ -34,12 +34,11 @@ const user = useUserStore();
     <USlideover v-model="nav.visible">
       <div class="flex flex-1 flex-col overflow-auto">
         <UButton
-          :to="user.user ? '/main/user' : undefined"
+          :to="user.user ? '/main/user' : login"
           variant="ghost"
           color="gray"
           square
           class="mb-3 mt-4 self-center"
-          @click="user.user ? undefined : handleClickLogin"
         >
           <UAvatar v-if="user.avatar" size="lg" :src="user.avatar" />
           <UAvatar v-else size="lg" icon="i-tabler-user" />

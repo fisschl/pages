@@ -1,88 +1,63 @@
 <script setup lang="ts">
-import type { FormError } from "#ui/types";
 import { pick } from "lodash-es";
+import { type output, z } from "zod";
+import type { FormSubmitEvent } from "#ui/types";
 
-const state = reactive({
-  name: "",
-  password: "",
-  isRegister: false,
+const schema = z.object({
+  name: z.string(),
+  password: z.string(),
 });
-const errors = ref<FormError[]>([]);
+type Schema = output<typeof schema>;
 
-const validate = (data: typeof state) => {
-  errors.value = [];
-  if (!data.name) {
-    errors.value.push({
-      path: "name",
-      message: "请填写用户名",
-    });
-  }
-  if (!data.password) {
-    errors.value.push({
-      path: "password",
-      message: "请填写密码",
-    });
-  }
-  return errors.value;
+const state = reactive<Partial<Schema>>({});
+
+const isRegister = ref(false);
+const toast = useToast();
+
+const register = async (data: Schema) => {
+  const res = await $fetch("/api/user", {
+    method: "POST",
+    body: pick(data, ["name", "password"]),
+  }).catch(() => {
+    toast.add({ title: "用户名已存在" });
+  });
+  if (!res) return;
+  toast.add({ title: res.message });
+};
+
+export type NuxtSubmit = (event: FormSubmitEvent<Schema>) => PromiseLike<void>;
+
+const onSubmit: NuxtSubmit = async ({ data }) => {
+  if (isRegister.value) await register(data);
+  const res = await $fetch("/api/auth", {
+    method: "POST",
+    body: pick(data, ["name", "password"]),
+  }).catch(() => {
+    toast.add({ title: "用户名或密码错误" });
+  });
+  if (!res) return;
+  store.user = res;
+  const { from } = route.query;
+  if (!from || typeof from !== "string") return;
+  location.href = from;
 };
 
 const store = useUserStore();
 const route = useRoute();
-
-const onSubmit = async () => {
-  if (state.isRegister) {
-    try {
-      await $fetch("/api/user", {
-        method: "POST",
-        body: pick(state, ["name", "password"]),
-      });
-    } catch (e) {
-      errors.value.push({
-        path: "name",
-        message: "用户名已存在",
-      });
-      return;
-    }
-  }
-  try {
-    store.user = await $fetch("/api/auth", {
-      method: "POST",
-      body: pick(state, ["name", "password"]),
-    });
-    const { from } = route.query;
-    if (!from || typeof from !== "string") return;
-    location.href = from;
-  } catch (e) {
-    errors.value.push({
-      path: "password",
-      message: "用户名或密码错误",
-    });
-    return;
-  }
-};
 </script>
 
 <template>
   <main
     class="flex h-screen w-screen items-center justify-center overflow-hidden"
   >
-    <UForm
-      :state="state"
-      class="space-y-4"
-      :validate="validate"
-      @submit="onSubmit"
-    >
+    <UForm :state="state" :schema="schema" class="space-y-4" @submit="onSubmit">
       <UFormGroup label="用户名" name="name">
         <UInput v-model="state.name" />
       </UFormGroup>
       <UFormGroup label="密码" name="password">
         <UInput v-model="state.password" type="password" />
       </UFormGroup>
-      <UCheckbox
-        v-model="state.isRegister"
-        name="isRegister"
-        label="注册用户"
-      />
+      <UCheckbox v-model="isRegister" name="isRegister" label="注册用户" />
       <UButton type="submit" block> 登 录 </UButton>
     </UForm>
   </main>
