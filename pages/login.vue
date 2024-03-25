@@ -4,9 +4,10 @@ import { type output, z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
 const schema = z.object({
-  name: z.string(),
-  password: z.string(),
+  name: z.string().min(3, "请填写用户名"),
+  password: z.string().min(6, "请填写密码"),
 });
+
 type Schema = output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({});
