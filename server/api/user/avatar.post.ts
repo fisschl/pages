@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { extname } from "node:path";
 import { database } from "~/server/database/postgres";
-import { users } from "~/server/database/schema";
+import { $id, users } from "~/server/database/schema";
 import { eq } from "drizzle-orm";
 import { redis } from "~/server/database/redis";
 import { checkUser } from "../auth/index.post";
 
-import { $id } from "~/utils/token";
 import { logs } from "~/server/database/mongo";
 
 const QuerySchema = z.object({

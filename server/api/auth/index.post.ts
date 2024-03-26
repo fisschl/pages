@@ -5,8 +5,8 @@ import { User, UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 import { H3Event } from "h3";
 import { isString } from "lodash-es";
-import { $token } from "~/utils/token";
 import { logs } from "~/server/database/mongo";
+import { $token } from "~/server/utils/token";
 
 /**
  * 登录
