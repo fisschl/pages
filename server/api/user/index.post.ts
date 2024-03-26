@@ -11,11 +11,11 @@ export default defineEventHandler(async (event) => {
   const password = await hashPassword(body.password);
   if (!password) throw createError({ status: 400 });
   body.password = password;
-  await database.insert(users).values(body);
   await logs.insertOne({
-    metadata: "注册成功",
+    metadata: "用户注册",
     timestamp: new Date(),
     user: body,
   });
+  await database.insert(users).values(body);
   return { message: "注册成功" };
 });

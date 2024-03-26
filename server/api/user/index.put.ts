@@ -6,6 +6,7 @@ import { UserUpdateSchema, users } from "~/server/database/schema";
 import { sanitize } from "~/server/utils/purify";
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
+import { logs } from "~/server/database/mongo";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -24,6 +25,11 @@ export default defineEventHandler(async (event) => {
   }
   body.avatar = undefined;
   body.role = undefined;
+  await logs.insertOne({
+    metadata: "更改用户信息",
+    timestamp: new Date(),
+    user: body,
+  });
   const list = await database
     .update(users)
     .set(body)

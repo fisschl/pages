@@ -25,7 +25,6 @@ const row = computed(() => {
 
 <template>
   <tr
-    :data-index="virtualRow.index"
     :data-row="row.id"
     class="absolute left-0 top-0 z-0 flex"
     :class="get(row_style, row.id)"
