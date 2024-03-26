@@ -6,6 +6,7 @@ import type { UnRef } from "./utils";
 import TableRow from "./TableRow.vue";
 import table_style from "./table.module.css";
 import HeaderCell from "./HeaderCell.vue";
+import WidthHandler from "./WidthHandler.vue";
 
 const props = defineProps<{
   table: Table;
@@ -112,6 +113,7 @@ const columns = toRef(table, "columns");
         />
       </tbody>
     </table>
+    <WidthHandler :table="table" :virtualizer="columns_virtual" />
   </div>
 </template>
 

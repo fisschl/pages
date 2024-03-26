@@ -10,15 +10,17 @@ const props = defineProps<{
 }>();
 
 const { table } = props;
-const { index } = props.virtualColumn;
+const index = computed(() => {
+  return props.virtualColumn.index;
+});
 const column = computed(() => {
-  return table.columns[index];
+  return table.columns[index.value];
 });
 </script>
 
 <template>
   <th
-    :data-column="column.name"
+    :data-column="index"
     class="absolute left-0 top-0 z-0 bg-[--header-background]"
     :class="table_style.cell"
   >
@@ -30,5 +32,6 @@ const column = computed(() => {
     <span class="mx-2 truncate">
       {{ column.title }}
     </span>
+    <button :class="table_style.width_handler_button"></button>
   </th>
 </template>

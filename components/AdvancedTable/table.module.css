@@ -5,3 +5,12 @@
   border-right: 1px solid var(--el-border-color);
   border-bottom: 1px solid var(--el-border-color);
 }
+
+.width_handler_button {
+  cursor: col-resize;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 3px;
+}
