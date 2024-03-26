@@ -3,17 +3,13 @@ import type { VirtualItem } from "@tanstack/vue-virtual";
 import { Table } from "./schema";
 import table_style from "./table.module.css";
 import { computed } from "vue";
-import { get } from "lodash-es";
 
 const props = defineProps<{
   table: Table;
-  row: Record<string, string>;
   virtualColumn: VirtualItem;
 }>();
 
 const { table } = props;
-const { cell_style } = table;
-
 const { index } = props.virtualColumn;
 const column = computed(() => {
   return table.columns[index];
@@ -21,20 +17,18 @@ const column = computed(() => {
 </script>
 
 <template>
-  <td
-    :data-row="row.id"
+  <th
     :data-column="column.name"
-    class="absolute left-0 top-0 z-0"
-    :class="[table_style.cell, get(cell_style, [row.id, column.name])]"
+    class="absolute left-0 top-0 z-0 bg-[--header-background]"
+    :class="table_style.cell"
   >
     <component
-      :is="column.component"
-      v-if="column.component"
-      :row="row"
+      :is="column.headerComponent"
+      v-if="column.headerComponent"
       :column="column"
     />
     <span class="mx-2 truncate">
-      {{ row[column.name] }}
+      {{ column.title }}
     </span>
-  </td>
+  </th>
 </template>

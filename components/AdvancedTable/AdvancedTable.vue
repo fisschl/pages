@@ -5,6 +5,7 @@ import { Table } from "./schema";
 import type { UnRef } from "./utils";
 import TableRow from "./TableRow.vue";
 import table_style from "./table.module.css";
+import HeaderCell from "./HeaderCell.vue";
 
 const props = defineProps<{
   table: Table;
@@ -83,23 +84,17 @@ const columns = toRef(table, "columns");
           >
             <input type="checkbox" />
           </th>
-          <th
+          <HeaderCell
             v-for="column in virtual_columns"
             :key="columns[column.index].name"
-            :data-index="column.index"
-            :data-column="columns[column.index].name"
-            class="absolute left-0 top-0 z-0 bg-[--header-background]"
             :style="{
               width: `${column.size}px`,
               height: `${table.ITEM_HEIGHT}px`,
               transform: `translateX(${column.start}px)`,
             }"
-            :class="table_style.cell"
-          >
-            <span class="mx-2 truncate">
-              {{ columns[column.index].title }}
-            </span>
-          </th>
+            :table="table"
+            :virtual-column="column"
+          />
         </tr>
       </thead>
       <tbody class="block">

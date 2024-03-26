@@ -14,6 +14,8 @@ export interface Column {
    */
   width: number;
 
+  headerComponent?: Component | FunctionalComponent;
+
   /**
    * 自定义单元格
    */
