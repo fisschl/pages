@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const sse = createEventStream(event);
 
   const push = async (message: string) => {
+    console.log(message);
     await sse.push(message);
   };
 

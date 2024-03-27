@@ -25,8 +25,11 @@ const row = computed(() => {
 
 <template>
   <tr
-    :data-row="row.id"
     class="absolute left-0 top-0 z-0 flex"
+    :style="{
+      height: `${virtualRow.size}px`,
+      transform: `translateY(${virtualRow.start}px)`,
+    }"
     :class="get(row_style, row.id)"
   >
     <td
@@ -48,8 +51,9 @@ const row = computed(() => {
         height: `${virtualRow.size}px`,
         transform: `translateX(${column.start}px)`,
       }"
-      :virtual-column="column"
       :row="row"
+      :virtual-row="virtualRow"
+      :virtual-column="column"
     />
   </tr>
 </template>

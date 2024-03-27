@@ -7,6 +7,7 @@ import TableRow from "./TableRow.vue";
 import table_style from "./table.module.css";
 import HeaderCell from "./HeaderCell.vue";
 import WidthHandler from "./WidthHandler.vue";
+import BoxSelector from "./BoxSelector.vue";
 
 const props = defineProps<{
   table: Table;
@@ -28,7 +29,6 @@ const rows_virtual = useVirtualizer(
       paddingStart: ITEM_HEIGHT,
       scrollPaddingStart: ITEM_HEIGHT,
       getItemKey: (i) => rows[i].id,
-      initialRect: { width: 1920, height: 1080 },
     };
   }),
 );
@@ -44,7 +44,6 @@ const columns_virtual = useVirtualizer(
       paddingStart: ITEM_HEIGHT,
       scrollPaddingStart: ITEM_HEIGHT,
       getItemKey: (i) => columns[i].name,
-      initialRect: { width: 1920, height: 1080 },
     };
   }),
 );
@@ -105,15 +104,20 @@ const columns = toRef(table, "columns");
           :table="table"
           :style="{
             width: `${total_width}px`,
-            height: `${row.size}px`,
-            transform: `translateY(${row.start}px)`,
           }"
           :virtual-row="row"
           :virtual-columns="virtual_columns"
         />
       </tbody>
     </table>
-    <WidthHandler :table="table" :virtualizer="columns_virtual" />
+    <WidthHandler
+      :table="table"
+      :style="{
+        height: `${total_height}px`,
+      }"
+      :virtualizer="columns_virtual"
+    />
+    <BoxSelector :table="table" />
   </div>
 </template>
 

@@ -43,4 +43,11 @@ export class Table {
   readonly row_style: Record<string, string> = {};
 
   readonly cell_style: Record<string, Record<string, string>> = {};
+
+  /**
+   * 选区矩阵。
+   * 第一个元素是选中的行的 index 列表。
+   * 第二个元素是列的 index 列表。
+   */
+  select_box: [number[], number[]] = [[], []];
 }

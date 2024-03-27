@@ -5,7 +5,6 @@ import { User, UserInsertSchema, users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 import { H3Event } from "h3";
 import { isString } from "lodash-es";
-import { logs } from "~/server/database/mongo";
 import { $token } from "~/server/utils/token";
 
 /**
@@ -25,11 +24,6 @@ export default defineEventHandler(async (event) => {
   const session = useSession(event);
   await session.set("user", user.id);
   user.password = "******";
-  await logs.insertOne({
-    metadata: "用户登录",
-    timestamp: new Date(),
-    user,
-  });
   return user;
 });
 
@@ -59,7 +53,7 @@ export const useSession = (event: H3Event) => {
     await redis.hSet(token, name, value);
     await redis.expire(token, 30 * DAY);
   };
-  return { get, set };
+  return { token, get, set };
 };
 
 export const useCurrentUser = async (

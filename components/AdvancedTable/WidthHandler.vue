@@ -88,7 +88,7 @@ useEventListener(toRef(props.table, "container"), "mousedown", handleMouseDown);
 <template>
   <span
     ref="widthIndicator"
-    class="absolute left-0 top-0 z-10 h-full"
+    class="absolute left-0 top-0 z-10"
     :class="$style.widthIndicator"
   ></span>
 </template>

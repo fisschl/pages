@@ -8,6 +8,7 @@ import { get } from "lodash-es";
 const props = defineProps<{
   table: Table;
   row: Record<string, string>;
+  virtualRow: VirtualItem;
   virtualColumn: VirtualItem;
 }>();
 
@@ -22,8 +23,8 @@ const column = computed(() => {
 
 <template>
   <td
-    :data-row="row.id"
-    :data-column="column.name"
+    :data-row="virtualRow.index"
+    :data-column="virtualColumn.index"
     class="absolute left-0 top-0 z-0"
     :class="[table_style.cell, get(cell_style, [row.id, column.name])]"
   >
