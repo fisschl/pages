@@ -1,8 +1,7 @@
 FROM node:latest AS builder
 WORKDIR /root
-RUN npm config set registry https://registry.npmmirror.com
-RUN npm install -g pnpm
 COPY .npmrc .
+RUN npm install -g pnpm
 COPY package.json .
 RUN pnpm install --prod
 COPY . .
