@@ -4,8 +4,8 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@vueuse/nuxt",
     "@pinia/nuxt",
-    "@pinia-plugin-persistedstate/nuxt",
     "@element-plus/nuxt",
+    "@nuxtjs/mdc",
   ],
 
   ui: {
@@ -34,9 +34,7 @@ export default defineNuxtConfig({
 
   css: ["@/assets/css/global.css"],
 
-  devtools: {
-    timeline: {
-      enabled: true,
-    },
+  mdc: {
+    highlight: {},
   },
 });

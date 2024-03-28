@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
-import { codeToHtml } from "shiki";
 
 const params = reactive({
   text: "",
@@ -18,16 +17,13 @@ const submit = debounce(async () => {
     body: params,
   });
   params.text = text;
-  result.value = await codeToHtml(text, {
-    lang: params.extension,
-    theme: "vitesse-dark",
-  });
+  result.value = "```" + params.extension + "\n" + text + "\n " + "```";
 }, 500);
 </script>
 
 <template>
   <UContainer>
-    <UForm :state="params" class="mb-4 px-4 pt-5" @submit.prevent>
+    <UForm :state="params" class="mb-4 pt-5" @submit.prevent>
       <UFormGroup label="扩展名" name="extension" class="mb-3 max-w-xs">
         <USelectMenu
           v-model="params.extension"
@@ -45,12 +41,11 @@ const submit = debounce(async () => {
         />
       </UFormGroup>
     </UForm>
-    <div v-if="params.text && result" class="relative mx-3">
-      <CopyButton class="absolute right-2 top-2" :text="params.text" />
-      <article
-        class="prose max-w-none dark:prose-invert"
-        v-html="result"
-      ></article>
-    </div>
+    <MDC
+      v-if="params.text && result"
+      tag="div"
+      :value="result"
+      class="prose max-w-none dark:prose-invert"
+    />
   </UContainer>
 </template>

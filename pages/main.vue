@@ -59,12 +59,10 @@ const user = useUserStore();
       />
     </USlideover>
   </header>
-  <main class="overflow-hidden">
+  <main>
     <NuxtPage />
   </main>
-  <footer
-    class="bg-zinc-50 py-10 text-center text-sm text-gray-500 dark:bg-zinc-900"
-  >
+  <footer class="py-10 text-center text-sm text-gray-500">
     <a
       href="https://beian.miit.gov.cn/"
       target="_blank"

@@ -11,9 +11,10 @@ const { data } = await useFetch<Record<string, string>>("/api/poetry", {
     <p class="mb-4 text-base text-gray-500 dark:text-gray-400">
       {{ data?.author }}
     </p>
-    <div
+    <MDC
       class="prose max-w-none dark:prose-invert"
-      v-html="data?.content"
-    ></div>
+      tag="div"
+      :value="data?.content"
+    />
   </UContainer>
 </template>
