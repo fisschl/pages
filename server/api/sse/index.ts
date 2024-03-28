@@ -1,5 +1,5 @@
 import { isString } from "lodash-es";
-import { subscriber } from "../database/redis";
+import { subscriber } from "../../database/redis";
 
 export default defineEventHandler(async (event) => {
   const { key } = getQuery(event);

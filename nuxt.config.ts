@@ -30,7 +30,6 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
-    "/window/**": { ssr: false },
   },
 
   css: ["@/assets/css/global.css"],
