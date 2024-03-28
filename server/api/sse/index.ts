@@ -1,13 +1,15 @@
-import { isString } from "lodash-es";
 import { subscriber } from "../../database/redis";
+import { z } from "zod";
+
+export const SSEQuerySchema = z.object({
+  key: z.string(),
+});
 
 export default defineEventHandler(async (event) => {
-  const { key } = getQuery(event);
-  if (!key || !isString(key)) throw createError({ status: 400 });
+  const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
 
   const push = async (message: string) => {
-    console.log(message);
     await sse.push(message);
   };
 

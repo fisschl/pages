@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { pick } from "lodash-es";
-import { type output, z } from "zod";
+const user = useUserStore();
+await user.checkLogin();
+
+const sse = ref<EventSource>();
+
+onMounted(() => {
+  sse.value = new EventSource(`/api/sse?key=${user.user?.id}`);
+});
 
 const send = async () => {
-  const res = await $fetch("/api/chat/send", {
+  await $fetch("/api/chat/send", {
     method: "POST",
     body: {
       content: "你好",

@@ -1,9 +1,11 @@
-import { z } from "zod";
-import { useCurrentUser } from "../auth/index.post";
+import { desc, eq } from "drizzle-orm";
+import { pick } from "lodash-es";
 import OpenAI from "openai";
+import { z } from "zod";
+import { database } from "~/server/database/postgres";
 import { publisher } from "~/server/database/redis";
 import { $id, ai_chats } from "~/server/database/schema";
-import { database } from "~/server/database/postgres";
+import { useCurrentUser } from "../auth/index.post";
 
 const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -18,33 +20,65 @@ export default defineEventHandler(async (event) => {
   const user = await useCurrentUser(event);
   if (!user) throw createError({ status: 403 });
   const { content } = await readValidatedBody(event, SendBodySchema.parse);
-  const message = {
-    role: "user",
-    content: content,
-  };
   const [item] = await database
     .insert(ai_chats)
     .values({
-      ...message,
+      role: "user",
+      content: content,
       user_id: user.id,
     })
     .returning();
   await publisher.publish(
     user.id,
     JSON.stringify({
-      method: "用户消息",
-      ...message,
-      id: item.id,
+      method: "AI对话",
+      ...item,
     }),
   );
+  const history = await database.query.ai_chats.findMany({
+    where: eq(ai_chats.user_id, user.id),
+    orderBy: desc(ai_chats.update_at),
+    limit: 9,
+  });
+  const messages = history.reverse().map((item): any => {
+    return pick(item, ["role", "content"]);
+  });
   const stream = await openai.chat.completions.create({
     model: "gpt-4",
-    messages: [{ role: "user", content: content }],
+    messages: messages,
     stream: true,
   });
+  const resulting = {
+    id: $id(),
+    role: "assistant",
+    content: "",
+  };
   for await (const { choices } of stream) {
     if (!choices.length) continue;
-    const { delta } = choices[0];
-    console.log(delta.content);
+    const [{ delta }] = choices;
+    if (!delta.content) continue;
+    resulting.content += delta.content;
+    await publisher.publish(
+      user.id,
+      JSON.stringify({
+        method: "AI对话",
+        ...resulting,
+      }),
+    );
   }
+  const [theEnd] = await database
+    .insert(ai_chats)
+    .values({
+      ...resulting,
+      user_id: user.id,
+    })
+    .returning();
+  await publisher.publish(
+    user.id,
+    JSON.stringify({
+      method: "AI对话",
+      ...theEnd,
+    }),
+  );
+  return { message: "完成" };
 });

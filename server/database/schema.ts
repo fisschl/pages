@@ -50,3 +50,7 @@ export const ai_chats_relations = relations(ai_chats, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type AiChart = typeof ai_chats.$inferSelect;
+export const AiChartInsertSchema = createInsertSchema(ai_chats);
+export const AiChartUpdateSchema = AiChartInsertSchema.partial();

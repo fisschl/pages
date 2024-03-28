@@ -37,4 +37,10 @@ export default defineNuxtConfig({
   mdc: {
     highlight: {},
   },
+
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 });

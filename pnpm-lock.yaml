@@ -46,7 +46,7 @@ dependencies:
     version: 10.9.0(vue@3.4.21)
   '@vueuse/integrations':
     specifier: ^10.9.0
-    version: 10.9.0(axios@1.6.8)(change-case@5.4.3)(fuse.js@6.6.2)(qrcode@1.5.3)(vue@3.4.21)
+    version: 10.9.0(axios@1.6.8)(change-case@5.4.3)(focus-trap@7.5.4)(qrcode@1.5.3)(vue@3.4.21)
   '@vueuse/nuxt':
     specifier: ^10.9.0
     version: 10.9.0(nuxt@3.11.1)(vue@3.4.21)
