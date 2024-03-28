@@ -1,9 +1,5 @@
-export const useWindowStore = defineStore(
-  "pages-window",
-  () => {
-    const server = ref("");
+export const useWindowStore = defineStore("pages-window", () => {
+  const server = ref("");
 
-    return { server };
-  },
-  { persist: true },
-);
+  return { server };
+});

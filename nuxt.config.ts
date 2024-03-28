@@ -7,9 +7,11 @@ export default defineNuxtConfig({
     "@pinia-plugin-persistedstate/nuxt",
     "@element-plus/nuxt",
   ],
+
   ui: {
     icons: ["tabler"],
   },
+
   app: {
     head: {
       link: [
@@ -20,13 +22,22 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   elementPlus: {
     themes: ["dark"],
   },
+
   routeRules: {
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
     "/window/**": { ssr: false },
   },
+
   css: ["@/assets/css/global.css"],
+
+  devtools: {
+    timeline: {
+      enabled: true,
+    },
+  },
 });
