@@ -2,10 +2,11 @@ import { eq } from "drizzle-orm";
 import { first } from "lodash-es";
 import { hashPassword } from "~/server/utils/password";
 import { redis } from "~/server/database/redis";
-import { UserUpdateSchema, users } from "~/server/database/schema";
+import { $id, UserUpdateSchema, users } from "~/server/database/schema";
 import { sanitize } from "~/server/utils/purify";
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
+import { extname } from "pathe";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -22,7 +23,13 @@ export default defineEventHandler(async (event) => {
   } else {
     body.name = undefined;
   }
-  body.avatar = undefined;
+  // 用户头像应重命名
+  if (body.avatar) {
+    const avatar = $id() + extname(body.avatar);
+    body.avatar = avatar;
+  } else {
+    body.avatar = undefined;
+  }
   body.role = undefined;
   const list = await database
     .update(users)
