@@ -76,7 +76,6 @@ useEventListener("mouseup", (e) => {
   const { select_box } = props.table;
   select_box[0] = range(row_index[0], row_index[1] + 1);
   select_box[1] = range(column_index[0], column_index[1] + 1);
-  console.log(select_box);
 });
 
 const selectBar = ref<HTMLElement>();

@@ -7,7 +7,7 @@ import { publisher } from "~/server/database/redis";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 
-const openai = new OpenAI({
+export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
   baseURL: process.env["OPENAI_PROXY_URL"],
 });
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     return pick(item, ["role", "content"]);
   });
   const stream = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4-turbo-preview",
     messages: messages,
     stream: true,
   });

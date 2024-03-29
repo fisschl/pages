@@ -15,7 +15,7 @@ if (data.value) store.user = data.value;
     <Head>
       <Title> 沅有茝兮醴有兰 </Title>
     </Head>
-    <Body class="bg-neutral-50 dark:bg-neutral-900">
+    <Body class="h-dvh overflow-auto bg-neutral-50 dark:bg-neutral-900">
       <ElConfigProvider :locale="zhCn">
         <NuxtPage />
         <UNotifications />

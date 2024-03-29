@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useRouteQuery } from "@vueuse/router";
-import { objectUnRef } from "~/utils/util";
 
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 const keyword = useRouteQuery<string>("keyword", "");
@@ -10,7 +9,7 @@ const librarySet = computed(() => {
   return new Set(library.value.split(","));
 });
 
-const handleLibraryChange = (value: string, checked: boolean) => {
+const handleLibraryChange = async (value: string, checked: boolean) => {
   const list = library.value.split(",").filter((item) => {
     return item.trim();
   });
@@ -20,29 +19,30 @@ const handleLibraryChange = (value: string, checked: boolean) => {
   library.value = Array.from(set).join();
 };
 
-const query = computed(() => {
-  return objectUnRef({
-    keyword,
-    library,
-  });
-});
+const offset = ref(0);
 
-const { data } = await useFetch<Record<string, string>[]>(
-  "/api/poetry/poetries",
-  { query: refDebounced(query, 200) },
-);
+const fetchData = async () => {
+  return $fetch<Record<string, string>[]>("/api/poetry/poetries", {
+    query: {
+      keyword: keyword.value,
+      library: library.value,
+      offset: offset.value,
+    },
+  });
+};
+
+const fetchInit = async () => {
+  offset.value = 0;
+  return fetchData();
+};
+
+const { data } = await useAsyncData(fetchInit, { watch: [keyword, library] });
 
 const isAll = ref(false);
 
 const loadMore = async () => {
-  const offset = data.value?.length;
-  if (!offset) return;
-  const res = await $fetch("/api/poetry/poetries", {
-    query: {
-      ...query.value,
-      offset,
-    },
-  });
+  offset.value = data.value?.length || 0;
+  const res = await fetchData();
   if (!res.length) {
     isAll.value = true;
     return;
