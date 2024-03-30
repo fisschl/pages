@@ -29,7 +29,6 @@ export const upload_file = async (
   const filename = encodeURIComponent(file.name);
   await oss.value.multipartUpload(key, file, {
     progress: (...params) => {
-      console.log(params);
       if (!progress) return;
       progress(params[0] * 100);
     },

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { isEmpty } from "lodash-es";
-import { useUserStore } from "~/composables/user";
-import { ofetch } from "ofetch";
 import type {
   FormInstance,
   FormRules,
   UploadRequestHandler,
 } from "element-plus";
-import { changed } from "~/utils/util";
+import { pick } from "lodash-es";
+import { useUserStore } from "~/composables/user";
 
 const store = useUserStore();
 await store.checkLogin();
@@ -16,85 +14,94 @@ const form = ref<FormInstance>();
 
 const state = reactive({
   name: store.user?.name,
-  password: store.user?.password,
 });
 
 const rules = reactive<FormRules<typeof state>>({
   name: [{ required: true, message: "请输入用户名" }],
-  password: [{ required: true, message: "请输入密码" }],
 });
+
+const changedProps = reactive(new Set<keyof typeof state>());
 
 const submit = async () => {
   await form.value?.validate();
-  const param = changed(state, store.user);
-  if (isEmpty(param)) return;
+  if (!changedProps.size) return;
   const res = await $fetch("/api/user", {
     method: "PUT",
-    body: param,
+    body: pick(state, Array.from(changedProps)),
   });
   store.user = res;
+  changedProps.clear();
 };
 
 const handleUpload: UploadRequestHandler = async ({ file }) => {
   if (!store.user) return;
-  const { avatar } = await $fetch("/api/user/avatar", {
-    method: "POST",
-    body: { type: file.type, name: file.name },
+  if (store.user.avatar) {
+    await $fetch("/api/oss/delete", {
+      method: "DELETE",
+      query: {
+        key: `home/${store.user.id}/avatar/${store.user.avatar}`,
+      },
+    });
+  }
+  const res = await $fetch("/api/user", {
+    method: "PUT",
+    body: { avatar: file.name },
   });
-  await ofetch("/oss/delete", {
-    baseURL: "https://bronya.world",
-    method: "DELETE",
-    query: {
-      key: `home/${store.user.id}/avatar/${store.user.avatar}`,
-    },
-    headers: {
-      token: store.token || "",
-    },
+  await upload_file(`home/${res.id}/avatar/${res.avatar}`, file);
+  store.user.avatar = res.avatar;
+};
+
+const handleChangePassword = async () => {
+  const { value } = await ElMessageBox.prompt("请输入新密码", "提示");
+  if (!value) {
+    ElMessage.info("取消");
+    return;
+  }
+  await $fetch("/api/user", {
+    method: "PUT",
+    body: { password: value },
   });
-  await upload_file(`home/${store.user.id}/avatar/${avatar}`, file);
-  store.user.avatar = avatar;
+  ElMessage.success("修改成功");
 };
 </script>
 
 <template>
   <UContainer class="py-6">
-    <ElForm ref="form" :model="state" :rules="rules" @submit.prevent="submit">
-      <ElFormItem label="头像" label-width="80">
-        <ElAvatar
-          :src="store.avatar"
-          style="width: 5rem; height: 5rem"
-          class="mr-3"
-        />
+    <ElForm
+      ref="form"
+      :model="state"
+      label-width="80"
+      :rules="rules"
+      @submit.prevent="submit"
+    >
+      <ElFormItem label="头像">
+        <ElAvatar :src="store.avatar" size="large" class="mr-3" />
         <ElUpload
           accept="image/*"
           :show-file-list="false"
           :http-request="handleUpload"
         >
-          <ElButton> 修改头像 </ElButton>
+          <ElButton circle>
+            <UIcon name="i-tabler-pencil" style="font-size: 16px" />
+          </ElButton>
         </ElUpload>
       </ElFormItem>
-      <ElFormItem label="用户名" label-width="80" prop="name">
+      <ElFormItem label="用户名" prop="name">
         <ElInput
           v-model="state.name"
           style="max-width: 20rem"
           placeholder="请输入用户名"
+          class="mr-3"
+          @change="changedProps.add('name')"
         />
       </ElFormItem>
-      <ElFormItem label="密码" label-width="80" prop="password">
-        <ElInput
-          v-model="state.password"
-          placeholder="请输入密码"
-          type="password"
-          style="max-width: 20rem"
-          show-password
-        />
+      <ElFormItem label="密码">
+        <ElButton circle @click="handleChangePassword">
+          <UIcon name="i-tabler-pencil" style="font-size: 16px" />
+        </ElButton>
       </ElFormItem>
-      <ElButton
-        native-type="submit"
-        style="margin-left: 80px"
-        type="primary"
-        class="mt-3 !px-6"
-      >
+      <ElButton native-type="submit" style="margin-left: 80px" type="primary">
+        <UIcon name="i-tabler-checks" style="font-size: 18px" class="mr-2" />
         保 存
       </ElButton>
     </ElForm>

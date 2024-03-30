@@ -36,12 +36,8 @@ export default defineNuxtConfig({
   css: ["@/assets/css/global.css"],
 
   mdc: {
-    highlight: {},
-  },
-
-  nitro: {
-    experimental: {
-      websocket: true,
+    highlight: {
+      theme: "vitesse-dark",
     },
   },
 });

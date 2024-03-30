@@ -11,10 +11,12 @@ await user.checkLogin();
 const prefix = `home/${user.user?.id}/store`;
 const path = ref("/");
 
+const headers = useRequestHeaders(["cookie"]);
 const { data, refresh } = await useFetch("/api/oss/list", {
   query: computed(() => ({
     prefix: join(prefix, path.value),
   })),
+  headers,
 });
 
 const handleDelete = async (key: string) => {
