@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@element-plus/nuxt",
     "@nuxtjs/mdc",
+    "@nuxt/fonts",
   ],
 
   ui: {
@@ -15,10 +16,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        {
-          rel: "stylesheet",
-          href: "https://cdn.fisschl.world/static/MiSans/font.css",
-        },
+        // {
+        //   rel: "stylesheet",
+        //   href: "https://cdn.fisschl.world/static/MiSans/font.css",
+        // },
       ],
     },
   },
