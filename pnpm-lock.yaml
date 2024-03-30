@@ -65,6 +65,9 @@ dependencies:
   dompurify:
     specifier: ^3.0.11
     version: 3.0.11
+  dotenv:
+    specifier: ^16.4.5
+    version: 16.4.5
   drizzle-orm:
     specifier: ^0.30.6
     version: 0.30.6(pg@8.11.3)(postgres@3.4.4)
@@ -163,9 +166,6 @@ devDependencies:
   czg:
     specifier: ^1.9.0
     version: 1.9.0
-  dotenv:
-    specifier: ^16.4.5
-    version: 16.4.5
   drizzle-kit:
     specifier: ^0.20.14
     version: 0.20.14
@@ -5298,6 +5298,7 @@ packages:
   /dotenv@16.4.5:
     resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
+    dev: false
 
   /dreamopt@0.8.0:
     resolution: {integrity: sha512-vyJTp8+mC+G+5dfgsY+r3ckxlz+QMX40VjPQsZc5gxVAxLmi64TBoVkP54A/pRAXMXsbu2GMMBrZPxNv23waMg==}
