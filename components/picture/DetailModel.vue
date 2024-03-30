@@ -56,7 +56,7 @@ const videoExtensions = [".mp4", ".webm", ".ogg", ".ogv"];
         v-if="imageExtensions.includes(extname(item.name))"
         :src="cdn"
         :alt="item.name"
-      />
+      >
       <video
         v-else-if="videoExtensions.includes(extname(item.name))"
         autoplay

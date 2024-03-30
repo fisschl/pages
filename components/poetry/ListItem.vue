@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { Poetry } from "~/server/api/poetry/poetries";
+
 const props = defineProps<{
-  item: Record<string, string>;
+  item: Poetry;
 }>();
 
 const to = computed(() => {
@@ -23,7 +25,7 @@ const to = computed(() => {
         :class="$style.content"
         class="text-sm text-zinc-600 dark:text-zinc-200"
         v-html="item.content"
-      ></p>
+      />
     </NuxtLink>
   </article>
 </template>

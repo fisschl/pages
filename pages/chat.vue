@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { debounce, throttle } from "lodash-es";
+import { z, type output } from "zod";
 import { useUserStore } from "~/composables/user";
 
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
 
-interface Message {
-  id: string;
-  update_at?: string;
-  role: string;
-  content: string;
-}
+const MessageSchema = z.object({
+  id: z.string(),
+  role: z.enum(["user", "assistant"]),
+  content: z.string(),
+  update_at: z.string().datetime().optional(),
+});
+
+type Message = output<typeof MessageSchema>;
 
 const last_time = ref<string>();
 const headers = useRequestHeaders(["cookie"]);
@@ -53,7 +56,8 @@ const { eventSource } = useEventSource(`/api/sse?key=${user?.id}`);
 useEventListener(eventSource, "message", (e) => {
   if (!(e instanceof MessageEvent)) return;
   const data = JSON.parse(e.data);
-  if (data.method !== "AI对话") return;
+  const res = MessageSchema.safeParse(data);
+  if (!res.success) return;
   handleNewMessage(data);
 });
 
@@ -119,7 +123,7 @@ const welcome = `
       @keydown.enter="handleKeydown"
     />
     <div class="my-3 flex">
-      <span class="flex-1"></span>
+      <span class="flex-1" />
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
   </UContainer>

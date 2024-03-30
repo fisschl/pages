@@ -2,6 +2,16 @@ import { z } from "zod";
 import { pick } from "lodash-es";
 import { meilisearch } from "~/server/database/meilisearch";
 
+export interface Poetry {
+  id: string;
+  library: string;
+  author?: string;
+  content: string;
+  title: string;
+  index?: number;
+  tags?: string[];
+}
+
 export const poetriesIndex = meilisearch.index("poetries");
 
 export const meilisearchQueryFilter = (key: string, items?: string[]) => {
@@ -21,7 +31,7 @@ export default defineEventHandler(async (event) => {
     event,
     RequestSchema.parse,
   );
-  const res = await poetriesIndex.search(keyword, {
+  const res = await poetriesIndex.search<Poetry>(keyword, {
     limit: 32,
     offset: parseInt(offset) || 0,
     filter: meilisearchQueryFilter("library", library?.split(",")),

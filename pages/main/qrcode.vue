@@ -10,6 +10,6 @@ const qrcode = useQRCode(text);
     <div class="mb-8 flex">
       <UInput v-model="text" size="lg" class="flex-1" />
     </div>
-    <img v-if="qrcode" class="mx-auto size-40" :src="qrcode" alt="QR Code" />
+    <img v-if="qrcode" class="mx-auto size-40" :src="qrcode" alt="QR Code" >
   </UContainer>
 </template>

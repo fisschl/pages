@@ -1,9 +1,11 @@
 import { desc, eq } from "drizzle-orm";
 import { pick } from "lodash-es";
 import OpenAI from "openai";
+import type { output } from "zod";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { publisher } from "~/server/database/redis";
+import type { AiChartInsertSchema } from "~/server/database/schema";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 
@@ -40,7 +42,7 @@ export default defineEventHandler(async (event) => {
     orderBy: desc(ai_chats.update_at),
     limit: 9,
   });
-  const messages = history.reverse().map((item): any => {
+  const messages = history.reverse().map((item) => {
     return pick(item, ["role", "content"]);
   });
   const stream = await openai.chat.completions.create({
@@ -48,8 +50,9 @@ export default defineEventHandler(async (event) => {
     messages: messages,
     stream: true,
   });
-  const resulting = {
+  const resulting: output<typeof AiChartInsertSchema> = {
     id: $id(),
+    user_id: user.id,
     role: "assistant",
     content: "",
   };
@@ -68,10 +71,7 @@ export default defineEventHandler(async (event) => {
   }
   const [theEnd] = await database
     .insert(ai_chats)
-    .values({
-      ...resulting,
-      user_id: user.id,
-    })
+    .values([resulting])
     .returning();
   await publisher.publish(
     user.id,

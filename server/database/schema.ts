@@ -40,7 +40,7 @@ export const ai_chats = pgTable("ai_chats", {
   id: varchar("id").primaryKey().$default($id),
   update_at: dateTime("update_at").notNull(),
   user_id: varchar("user_id").notNull(),
-  role: varchar("role").notNull(),
+  role: varchar("role", { enum: ["user", "assistant"] }).notNull(),
   content: text("content").notNull(),
 });
 

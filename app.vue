@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from "./composables/user";
-// @ts-ignore
+// @ts-expect-error element-plus locale mjs file
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 const store = useUserStore();
@@ -23,3 +23,13 @@ if (data.value) store.user = data.value;
     </Body>
   </Html>
 </template>
+
+<style>
+html:root {
+  --el-font-family: "MiSans", sans-serif;
+}
+
+html {
+  overflow: hidden;
+}
+</style>

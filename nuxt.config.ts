@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@element-plus/nuxt",
     "@nuxtjs/mdc",
-    "@nuxt/fonts",
+    "@nuxt/eslint",
   ],
 
   ui: {
@@ -16,10 +16,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        // {
-        //   rel: "stylesheet",
-        //   href: "https://cdn.fisschl.world/static/MiSans/font.css",
-        // },
+        {
+          rel: "stylesheet",
+          href: "https://cdn.fisschl.world/static/MiSans/font.css",
+        },
       ],
     },
   },
@@ -32,8 +32,6 @@ export default defineNuxtConfig({
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
   },
-
-  css: ["@/assets/css/global.css"],
 
   mdc: {
     highlight: {

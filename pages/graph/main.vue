@@ -33,5 +33,5 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main ref="mainContainer" class="h-dvh w-screen overflow-hidden"></main>
+  <main ref="mainContainer" class="h-dvh w-screen overflow-hidden"/>
 </template>

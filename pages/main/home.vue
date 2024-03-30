@@ -22,7 +22,7 @@ const handleLibraryChange = async (value: string, checked: boolean) => {
 const offset = ref(0);
 
 const fetchData = async () => {
-  return $fetch<Record<string, string>[]>("/api/poetry/poetries", {
+  return $fetch("/api/poetry/poetries", {
     query: {
       keyword: keyword.value,
       library: library.value,
