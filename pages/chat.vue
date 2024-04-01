@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { debounce, throttle } from "lodash-es";
+import { debounce, first } from "lodash-es";
 import { z, type output } from "zod";
 import { useUserStore } from "~/composables/user";
+import type { MessagesQuery } from "~/server/api/chat/messages";
 
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
@@ -10,28 +11,44 @@ const MessageSchema = z.object({
   id: z.string(),
   role: z.enum(["user", "assistant"]),
   content: z.string(),
-  update_at: z.string().datetime().optional(),
+  update_at: z.string().optional(),
 });
 
 type Message = output<typeof MessageSchema>;
 
-const last_time = ref<string>();
 const headers = useRequestHeaders(["cookie"]);
 
-const fetchData = async () => {
-  return $fetch<Message[]>("/api/chat/messages", {
-    query: {
-      update_at: last_time.value,
-    },
+const fetchData = async (param?: MessagesQuery) => {
+  const res = await $fetch<Message[]>("/api/chat/messages", {
+    query: param,
     headers,
   });
+  return res;
 };
 
-const { data: list } = await useAsyncData(fetchData);
+const { data: list } = await useAsyncData(() => fetchData());
 
-const updateMessageItem = throttle(async (target: Message, source: Message) => {
-  Object.assign(target, source);
-}, 100);
+const isMounted = useMounted();
+const { directions, y: originalScrollTop } = useScroll(() => {
+  return isMounted.value ? document.body : undefined;
+});
+
+const scrollToBottom = async () => {
+  await nextTick();
+  const { body } = document;
+  body.scrollTop = body.scrollHeight;
+};
+onMounted(scrollToBottom);
+
+const scrollTop = refThrottled(originalScrollTop, 200);
+
+const isShowScrollButton = computed(() => {
+  if (!isMounted.value) return;
+  const { body } = document;
+  const { scrollHeight, clientHeight } = body;
+  const bottom = scrollHeight - scrollTop.value - clientHeight;
+  return bottom > 100;
+});
 
 const handleNewMessage = (message: Message) => {
   if (!list.value) return;
@@ -39,17 +56,14 @@ const handleNewMessage = (message: Message) => {
   if (!item) {
     list.value?.push(message);
   } else {
-    updateMessageItem(item, message);
+    Object.assign(item, message);
   }
+  if (directions.top) return;
   const { body } = document;
-  const bottom = body.scrollHeight - body.scrollTop - body.clientHeight;
-  if (bottom < 100) body.scrollTop = body.scrollHeight;
+  const { scrollHeight, scrollTop, clientHeight } = body;
+  const bottom = scrollHeight - scrollTop - clientHeight;
+  if (bottom < 80) return scrollToBottom();
 };
-
-onMounted(() => {
-  const { body } = document;
-  body.scrollTop = body.scrollHeight;
-});
 
 const { eventSource } = useEventSource(`/api/sse?key=${user?.id}`);
 
@@ -57,7 +71,10 @@ useEventListener(eventSource, "message", (e) => {
   if (!(e instanceof MessageEvent)) return;
   const data = JSON.parse(e.data);
   const res = MessageSchema.safeParse(data);
-  if (!res.success) return;
+  if (!res.success) {
+    console.log("解析 SSE 响应失败", data);
+    return;
+  }
   handleNewMessage(data);
 });
 
@@ -82,36 +99,77 @@ const handleKeydown = async (e: KeyboardEvent) => {
   send();
 };
 
-const welcome = `
-> 早上好，夜之城。
-> 已授权访问。
-> 当前模型：**gpt-4-turbo-preview**。
-> 对话将携带 **9** 条历史记录。
-> 若使用时发生异常，请联系管理员。
-`;
+const loading = ref<boolean>(false);
+
+const isAll = ref(false);
+const thisStyle = useCssModule();
+whenever(
+  () => directions.top && scrollTop.value < 100 && !isAll.value,
+  async () => {
+    if (!list.value?.length) return;
+    if (loading.value) return;
+    loading.value = true;
+    const res = await fetchData({
+      update_at: first(list.value)?.update_at,
+    });
+    if (!res.length) {
+      isAll.value = true;
+      loading.value = false;
+      return;
+    }
+    await nextTick();
+    // 记忆滚动位置
+    const firstElement = document.querySelector("." + thisStyle.message);
+    const oldRect = firstElement?.getBoundingClientRect();
+    list.value.unshift(...res);
+    await nextTick();
+    const newRect = firstElement?.getBoundingClientRect();
+    if (oldRect && newRect) {
+      // 恢复滚动位置
+      const { body } = document;
+      console.log(newRect, oldRect, newRect.top - oldRect.top);
+      body.scrollBy({ top: newRect.top - oldRect.top });
+    } else {
+      scrollToBottom();
+    }
+    loading.value = false;
+  },
+);
 </script>
 
 <template>
   <UContainer class="flex min-h-dvh flex-col py-5">
-    <MDC
-      tag="article"
-      :value="welcome"
-      class="prose prose-sm mb-4 max-w-none dark:prose-invert"
-    />
+    <article class="prose mb-8 mt-4 max-w-none dark:prose-invert">
+      <blockquote>
+        早上好，夜之城。 已授权访问。 当前模型：
+        <strong> gpt-4-turbo-preview </strong>
+        。 对话将携带
+        <strong> 9 </strong>
+        条历史记录。 若使用时发生异常，请联系管理员。
+      </blockquote>
+    </article>
+    <div class="flex justify-center">
+      <UIcon
+        v-if="loading"
+        name="i-tabler-loader-2"
+        class="my-4 animate-spin"
+        style="font-size: 1.5rem"
+      />
+    </div>
     <div class="flex flex-1 flex-col items-start gap-5">
       <section
         v-for="item in list"
         :key="item.id"
-        class="rounded px-3 py-2"
+        class="message rounded px-3 py-2"
         :class="{
           'bg-stone-500/10': item.role === 'assistant',
           'bg-violet-500/15': item.role === 'user',
+          [$style.message]: true,
         }"
       >
-        <MDC
-          tag="article"
-          :value="item.content"
+        <article
           class="prose prose-sm max-w-none dark:prose-invert"
+          v-html="item.content"
         />
       </section>
     </div>
@@ -126,5 +184,19 @@ const welcome = `
       <span class="flex-1" />
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
+    <UButton
+      v-if="isShowScrollButton"
+      size="lg"
+      variant="soft"
+      icon="i-tabler-chevrons-down"
+      class="fixed bottom-10 left-1/2 -translate-x-1/2"
+      @click="scrollToBottom"
+    />
   </UContainer>
 </template>
+
+<style module>
+.message {
+  display: block;
+}
+</style>

@@ -1,4 +1,5 @@
-import type { Poetry} from "./poetries";
+import { parseMarkdown } from "../markdown";
+import type { Poetry } from "./poetries";
 import { poetriesIndex } from "./poetries";
 import { z } from "zod";
 
@@ -8,6 +9,7 @@ const RequestQuerySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedQuery(event, RequestQuerySchema.parse);
-  const res = await poetriesIndex.getDocument<Poetry>(id);
-  return res;
+  const item = await poetriesIndex.getDocument<Poetry>(id);
+  item.content = parseMarkdown(item.content);
+  return item;
 });

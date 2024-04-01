@@ -1,15 +1,16 @@
-import { database } from "~/server/database/postgres";
-import { useCurrentUser } from "../auth/index.post";
-import { ai_chats } from "~/server/database/schema";
 import { and, desc, eq, lt } from "drizzle-orm";
+import type { input } from "zod";
 import { z } from "zod";
+import { database } from "~/server/database/postgres";
+import { ai_chats } from "~/server/database/schema";
+import { useCurrentUser } from "../auth/index.post";
+import { parseMarkdown } from "../markdown";
 
 const QuerySchema = z.object({
-  update_at: z
-    .string()
-    .datetime()
-    .default(() => new Date().toISOString()),
+  update_at: z.string().default(() => new Date().toISOString()),
 });
+
+export type MessagesQuery = input<typeof QuerySchema>;
 
 export default defineEventHandler(async (event) => {
   const user = await useCurrentUser(event);
@@ -21,7 +22,10 @@ export default defineEventHandler(async (event) => {
       lt(ai_chats.update_at, update_at),
     ),
     orderBy: desc(ai_chats.update_at),
-    limit: 24,
+    limit: 16,
   });
-  return history.reverse();
+  return history.reverse().map((item) => {
+    item.content = parseMarkdown(item.content);
+    return item;
+  });
 });

@@ -1,7 +1,8 @@
 import { format } from "prettier";
 import { z } from "zod";
+import { parseMarkdown } from "./markdown";
 
-const RequestBodySchema = z.object({
+const RequestSchema = z.object({
   text: z.string(),
   extension: z.string(),
 });
@@ -9,10 +10,12 @@ const RequestBodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { text, extension } = await readValidatedBody(
     event,
-    RequestBodySchema.parse,
+    RequestSchema.parse,
   );
-  const res = await format(text, {
+  const result = await format(text, {
     filepath: `file.${extension}`,
   });
-  return { text: res };
+  const markdown = "```" + extension + "\n" + result + "\n " + "```";
+  const html = parseMarkdown(markdown);
+  return { text: result, html };
 });

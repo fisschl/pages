@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@pinia/nuxt",
     "@element-plus/nuxt",
-    "@nuxtjs/mdc",
     process.env.NODE_ENV === "development" ? "@nuxt/eslint" : false,
   ],
 
@@ -33,11 +32,5 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
-  },
-
-  mdc: {
-    highlight: {
-      theme: "vitesse-dark",
-    },
   },
 });

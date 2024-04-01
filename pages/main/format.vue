@@ -12,12 +12,12 @@ const extensions = ["json", "yaml", "md", "vue", "html", "js", "ts", "css"];
 
 const submit = debounce(async () => {
   if (!params.text) return;
-  const { text } = await $fetch("/api/format", {
+  const { text, html } = await $fetch("/api/format", {
     method: "POST",
     body: params,
   });
   params.text = text;
-  result.value = "```" + params.extension + "\n" + text + "\n " + "```";
+  result.value = html;
 }, 500);
 </script>
 
@@ -41,11 +41,10 @@ const submit = debounce(async () => {
         />
       </UFormGroup>
     </UForm>
-    <MDC
+    <article
       v-if="params.text && result"
-      tag="div"
-      :value="result"
       class="prose max-w-none dark:prose-invert"
+      v-html="result"
     />
   </UContainer>
 </template>

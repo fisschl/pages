@@ -34,6 +34,11 @@ export const useNav = defineStore("pages-nav", () => {
       to: "https://gitea.bronya.world",
       target: "_blank",
     },
+    {
+      label: "智能对话",
+      icon: "i-tabler-brand-openai",
+      to: "/chat",
+    },
   ]);
 
   const visible = ref(false);

@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { pick } from "lodash-es";
+import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
 import type { output } from "zod";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { publisher } from "~/server/database/redis";
 import type { AiChartInsertSchema } from "~/server/database/schema";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
+import { parseMarkdown } from "../markdown";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -30,13 +31,7 @@ export default defineEventHandler(async (event) => {
       user_id: user.id,
     })
     .returning();
-  await publisher.publish(
-    user.id,
-    JSON.stringify({
-      method: "AI对话",
-      ...item,
-    }),
-  );
+  await publisher.publish(user.id, JSON.stringify(item));
   const history = await database.query.ai_chats.findMany({
     where: eq(ai_chats.user_id, user.id),
     orderBy: desc(ai_chats.update_at),
@@ -56,29 +51,26 @@ export default defineEventHandler(async (event) => {
     role: "assistant",
     content: "",
   };
+  const publish = throttle(async () => {
+    const content = parseMarkdown(resulting.content);
+    const item = {
+      ...resulting,
+      content,
+    };
+    await publisher.publish(user.id, JSON.stringify(item));
+  }, 200);
   for await (const { choices } of stream) {
     if (!choices.length) continue;
     const [{ delta }] = choices;
     if (!delta.content) continue;
     resulting.content += delta.content;
-    await publisher.publish(
-      user.id,
-      JSON.stringify({
-        method: "AI对话",
-        ...resulting,
-      }),
-    );
+    await publish();
   }
+  await new Promise<void>((resolve) => setTimeout(resolve, 250));
   const [theEnd] = await database
     .insert(ai_chats)
     .values([resulting])
     .returning();
-  await publisher.publish(
-    user.id,
-    JSON.stringify({
-      method: "AI对话",
-      ...theEnd,
-    }),
-  );
+  await publisher.publish(user.id, JSON.stringify(theEnd));
   return { message: "完成" };
 });
