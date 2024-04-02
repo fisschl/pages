@@ -53,12 +53,12 @@ export default defineEventHandler(async (event) => {
     content: "",
   };
   const publish = throttle(async () => {
-    const content = parseMarkdown(resulting.content);
-    const item = {
+    const message = {
       ...resulting,
-      content,
+      content: parseMarkdown(resulting.content),
+      user_id: undefined,
     };
-    await publisher.publish(user.id, JSON.stringify(item));
+    await publisher.publish(user.id, JSON.stringify(message));
   }, 200);
   for await (const { choices } of stream) {
     if (!choices.length) continue;
@@ -72,8 +72,12 @@ export default defineEventHandler(async (event) => {
     .insert(ai_chats)
     .values([resulting])
     .returning();
-  theEnd.content = parseMarkdown(theEnd.content);
-  await publisher.publish(user.id, JSON.stringify(theEnd));
+  const message = {
+    ...theEnd,
+    content: parseMarkdown(theEnd.content),
+    user_id: undefined,
+  };
+  await publisher.publish(user.id, JSON.stringify(message));
   upsert_residual();
   return { message: "完成" };
 });
