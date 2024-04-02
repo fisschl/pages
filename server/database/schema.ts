@@ -55,7 +55,7 @@ export const ai_chats = pgTable(
     role: varchar("role", { enum: ["user", "assistant"] }).notNull(),
     content: text("content").notNull(),
   },
-  ({ user_id,update_at }) => ({
+  ({ user_id, update_at }) => ({
     user_id_idx: index().on(user_id),
     update_at_idx: index().on(update_at),
   }),
