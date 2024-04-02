@@ -66,6 +66,7 @@ export const useNav = defineStore("pages-nav", () => {
     const item = new Howl({
       src: [music.src],
       loop: true,
+      html5: true,
     });
     sound.value = item;
     return item;
