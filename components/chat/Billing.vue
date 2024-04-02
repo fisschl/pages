@@ -79,7 +79,6 @@ whenever(chartElement, () => {
       {
         name: "消耗量",
         type: "bar",
-        barMaxWidth: 25,
         data: list.map((item) => item.usage),
       },
       {
