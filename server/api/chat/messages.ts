@@ -25,7 +25,10 @@ export default defineEventHandler(async (event) => {
     limit: 16,
   });
   return history.reverse().map((item) => {
-    item.content = parseMarkdown(item.content);
-    return item;
+    return {
+      ...item,
+      content: parseMarkdown(item.content),
+      user_id: undefined,
+    };
   });
 });
