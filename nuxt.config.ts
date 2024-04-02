@@ -1,4 +1,5 @@
 import "dotenv/config";
+import legacy from "@vitejs/plugin-legacy";
 
 export default defineNuxtConfig({
   modules: [
@@ -32,5 +33,9 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
+  },
+
+  vite: {
+    plugins: [legacy({ modernPolyfills: true })],
   },
 });
