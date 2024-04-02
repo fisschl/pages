@@ -33,6 +33,7 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.6",
     "drizzle-zod": "^0.5.1",
+    "echarts": "^5.5.0",
     "element-plus": "^2.6.3",
     "h3": "^1.11.1",
     "hash-wasm": "^4.11.0",

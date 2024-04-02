@@ -53,7 +53,7 @@ export interface Billing {
 export default defineEventHandler(async () => {
   const right = new Date();
   const right_str = right.toISOString().slice(0, 10);
-  const left = subDays(right, 7);
+  const left = subDays(right, 8);
   const list = await database.query.ai_billing.findMany({
     where: and(
       gte(ai_billing.date, left.toISOString().slice(0, 10)),
