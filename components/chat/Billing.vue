@@ -32,6 +32,10 @@ const chart = shallowRef<ReturnType<typeof init>>();
 const colorMode = useColorMode();
 
 whenever(chartElement, () => {
+  if (chart.value) {
+    chart.value.off();
+    chart.value.dispose();
+  }
   chart.value = init(
     chartElement.value,
     colorMode.value === "dark" ? "dark" : undefined,
@@ -87,6 +91,12 @@ whenever(chartElement, () => {
       },
     ],
   } satisfies EChartsOption);
+});
+
+onBeforeUnmount(() => {
+  if (!chart.value) return;
+  chart.value.off();
+  chart.value.dispose();
 });
 
 const today_data = computed(() => {
