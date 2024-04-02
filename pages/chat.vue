@@ -159,6 +159,7 @@ whenever(
       @keydown.enter="handleKeydown"
     />
     <div class="my-3 flex">
+      <ChatBilling />
       <span class="flex-1" />
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
