@@ -32,7 +32,7 @@ const user = useUserStore();
         icon="i-tabler-menu"
         @click="nav.visible = true"
       />
-      <USlideover v-model="nav.visible">
+      <USlideover v-model="nav.visible" :ui="{ width: 'max-w-xs' }">
         <div class="flex flex-1 flex-col overflow-auto">
           <UButton
             :to="user.user ? '/main/user' : login"
@@ -74,3 +74,9 @@ const user = useUserStore();
     </footer>
   </div>
 </template>
+
+<style module>
+.menu_width {
+  width: 12rem;
+}
+</style>

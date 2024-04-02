@@ -72,7 +72,7 @@ useEventListener(eventSource, "message", (e) => {
   const data = JSON.parse(e.data);
   const res = MessageSchema.safeParse(data);
   if (!res.success) {
-    console.log("解析 SSE 响应失败", data);
+    console.log("不符合 SSE 响应规则", data);
     return;
   }
   handleNewMessage(data);
@@ -87,9 +87,7 @@ const send = debounce(async () => {
   inputText.value = undefined;
   await $fetch("/api/chat/send", {
     method: "POST",
-    body: {
-      content: content,
-    },
+    body: { content: content },
   });
 }, 200);
 
@@ -99,24 +97,16 @@ const handleKeydown = async (e: KeyboardEvent) => {
   send();
 };
 
-const loading = ref<boolean>(false);
-
 const isAll = ref(false);
 const thisStyle = useCssModule();
 whenever(
   () => directions.top && scrollTop.value < 100 && !isAll.value,
   async () => {
     if (!list.value?.length) return;
-    if (loading.value) return;
-    loading.value = true;
     const res = await fetchData({
       update_at: first(list.value)?.update_at,
     });
-    if (!res.length) {
-      isAll.value = true;
-      loading.value = false;
-      return;
-    }
+    if (!res.length) return (isAll.value = true);
     await nextTick();
     // 记忆滚动位置
     const firstElement = document.querySelector("." + thisStyle.message);
@@ -124,15 +114,11 @@ whenever(
     list.value.unshift(...res);
     await nextTick();
     const newRect = firstElement?.getBoundingClientRect();
-    if (oldRect && newRect) {
-      // 恢复滚动位置
-      const { body } = document;
-      console.log(newRect, oldRect, newRect.top - oldRect.top);
-      body.scrollBy({ top: newRect.top - oldRect.top });
-    } else {
-      scrollToBottom();
-    }
-    loading.value = false;
+    if (!oldRect || !newRect) return scrollToBottom();
+    // 恢复滚动位置
+    const { body } = document;
+    console.log(newRect, oldRect, newRect.top - oldRect.top);
+    body.scrollBy({ top: newRect.top - oldRect.top });
   },
 );
 </script>
@@ -148,14 +134,6 @@ whenever(
         条历史记录。 若使用时发生异常，请联系管理员。
       </blockquote>
     </article>
-    <div class="flex justify-center">
-      <UIcon
-        v-if="loading"
-        name="i-tabler-loader-2"
-        class="my-4 animate-spin"
-        style="font-size: 1.5rem"
-      />
-    </div>
     <div class="flex flex-1 flex-col items-start gap-5">
       <section
         v-for="item in list"
