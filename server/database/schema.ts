@@ -2,6 +2,7 @@ import { base58 } from "@scure/base";
 import { relations } from "drizzle-orm";
 import {
   date,
+  index,
   integer,
   pgTable,
   text,
@@ -43,13 +44,22 @@ export const users_relations = relations(users, ({ many }) => ({
 /**
  * AI 对话
  */
-export const ai_chats = pgTable("ai_chats", {
-  id: varchar("id").primaryKey().$default($id),
-  update_at: dateTime("update_at").notNull(),
-  user_id: varchar("user_id").notNull(),
-  role: varchar("role", { enum: ["user", "assistant"] }).notNull(),
-  content: text("content").notNull(),
-});
+export const ai_chats = pgTable(
+  "ai_chats",
+  {
+    id: varchar("id").primaryKey().$default($id),
+    update_at: dateTime("update_at").notNull(),
+    user_id: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    role: varchar("role", { enum: ["user", "assistant"] }).notNull(),
+    content: text("content").notNull(),
+  },
+  ({ user_id,update_at }) => ({
+    user_id_idx: index().on(user_id),
+    update_at_idx: index().on(update_at),
+  }),
+);
 
 export const ai_chats_relations = relations(ai_chats, ({ one }) => ({
   user: one(users, {
