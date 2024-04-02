@@ -65,7 +65,9 @@ const handleNewMessage = (message: Message) => {
   if (bottom < 80) return scrollToBottom();
 };
 
-const { eventSource } = useEventSource(`/api/sse?key=${user?.id}`);
+const { eventSource, status, open } = useEventSource(
+  `/api/sse?key=${user?.id}`,
+);
 
 useEventListener(eventSource, "message", (e) => {
   if (!(e instanceof MessageEvent)) return;
@@ -89,6 +91,7 @@ const send = debounce(async () => {
     method: "POST",
     body: { content: content },
   });
+  if (status.value !== "OPEN") open();
 }, 200);
 
 const handleKeydown = async (e: KeyboardEvent) => {
