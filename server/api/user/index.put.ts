@@ -1,12 +1,11 @@
 import { eq } from "drizzle-orm";
-import { first } from "lodash-es";
-import { hashPassword } from "~/server/utils/password";
+import { extname } from "pathe";
+import { database } from "~/server/database/postgres";
 import { redis } from "~/server/database/redis";
 import { $id, UserUpdateSchema, users } from "~/server/database/schema";
+import { hashPassword } from "~/server/utils/password";
 import { sanitize } from "~/server/utils/purify";
-import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
-import { extname } from "pathe";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -31,12 +30,11 @@ export default defineEventHandler(async (event) => {
     body.avatar = undefined;
   }
   body.role = undefined;
-  const list = await database
+  const [item] = await database
     .update(users)
     .set(body)
     .where(eq(users.id, user.id))
     .returning();
-  const item = first(list);
   if (!item) throw createError({ status: 400 });
   await redis.del(item.id);
   item.password = "******";

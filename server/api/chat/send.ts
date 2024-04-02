@@ -9,6 +9,7 @@ import type { AiChartInsertSchema } from "~/server/database/schema";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
+import { upsert_residual } from "./billing";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -71,6 +72,8 @@ export default defineEventHandler(async (event) => {
     .insert(ai_chats)
     .values([resulting])
     .returning();
+  theEnd.content = parseMarkdown(theEnd.content);
   await publisher.publish(user.id, JSON.stringify(theEnd));
+  upsert_residual();
   return { message: "完成" };
 });

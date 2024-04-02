@@ -1,6 +1,13 @@
 import { base58 } from "@scure/base";
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  date,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { typeid } from "typeid-js";
 
@@ -54,3 +61,10 @@ export const ai_chats_relations = relations(ai_chats, ({ one }) => ({
 export type AiChart = typeof ai_chats.$inferSelect;
 export const AiChartInsertSchema = createInsertSchema(ai_chats);
 export const AiChartUpdateSchema = AiChartInsertSchema.partial();
+
+export const ai_billing = pgTable("ai_billing", {
+  date: date("date", { mode: "string" }).primaryKey(),
+  residual: integer("residual").notNull(),
+});
+
+export type AiBilling = typeof ai_billing.$inferInsert;
