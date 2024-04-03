@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { extname } from "pathe";
 import { database } from "~/server/database/postgres";
 import { redis } from "~/server/database/redis";
-import { $id, UserUpdateSchema, users } from "~/server/database/schema";
+import { $id, users, UserUpdateSchema } from "~/server/database/schema";
 import { hashPassword } from "~/server/utils/password";
 import { sanitize } from "~/server/utils/purify";
 import { checkUser } from "../auth/index.post";
@@ -24,8 +24,7 @@ export default defineEventHandler(async (event) => {
   }
   // 用户头像应重命名
   if (body.avatar) {
-    const avatar = $id() + extname(body.avatar);
-    body.avatar = avatar;
+    body.avatar = $id() + extname(body.avatar);
   } else {
     body.avatar = undefined;
   }

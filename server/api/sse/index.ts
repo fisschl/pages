@@ -1,4 +1,4 @@
-import { subscriber } from "../../database/redis";
+import { redis } from "../../database/redis";
 import { z } from "zod";
 
 export const SSEQuerySchema = z.object({
@@ -8,15 +8,19 @@ export const SSEQuerySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
+  const subscriber = redis.duplicate();
+  await subscriber.subscribe(key);
 
-  const push = async (message: string) => {
+  const push = async (channel: string, message: string) => {
     await sse.push(message);
   };
 
-  await subscriber.subscribe(key, push);
+  subscriber.on("message", push);
 
   sse.onClosed(async () => {
-    await subscriber.unsubscribe(key, push);
+    subscriber.off("message", push);
+    await subscriber.unsubscribe(key);
+    await subscriber.quit();
     await sse.close();
   });
 

@@ -97,7 +97,7 @@ const send = debounce(async () => {
 const handleKeydown = async (e: KeyboardEvent) => {
   if (e.ctrlKey || e.shiftKey) return;
   e.preventDefault();
-  send();
+  await send();
 };
 
 const isAll = ref(false);
@@ -120,7 +120,6 @@ whenever(
     if (!oldRect || !newRect) return scrollToBottom();
     // 恢复滚动位置
     const { body } = document;
-    console.log(newRect, oldRect, newRect.top - oldRect.top);
     body.scrollBy({ top: newRect.top - oldRect.top });
   },
 );

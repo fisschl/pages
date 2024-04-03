@@ -26,7 +26,7 @@ const register = async (data: Schema) => {
   toast.add({ title: res.message });
 };
 
-export type NuxtSubmit = (event: FormSubmitEvent<Schema>) => PromiseLike<void>;
+export type NuxtSubmit = (event: FormSubmitEvent<Schema>) => Promise<void>;
 
 const onSubmit: NuxtSubmit = async ({ data }) => {
   if (isRegister.value) await register(data);

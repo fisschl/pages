@@ -75,6 +75,5 @@ export const AiChartUpdateSchema = AiChartInsertSchema.partial();
 export const ai_billing = pgTable("ai_billing", {
   date: date("date", { mode: "string" }).primaryKey(),
   residual: integer("residual").notNull(),
+  usage: integer("usage").notNull().default(0),
 });
-
-export type AiBilling = typeof ai_billing.$inferInsert;

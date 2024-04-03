@@ -3,7 +3,7 @@ import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
-import type { User} from "~/server/database/schema";
+import type { User } from "~/server/database/schema";
 import { UserInsertSchema, users } from "~/server/database/schema";
 import { verifyPassword } from "~/server/utils/password";
 import { $token } from "~/server/utils/token";
@@ -19,11 +19,10 @@ export default defineEventHandler(async (event) => {
   if (!user) throw createError({ status: 401 });
   const ok = await verifyPassword(body.password, user.password);
   if (!ok) throw createError({ status: 401 });
-  await redis.set(user.id, JSON.stringify(user), {
-    EX: 60 * DAY,
-  });
-  const session = useSession(event);
-  await session.set("user", user.id);
+  await redis.setex(user.id, 60 * DAY, JSON.stringify(user));
+  const token = useToken(event);
+  await redis.hset(token, { user: user.id });
+  await redis.expire(token, 30 * DAY);
   user.password = "******";
   return user;
 });
@@ -47,23 +46,11 @@ export const useToken = (event: H3Event) => {
   return _token;
 };
 
-export const useSession = (event: H3Event) => {
-  const token = useToken(event);
-  const get = async (name: string) => {
-    return redis.hGet(token, name);
-  };
-  const set = async (name: string, value: string) => {
-    await redis.hSet(token, name, value);
-    await redis.expire(token, 30 * DAY);
-  };
-  return { token, get, set };
-};
-
 export const useCurrentUser = async (
   event: H3Event,
 ): Promise<User | undefined> => {
-  const session = useSession(event);
-  const user_id = await session.get("user");
+  const token = useToken(event);
+  const user_id = await redis.hget(token, "user");
   if (!user_id) return;
   const user_str = await redis.get(user_id);
   if (user_str) return JSON.parse(user_str);
@@ -72,9 +59,7 @@ export const useCurrentUser = async (
   });
   if (!user) return;
   user.password = "******";
-  await redis.set(user.id, JSON.stringify(user), {
-    EX: 60 * DAY,
-  });
+  await redis.setex(user.id, 60 * DAY, JSON.stringify(user));
   return user;
 };
 

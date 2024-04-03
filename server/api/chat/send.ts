@@ -4,12 +4,11 @@ import OpenAI from "openai";
 import type { output } from "zod";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { publisher } from "~/server/database/redis";
+import { publisher, queue } from "~/server/database/redis";
 import type { AiChartInsertSchema } from "~/server/database/schema";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
-import { upsert_residual } from "./billing";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -78,6 +77,9 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
   };
   await publisher.publish(user.id, JSON.stringify(message));
-  upsert_residual();
+  await queue.add("upsert_residual", null, {
+    delay: 10 * 1000,
+    jobId: "upsert_residual",
+  });
   return { message: "完成" };
 });
