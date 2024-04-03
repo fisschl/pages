@@ -1,16 +1,15 @@
 import { subDays } from "date-fns";
 import { and, asc, desc, gte, lt, lte } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
-import { last } from "lodash-es";
+import { last, throttle } from "lodash-es";
 import type { input } from "zod";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { processor } from "~/server/database/redis";
 import { ai_billing } from "~/server/database/schema";
 
 export const InsertAiBillingSchema = createInsertSchema(ai_billing);
 
-const upsert_residual = async () => {
+export const upsert_residual = throttle(async () => {
   const { OPENAI_API_KEY, OPENAI_PROXY_URL } = process.env;
   const fetch_option = {
     baseURL: OPENAI_PROXY_URL,
@@ -51,9 +50,7 @@ const upsert_residual = async () => {
     target: ai_billing.date,
     set: value,
   });
-};
-
-Object.assign(processor, { upsert_residual });
+}, 10 * 1000);
 
 export default defineEventHandler(async () => {
   const right = new Date();

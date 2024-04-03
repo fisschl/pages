@@ -1,28 +1,27 @@
-import { redis } from "../../database/redis";
 import { z } from "zod";
+import { createClient } from "redis";
 
 export const SSEQuerySchema = z.object({
   key: z.string(),
 });
 
+const subscriber = createClient({
+  url: process.env.REDIS_URL,
+});
+
+export const publisher = subscriber.duplicate();
+
 export default defineEventHandler(async (event) => {
+  if (!subscriber.isReady) await subscriber.connect();
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
-  const subscriber = redis.duplicate();
-  await subscriber.subscribe(key);
-
-  const push = async (channel: string, message: string) => {
+  const push = async (message: string) => {
     await sse.push(message);
   };
-
-  subscriber.on("message", push);
-
+  await subscriber.subscribe(key, push);
   sse.onClosed(async () => {
-    subscriber.off("message", push);
-    await subscriber.unsubscribe(key);
-    await subscriber.quit();
+    await subscriber.unsubscribe(key, push);
     await sse.close();
   });
-
   return sse.send();
 });

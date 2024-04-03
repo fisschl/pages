@@ -27,7 +27,6 @@
     "@vueuse/nuxt": "^10.9.0",
     "@vueuse/router": "^10.9.0",
     "ali-oss": "^6.20.0",
-    "bullmq": "^5.5.0",
     "change-case": "^5.4.3",
     "date-fns": "^3.6.0",
     "dompurify": "^3.0.11",
