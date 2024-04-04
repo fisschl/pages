@@ -1,5 +1,4 @@
-import { publisher } from "~/server/database/redis";
-import { SSEQuerySchema } from ".";
+import { SSEQuerySchema, publisher } from ".";
 
 export default defineEventHandler(async (event) => {
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);

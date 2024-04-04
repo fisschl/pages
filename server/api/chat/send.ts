@@ -4,12 +4,12 @@ import OpenAI from "openai";
 import type { output } from "zod";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { publisher } from "~/server/database/redis";
 import type { AiChartInsertSchema } from "~/server/database/schema";
 import { $id, ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 import { upsert_residual } from "~/server/api/chat/billing";
+import { publisher } from "../sse";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
