@@ -12,7 +12,8 @@ const subscriber = createClient({
 export const publisher = subscriber.duplicate();
 
 export default defineEventHandler(async (event) => {
-  if (!subscriber.isReady) await subscriber.connect();
+  if (!subscriber.isOpen) await subscriber.connect();
+  if (!publisher.isOpen) await publisher.connect();
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
   const push = async (message: string) => {

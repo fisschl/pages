@@ -92,14 +92,15 @@ const inputFiles = ref<string[]>();
 
 const send = debounce(async () => {
   inputText.value = inputText.value?.trim();
-  const content = inputText.value;
-  if (!content) return;
+  const param = { content: inputText.value, images: inputFiles.value };
+  if (!param.content) return;
+  inputFiles.value = [];
   inputText.value = undefined;
+  if (status.value !== "OPEN") open();
   await $fetch("/api/chat/send", {
     method: "POST",
-    body: { content: content, images: inputFiles.value },
+    body: param,
   });
-  if (status.value !== "OPEN") open();
 }, 200);
 
 const handleKeydown = async (e: KeyboardEvent) => {
@@ -159,6 +160,13 @@ whenever(
           class="prose prose-sm max-w-none dark:prose-invert"
           v-html="item.content"
         />
+        <img
+          v-for="file in item.files"
+          :key="file.key"
+          class="mt-2 inline-block w-16"
+          :src="`https://cdn.fisschl.world/${file.key}`"
+          :alt="file.key"
+        />
       </section>
     </div>
     <UDivider class="mb-4 mt-5" />
@@ -168,18 +176,17 @@ whenever(
       placeholder="请输入"
       @keydown.enter="handleKeydown"
     />
-    <div class="my-3 flex">
-      <section v-if="inputFiles?.length">
+    <div class="my-3 flex items-start">
+      <section class="flex flex-1 items-start">
         <img
           v-for="item in inputFiles"
           :key="item"
-          class="w-10"
+          class="mr-2 w-12"
           :src="`https://cdn.fisschl.world/${item}`"
           :alt="item"
         />
       </section>
-      <span class="flex-1" />
-      <ChatUpload v-model:files="inputFiles" />
+      <ChatUpload v-model:files="inputFiles" class="mr-3" />
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
     <UButton

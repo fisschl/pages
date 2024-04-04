@@ -12,6 +12,7 @@ const prefix = `home/${user.user?.id}/chat`;
 const { open, onChange } = useFileDialog({
   accept: "image/*",
   multiple: true,
+  reset: true,
 });
 onChange(async (list) => {
   if (!list?.length) return;
@@ -29,7 +30,7 @@ onChange(async (list) => {
       image.onload = resolve;
     });
     const canvas = document.createElement("canvas");
-    const target_px = 512;
+    const target_px = 720;
     // 如果图片的长和宽都小于 target_px 像素，那么 scale 将会是 1，这意味着图片不会被缩放。
     const scale = Math.max(
       image.width / target_px,
@@ -55,14 +56,14 @@ onChange(async (list) => {
     const key = join(prefix, webp.name);
     await upload_file(key, webp);
     if (!files.value) files.value = [];
+    await nextTick();
     files.value.push(key);
   }
 });
 </script>
 
 <template>
-  <UButton @click="open">
-    <UIcon name="i-tabler-folder" style="font-size: 1.1rem" />
-    选择文件
+  <UButton color="sky" icon="i-tabler-photo-up" variant="soft" @click="open">
+    选择图片
   </UButton>
 </template>
