@@ -1,4 +1,4 @@
-import type { User } from "~/server/database/schema";
+import type { User } from "~/server/api/auth/index.post";
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
@@ -14,7 +14,7 @@ export const useUserStore = defineStore("pages-user", () => {
 
   const avatar = computed(() => {
     if (!user.value?.avatar) return;
-    return `https://cdn.fisschl.world/home/${user.value.id}/avatar/${user.value.avatar}`;
+    return `https://cdn.fisschl.world/${user.value.avatar}`;
   });
   return { user, checkLogin, token, avatar };
 });

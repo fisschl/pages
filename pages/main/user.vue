@@ -38,16 +38,15 @@ const handleUpload: UploadRequestHandler = async ({ file }) => {
   if (store.user.avatar) {
     await $fetch("/api/oss/delete", {
       method: "DELETE",
-      query: {
-        key: `home/${store.user.id}/avatar/${store.user.avatar}`,
-      },
+      query: { key: store.user.avatar },
     });
   }
+  const key = `home/${store.user.id}/avatar/${file.name}`;
   const res = await $fetch("/api/user", {
     method: "PUT",
-    body: { avatar: file.name },
+    body: { avatar: key },
   });
-  await upload_file(`home/${res.id}/avatar/${res.avatar}`, file);
+  await upload_file(key, file);
   store.user.avatar = res.avatar;
 };
 

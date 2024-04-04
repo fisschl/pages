@@ -1,7 +1,8 @@
 import { hashPassword } from "~/server/utils/password";
-import { UserInsertSchema, users } from "~/server/database/schema";
+import { users } from "~/server/database/schema";
 import { database } from "~/server/database/postgres";
 import { sanitize } from "~/server/utils/purify";
+import { UserInsertSchema } from "../auth/index.post";
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, UserInsertSchema.parse);

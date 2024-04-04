@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
-import { extname } from "pathe";
 import { database } from "~/server/database/postgres";
 import { redis } from "~/server/database/redis";
-import { $id, users, UserUpdateSchema } from "~/server/database/schema";
+import { users } from "~/server/database/schema";
 import { hashPassword } from "~/server/utils/password";
 import { sanitize } from "~/server/utils/purify";
-import { checkUser } from "../auth/index.post";
+import { UserInsertSchema, checkUser } from "../auth/index.post";
+
+export const UserUpdateSchema = UserInsertSchema.partial();
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -21,12 +22,6 @@ export default defineEventHandler(async (event) => {
     body.name = sanitize(body.name);
   } else {
     body.name = undefined;
-  }
-  // 用户头像应重命名
-  if (body.avatar) {
-    body.avatar = $id() + extname(body.avatar);
-  } else {
-    body.avatar = undefined;
   }
   body.role = undefined;
   const [item] = await database

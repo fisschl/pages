@@ -1,15 +1,6 @@
 import { base58 } from "@scure/base";
 import { relations } from "drizzle-orm";
-import {
-  date,
-  index,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { index, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { typeid } from "typeid-js";
 
 const dateTime = (name: string) => {
@@ -33,10 +24,6 @@ export const users = pgTable("users", {
   role: varchar("role"),
 });
 
-export type User = typeof users.$inferSelect;
-export const UserInsertSchema = createInsertSchema(users);
-export const UserUpdateSchema = UserInsertSchema.partial();
-
 export const users_relations = relations(users, ({ many }) => ({
   ai_chats: many(ai_chats),
 }));
@@ -51,7 +38,7 @@ export const ai_chats = pgTable(
     update_at: dateTime("update_at").notNull(),
     user_id: varchar("user_id")
       .notNull()
-      .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
+      .references(() => users.id),
     role: varchar("role", { enum: ["user", "assistant"] }).notNull(),
     content: text("content").notNull(),
   },
@@ -61,19 +48,26 @@ export const ai_chats = pgTable(
   }),
 );
 
-export const ai_chats_relations = relations(ai_chats, ({ one }) => ({
+export const ai_chats_relations = relations(ai_chats, ({ one, many }) => ({
   user: one(users, {
     fields: [ai_chats.user_id],
     references: [users.id],
   }),
+  files: many(chat_files),
 }));
 
-export type AiChart = typeof ai_chats.$inferSelect;
-export const AiChartInsertSchema = createInsertSchema(ai_chats);
-export const AiChartUpdateSchema = AiChartInsertSchema.partial();
-
-export const ai_billing = pgTable("ai_billing", {
-  date: date("date", { mode: "string" }).primaryKey(),
-  residual: integer("residual").notNull(),
-  usage: integer("usage").notNull().default(0),
+export const chat_files = pgTable("chat_files", {
+  key: varchar("key").primaryKey(),
+  chat_id: varchar("chat_id")
+    .notNull()
+    .references(() => ai_chats.id),
+  update_at: dateTime("update_at").notNull(),
 });
+
+export const chat_files_relations = relations(chat_files, ({ one }) => ({
+  chat: one(ai_chats, {
+    fields: [chat_files.chat_id],
+    references: [ai_chats.id],
+  }),
+}));
+

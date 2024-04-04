@@ -1,12 +1,16 @@
 import { eq } from "drizzle-orm";
+import { createInsertSchema } from "drizzle-zod";
 import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
-import type { User } from "~/server/database/schema";
-import { UserInsertSchema, users } from "~/server/database/schema";
+import { users } from "~/server/database/schema";
 import { verifyPassword } from "~/server/utils/password";
 import { $token } from "~/server/utils/token";
+
+export const UserInsertSchema = createInsertSchema(users);
+
+export type User = typeof users.$inferSelect;
 
 /**
  * 登录

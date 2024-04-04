@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     ),
     orderBy: desc(ai_chats.update_at),
     limit: 16,
+    with: { files: true },
   });
   return history.reverse().map((item) => {
     return {

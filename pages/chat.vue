@@ -12,6 +12,13 @@ const MessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string(),
   update_at: z.string().optional(),
+  files: z
+    .array(
+      z.object({
+        key: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 type Message = output<typeof MessageSchema>;
@@ -81,6 +88,7 @@ useEventListener(eventSource, "message", (e) => {
 });
 
 const inputText = ref<string>();
+const inputFiles = ref<string[]>();
 
 const send = debounce(async () => {
   inputText.value = inputText.value?.trim();
@@ -89,7 +97,7 @@ const send = debounce(async () => {
   inputText.value = undefined;
   await $fetch("/api/chat/send", {
     method: "POST",
-    body: { content: content },
+    body: { content: content, images: inputFiles.value },
   });
   if (status.value !== "OPEN") open();
 }, 200);
@@ -161,8 +169,17 @@ whenever(
       @keydown.enter="handleKeydown"
     />
     <div class="my-3 flex">
-      <ChatBilling />
+      <section v-if="inputFiles?.length">
+        <img
+          v-for="item in inputFiles"
+          :key="item"
+          class="w-10"
+          :src="`https://cdn.fisschl.world/${item}`"
+          :alt="item"
+        />
+      </section>
       <span class="flex-1" />
+      <ChatUpload v-model:files="inputFiles" />
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
     <UButton
