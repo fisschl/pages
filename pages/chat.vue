@@ -7,18 +7,16 @@ import type { MessagesQuery } from "~/server/api/chat/messages";
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
 
+const ChatFileSchema = z.object({
+  key: z.string(),
+});
+
 const MessageSchema = z.object({
   id: z.string(),
   role: z.enum(["user", "assistant"]),
   content: z.string(),
   update_at: z.string().optional(),
-  files: z
-    .array(
-      z.object({
-        key: z.string(),
-      }),
-    )
-    .optional(),
+  files: z.array(ChatFileSchema).optional(),
 });
 
 type Message = output<typeof MessageSchema>;
@@ -111,8 +109,9 @@ const handleKeydown = async (e: KeyboardEvent) => {
 
 const isAll = ref(false);
 const thisStyle = useCssModule();
+
 whenever(
-  () => directions.top && scrollTop.value < 100 && !isAll.value,
+  () => directions.top && originalScrollTop.value < 100 && !isAll.value,
   async () => {
     if (!list.value?.length) return;
     const res = await fetchData({
@@ -139,7 +138,7 @@ whenever(
     <article class="prose mb-8 mt-4 max-w-none dark:prose-invert">
       <blockquote>
         早上好，夜之城。 已授权访问。 当前模型：
-        <strong> gpt-4-turbo-preview </strong>
+        <strong> gpt-4-vision-preview </strong>
         。 对话将携带
         <strong> 9 </strong>
         条历史记录。 若使用时发生异常，请联系管理员。
@@ -149,12 +148,13 @@ whenever(
       <section
         v-for="item in list"
         :key="item.id"
-        class="message rounded px-3 py-2"
+        class="message relative rounded px-3 py-2"
         :class="{
           'bg-stone-500/10': item.role === 'assistant',
           'bg-violet-500/15': item.role === 'user',
           [$style.message]: true,
         }"
+        :data-id="item.id"
       >
         <article
           class="prose prose-sm max-w-none dark:prose-invert"
@@ -163,9 +163,9 @@ whenever(
         <img
           v-for="file in item.files"
           :key="file.key"
-          class="mt-2 inline-block w-16"
+          class="mt-2 inline-block size-16 object-cover"
           :src="`https://cdn.fisschl.world/${file.key}`"
-          :alt="file.key"
+          alt="..."
         />
       </section>
     </div>
@@ -181,9 +181,9 @@ whenever(
         <img
           v-for="item in inputFiles"
           :key="item"
-          class="mr-2 w-12"
+          class="mr-2 size-12 object-cover"
           :src="`https://cdn.fisschl.world/${item}`"
-          :alt="item"
+          alt="..."
         />
       </section>
       <ChatUpload v-model:files="inputFiles" class="mr-3" />

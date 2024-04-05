@@ -57,11 +57,9 @@ export const ai_chats_relations = relations(ai_chats, ({ one, many }) => ({
 }));
 
 export const chat_files = pgTable("chat_files", {
-  key: varchar("key").primaryKey(),
-  chat_id: varchar("chat_id")
-    .notNull()
-    .references(() => ai_chats.id),
-  update_at: dateTime("update_at").notNull(),
+  id: varchar("id").primaryKey().$default($id),
+  chat_id: varchar("chat_id").references(() => ai_chats.id),
+  key: varchar("key"),
 });
 
 export const chat_files_relations = relations(chat_files, ({ one }) => ({
@@ -70,4 +68,3 @@ export const chat_files_relations = relations(chat_files, ({ one }) => ({
     references: [ai_chats.id],
   }),
 }));
-
