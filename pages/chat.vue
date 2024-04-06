@@ -74,7 +74,7 @@ const send = debounce(async () => {
   if (!param.content) return;
   inputFiles.value = [];
   inputText.value = undefined;
-  if (status.value !== "OPEN") open();
+  if (status.value === "CLOSED") open();
   await $fetch("/api/chat/send", {
     method: "POST",
     body: param,
@@ -88,7 +88,7 @@ const handleKeydown = async (e: KeyboardEvent) => {
 };
 
 const isAll = ref(false);
-const thisStyle = useCssModule();
+const message_component = useId();
 
 whenever(
   () => directions.top && scrollTop.value < 100 && !isAll.value,
@@ -100,7 +100,7 @@ whenever(
     if (!res.length) return (isAll.value = true);
     await nextTick();
     // 记忆滚动位置
-    const firstElement = document.querySelector("." + thisStyle.message);
+    const firstElement = document.querySelector("." + message_component);
     const oldRect = firstElement?.getBoundingClientRect();
     list.value.unshift(...res);
     await nextTick();
@@ -125,7 +125,12 @@ whenever(
       </blockquote>
     </article>
     <div class="flex flex-1 flex-col items-start gap-5">
-      <ChatMessage v-for="item in list" :key="item.id" :message="item" />
+      <ChatMessage
+        v-for="item in list"
+        :key="item.id"
+        :message="item"
+        :class="message_component"
+      />
     </div>
     <UDivider class="mb-4 mt-5" />
     <UTextarea

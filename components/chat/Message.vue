@@ -17,18 +17,17 @@ export type Message = output<typeof MessageSchema>;
 <script setup lang="ts">
 import { z, type output } from "zod";
 
-const props = defineProps<{
+defineProps<{
   message: Message;
 }>();
 </script>
 
 <template>
   <section
-    class="message relative rounded px-3 py-2"
+    class="relative rounded px-3 py-2"
     :class="{
       'bg-stone-500/10': message.role === 'assistant',
       'bg-violet-500/15': message.role === 'user',
-      [$style.message]: true,
     }"
     :data-id="message.id"
   >
@@ -45,9 +44,3 @@ const props = defineProps<{
     />
   </section>
 </template>
-
-<style module>
-.message {
-  display: block;
-}
-</style>
