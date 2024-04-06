@@ -1,25 +1,11 @@
 <script setup lang="ts">
 import { debounce, first } from "lodash-es";
-import { z, type output } from "zod";
+import { MessageSchema, type Message } from "~/components/chat/Message.vue";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
-
-const ChatFileSchema = z.object({
-  key: z.string(),
-});
-
-const MessageSchema = z.object({
-  id: z.string(),
-  role: z.enum(["user", "assistant"]),
-  content: z.string(),
-  update_at: z.string().optional(),
-  files: z.array(ChatFileSchema).optional(),
-});
-
-type Message = output<typeof MessageSchema>;
 
 const headers = useRequestHeaders(["cookie"]);
 
@@ -34,7 +20,7 @@ const fetchData = async (param?: MessagesQuery) => {
 const { data: list } = await useAsyncData(() => fetchData());
 
 const isMounted = useMounted();
-const { directions, y: originalScrollTop } = useScroll(() => {
+const { directions, y: scrollTop } = useScroll(() => {
   return isMounted.value ? document.body : undefined;
 });
 
@@ -45,29 +31,22 @@ const scrollToBottom = async () => {
 };
 onMounted(scrollToBottom);
 
-const scrollTop = refThrottled(originalScrollTop, 200);
+const scroll_top_throttled = refThrottled(scrollTop, 200);
 
 const isShowScrollButton = computed(() => {
   if (!isMounted.value) return;
   const { body } = document;
   const { scrollHeight, clientHeight } = body;
-  const bottom = scrollHeight - scrollTop.value - clientHeight;
+  const bottom = scrollHeight - scroll_top_throttled.value - clientHeight;
   return bottom > 100;
 });
 
 const handleNewMessage = (message: Message) => {
   if (!list.value) return;
   const item = list.value?.find((item) => item.id === message.id);
-  if (!item) {
-    list.value?.push(message);
-  } else {
-    Object.assign(item, message);
-  }
-  if (directions.top) return;
-  const { body } = document;
-  const { scrollHeight, scrollTop, clientHeight } = body;
-  const bottom = scrollHeight - scrollTop - clientHeight;
-  if (bottom < 80) return scrollToBottom();
+  if (!item) list.value?.push(message);
+  else Object.assign(item, message);
+  if (!directions.top && !isShowScrollButton.value) scrollToBottom();
 };
 
 const { eventSource, status, open } = useEventSource(
@@ -82,6 +61,7 @@ useEventListener(eventSource, "message", (e) => {
     console.log("不符合 SSE 响应规则", data);
     return;
   }
+  console.log("SSE 响应", data);
   handleNewMessage(data);
 });
 
@@ -111,7 +91,7 @@ const isAll = ref(false);
 const thisStyle = useCssModule();
 
 whenever(
-  () => directions.top && originalScrollTop.value < 100 && !isAll.value,
+  () => directions.top && scrollTop.value < 100 && !isAll.value,
   async () => {
     if (!list.value?.length) return;
     const res = await fetchData({
@@ -145,29 +125,7 @@ whenever(
       </blockquote>
     </article>
     <div class="flex flex-1 flex-col items-start gap-5">
-      <section
-        v-for="item in list"
-        :key="item.id"
-        class="message relative rounded px-3 py-2"
-        :class="{
-          'bg-stone-500/10': item.role === 'assistant',
-          'bg-violet-500/15': item.role === 'user',
-          [$style.message]: true,
-        }"
-        :data-id="item.id"
-      >
-        <article
-          class="prose prose-sm max-w-none dark:prose-invert"
-          v-html="item.content"
-        />
-        <img
-          v-for="file in item.files"
-          :key="file.key"
-          class="mt-2 inline-block size-16 object-cover"
-          :src="`https://cdn.fisschl.world/${file.key}`"
-          alt="..."
-        />
-      </section>
+      <ChatMessage v-for="item in list" :key="item.id" :message="item" />
     </div>
     <UDivider class="mb-4 mt-5" />
     <UTextarea
@@ -199,9 +157,3 @@ whenever(
     />
   </UContainer>
 </template>
-
-<style module>
-.message {
-  display: block;
-}
-</style>
