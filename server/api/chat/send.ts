@@ -32,7 +32,6 @@ export type ChatFile = typeof chat_files.$inferInsert;
 export default defineEventHandler(async (event) => {
   const user = await useCurrentUser(event);
   if (!user) throw createError({ status: 403 });
-  if (!publisher.isOpen) await publisher.connect();
   const { content, images } = await readValidatedBody(
     event,
     SendBodySchema.parse,

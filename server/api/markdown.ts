@@ -8,14 +8,12 @@ const RequestSchema = z.object({
 
 const markdown = MarkdownIt();
 
-const init = async () => {
+(async () => {
   const shiki = await Shiki({
     theme: "vitesse-dark",
   });
   markdown.use(shiki);
-};
-
-init();
+})();
 
 export const parseMarkdown = (text: string) => {
   return markdown.render(text);

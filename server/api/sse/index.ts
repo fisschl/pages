@@ -11,9 +11,13 @@ const subscriber = createClient({
 
 export const publisher = subscriber.duplicate();
 
-export default defineEventHandler(async (event) => {
+export const checkConnection = async () => {
   if (!subscriber.isOpen) await subscriber.connect();
   if (!publisher.isOpen) await publisher.connect();
+};
+
+export default defineEventHandler(async (event) => {
+  await checkConnection();
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
   const push = async (message: string) => {
@@ -22,7 +26,6 @@ export default defineEventHandler(async (event) => {
   await subscriber.subscribe(key, push);
   sse.onClosed(async () => {
     await subscriber.unsubscribe(key, push);
-    await sse.close();
   });
   return sse.send();
 });
