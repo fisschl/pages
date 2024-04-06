@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { debounce, first } from "lodash-es";
+import { debounce, first, remove } from "lodash-es";
 import { MessageSchema, type Message } from "~/components/chat/Message.vue";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
@@ -111,6 +111,11 @@ whenever(
     body.scrollBy({ top: newRect.top - oldRect.top });
   },
 );
+
+const handleDelete = (message: Message) => {
+  if (!list.value) return;
+  remove(list.value, (item) => item.id === message.id);
+};
 </script>
 
 <template>
@@ -130,6 +135,7 @@ whenever(
         :key="item.id"
         :message="item"
         :class="message_component"
+        @delete="handleDelete"
       />
     </div>
     <UDivider class="mb-4 mt-5" />
