@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createClient } from "redis";
-import { shiki_install } from "../markdown";
 
 export const SSEQuerySchema = z.object({
   key: z.string(),
@@ -19,7 +18,6 @@ export const checkConnection = async () => {
 
 export default defineEventHandler(async (event) => {
   await checkConnection();
-  await shiki_install();
   const { key } = await getValidatedQuery(event, SSEQuerySchema.parse);
   const sse = createEventStream(event);
   const push = async (message: string) => {
