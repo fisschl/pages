@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
     filepath: `file.${extension}`,
   });
   const markdown = "```" + extension + "\n" + result + "\n " + "```";
-  const html = parseMarkdown(markdown);
+  const html = await parseMarkdown(markdown);
   return { text: result, html };
 });

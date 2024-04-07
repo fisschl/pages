@@ -7,21 +7,28 @@ const RequestSchema = z.object({
   text: z.string(),
 });
 
-const markdown = MarkdownIt();
-
-export const shiki_install = once(async () => {
+export const expert_markdown = once(async () => {
+  const markdown = MarkdownIt();
   const shiki = await Shiki({
     theme: "vitesse-dark",
   });
-  markdown.use(shiki);
+  return markdown.use(shiki);
 });
 
-export const parseMarkdown = (text: string) => {
-  return markdown.render(text);
+const markdown = MarkdownIt();
+
+export const parseMarkdown = async (text: string) => {
+  try {
+    const markdown = await expert_markdown();
+    return markdown.render(text);
+  } catch (err) {
+    console.log("渲染 Markdown 异常", err, text);
+    return markdown.render(text);
+  }
 };
 
 export default defineEventHandler(async (event) => {
   const { text } = await readValidatedBody(event, RequestSchema.parse);
-  const result = parseMarkdown(text);
+  const result = await parseMarkdown(text);
   return { text: result };
 });

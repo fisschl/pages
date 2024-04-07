@@ -10,6 +10,6 @@ const RequestQuerySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedQuery(event, RequestQuerySchema.parse);
   const item = await poetriesIndex.getDocument<Poetry>(id);
-  item.content = parseMarkdown(item.content);
+  item.content = await parseMarkdown(item.content);
   return item;
 });

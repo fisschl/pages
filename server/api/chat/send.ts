@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
     user.id,
     JSON.stringify({
       ...current_message,
-      content: parseMarkdown(current_message.content),
+      content: await parseMarkdown(current_message.content),
       user_id: undefined,
     }),
   );
@@ -139,7 +139,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     const publish = throttle(async () => {
       const message = {
         ...output,
-        content: parseMarkdown(output.content),
+        content: await parseMarkdown(output.content),
         user_id: undefined,
       };
       await publisher.publish(input.user_id, JSON.stringify(message));
@@ -149,9 +149,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
       const [{ delta }] = choices;
       if (!delta.content) continue;
       output.content += delta.content;
-      await publish()?.catch((e: unknown) => {
-        console.error("处理 AI 响应异常", e, input, output);
-      });
+      await publish();
     }
   } catch (e) {
     output.content = String(e);
@@ -169,7 +167,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     input.user_id,
     JSON.stringify({
       ...theEnd,
-      content: parseMarkdown(theEnd.content),
+      content: await parseMarkdown(theEnd.content),
       user_id: undefined,
     }),
   );

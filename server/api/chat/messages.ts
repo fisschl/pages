@@ -4,7 +4,7 @@ import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { ai_chats } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
-import { parseMarkdown, shiki_install } from "../markdown";
+import { parseMarkdown } from "../markdown";
 
 const QuerySchema = z.object({
   update_at: z.string().default(() => new Date().toISOString()),
@@ -13,7 +13,6 @@ const QuerySchema = z.object({
 export type MessagesQuery = input<typeof QuerySchema>;
 
 export default defineEventHandler(async (event) => {
-  await shiki_install();
   const user = await useCurrentUser(event);
   if (!user) throw createError({ status: 403 });
   const { update_at } = await getValidatedQuery(event, QuerySchema.parse);
@@ -26,10 +25,12 @@ export default defineEventHandler(async (event) => {
     limit: 16,
     with: { files: true },
   });
+  for (const item of history) {
+    item.content = await parseMarkdown(item.content);
+  }
   return history.reverse().map((item) => {
     return {
       ...item,
-      content: parseMarkdown(item.content),
       user_id: undefined,
     };
   });
