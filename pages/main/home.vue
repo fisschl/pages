@@ -1,31 +1,32 @@
 <script setup lang="ts">
-import { useRouteQuery } from "@vueuse/router";
+import { z } from "zod";
+import { useQuery } from "~/composables/route";
 
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
-const keyword = useRouteQuery<string>("keyword", "");
-const library = useRouteQuery<string>("library", "");
 
-const librarySet = computed(() => {
-  return new Set(library.value.split(","));
+const QuerySchema = z.object({
+  keyword: z.string().default(""),
+  library: z.string().optional(),
 });
 
-const handleLibraryChange = async (value: string, checked: boolean) => {
-  const list = library.value.split(",").filter((item) => {
-    return item.trim();
-  });
-  const set = new Set(list);
-  if (checked) set.add(value);
-  else set.delete(value);
-  library.value = Array.from(set).join();
-};
+const { query, setQuery } = useQuery(QuerySchema);
+
+const library = computed(() => {
+  const { library } = query.value;
+  if (!library) return [];
+  return library
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+});
 
 const offset = ref(0);
 
 const fetchData = async () => {
   return $fetch("/api/poetry/poetries", {
     query: {
-      keyword: keyword.value,
-      library: library.value,
+      keyword: query.value.keyword,
+      library: library.value.join(),
       offset: offset.value,
     },
   });
@@ -36,7 +37,17 @@ const fetchInit = async () => {
   return fetchData();
 };
 
-const { data } = await useAsyncData(fetchInit, { watch: [keyword, library] });
+const { data, refresh } = await useAsyncData(fetchInit);
+
+const handleLibraryChange = async (value: string, checked: boolean) => {
+  const c = new Set(library.value);
+  if (checked) c.add(value);
+  else c.delete(value);
+  await setQuery({
+    library: Array.from(c).join(","),
+  });
+  await refresh();
+};
 
 const isAll = ref(false);
 
@@ -50,12 +61,20 @@ const loadMore = async () => {
   if (!data.value) return;
   data.value = [...data.value, ...res];
 };
+
+const updateKeyword = async (value: string) => {
+  await setQuery({
+    keyword: value,
+  });
+  await refresh();
+};
 </script>
 
 <template>
   <UContainer class="pt-3">
     <UInput
-      v-model="keyword"
+      :modelValue="query.keyword"
+      @update:modelValue="updateKeyword"
       placeholder="搜索"
       icon="i-tabler-search"
       class="mb-4"
@@ -64,7 +83,7 @@ const loadMore = async () => {
       <UCheckbox
         v-for="item in libraryOptions"
         :key="item.value"
-        :model-value="librarySet.has(item.value)"
+        :model-value="library.includes(item.value)"
         @update:model-value="handleLibraryChange(item.value, $event)"
       >
         <template #label>

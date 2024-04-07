@@ -149,10 +149,13 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
       const [{ delta }] = choices;
       if (!delta.content) continue;
       output.content += delta.content;
-      await publish();
+      await publish()?.catch((e: unknown) => {
+        console.error("处理 AI 响应异常", e, input, output);
+      });
     }
   } catch (e) {
     output.content = String(e);
+    console.error("OpenAI 异常", e, input, output);
   }
   await new Promise<void>((resolve) => setTimeout(resolve, 250));
   const [theEnd] = await database
