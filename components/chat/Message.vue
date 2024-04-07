@@ -1,4 +1,6 @@
 <script lang="ts">
+import { z, type output } from "zod";
+
 export const ChatFileSchema = z.object({
   key: z.string(),
 });
@@ -15,8 +17,6 @@ export type Message = output<typeof MessageSchema>;
 </script>
 
 <script setup lang="ts">
-import { z, type output } from "zod";
-
 const props = defineProps<{
   message: Message;
 }>();
@@ -48,7 +48,7 @@ const handleCommand = async (command: string) => {
       :data-id="message.id"
     >
       <article
-        class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
+        class="prose prose-sm max-w-none dark:prose-invert"
         v-html="message.content"
       />
       <img
