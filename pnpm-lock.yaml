@@ -137,6 +137,9 @@ dependencies:
   typeid-js:
     specifier: ^0.5.0
     version: 0.5.0
+  ufo:
+    specifier: ^1.5.3
+    version: 1.5.3
   vue:
     specifier: ^3.4.21
     version: 3.4.21(typescript@5.4.4)

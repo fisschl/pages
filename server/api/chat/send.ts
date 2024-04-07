@@ -12,7 +12,7 @@ import { database } from "~/server/database/postgres";
 import { ai_chats, chat_files } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
-import { publisher } from "../sse";
+import { publisher } from "../socket";
 import { oss } from "../oss/download";
 
 export const AiChartInsertSchema = createInsertSchema(ai_chats);

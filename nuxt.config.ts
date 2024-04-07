@@ -33,4 +33,10 @@ export default defineNuxtConfig({
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
   },
+
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 });

@@ -50,7 +50,7 @@ const handleNewMessage = (message: Message) => {
 };
 
 const { eventSource, status, open } = useEventSource(
-  `/api/sse?key=${user?.id}`,
+  `/api/socket?key=${user?.id}`,
 );
 
 useEventListener(eventSource, "message", (e) => {

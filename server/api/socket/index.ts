@@ -5,7 +5,7 @@ export const SSEQuerySchema = z.object({
   key: z.string(),
 });
 
-const subscriber = createClient({
+export const subscriber = createClient({
   url: process.env.REDIS_URL,
 });
 
