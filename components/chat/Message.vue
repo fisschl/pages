@@ -48,7 +48,7 @@ const handleCommand = async (command: string) => {
       :data-id="message.id"
     >
       <article
-        class="prose prose-sm max-w-none dark:prose-invert"
+        class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
         v-html="message.content"
       />
       <img
