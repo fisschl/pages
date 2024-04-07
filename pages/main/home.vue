@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { throttle } from "lodash-es";
 import { z } from "zod";
 import { useQuery } from "~/composables/route";
 
@@ -38,6 +39,7 @@ const fetchInit = async () => {
 };
 
 const { data, refresh } = await useAsyncData(fetchInit);
+const refresh_throttled = throttle(refresh, 500);
 
 const handleLibraryChange = async (value: string, checked: boolean) => {
   const c = new Set(library.value);
@@ -46,7 +48,7 @@ const handleLibraryChange = async (value: string, checked: boolean) => {
   await setQuery({
     library: Array.from(c).join(","),
   });
-  await refresh();
+  await refresh_throttled();
 };
 
 const isAll = ref(false);
@@ -66,19 +68,21 @@ const updateKeyword = async (value: string) => {
   await setQuery({
     keyword: value,
   });
-  await refresh();
+  await refresh_throttled();
 };
 </script>
 
 <template>
   <UContainer class="pt-3">
-    <UInput
-      :modelValue="query.keyword"
-      @update:modelValue="updateKeyword"
-      placeholder="搜索"
-      icon="i-tabler-search"
-      class="mb-4"
-    />
+    <div class="mb-4 flex gap-2">
+      <UInput
+        :modelValue="query.keyword"
+        @update:modelValue="updateKeyword"
+        placeholder="搜索"
+        icon="i-tabler-search"
+        class="flex-1"
+      />
+    </div>
     <div class="mb-3 flex flex-wrap gap-x-5 gap-y-3">
       <UCheckbox
         v-for="item in libraryOptions"
