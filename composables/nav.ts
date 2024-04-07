@@ -19,11 +19,6 @@ export const useNav = defineStore("pages-nav", () => {
       to: "/main/case",
     },
     {
-      label: "二维码生成",
-      icon: "i-tabler-qrcode",
-      to: "/main/qrcode",
-    },
-    {
       label: "文件",
       icon: "i-tabler-photo",
       to: "/main/store",
