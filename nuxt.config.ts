@@ -22,6 +22,12 @@ export default defineNuxtConfig({
           href: "https://cdn.fisschl.world/static/MiSans/font.css",
         },
       ],
+      script: [
+        {
+          src: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js",
+          async: true,
+        },
+      ],
     },
   },
 
