@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, lt } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
@@ -12,8 +12,8 @@ import { database } from "~/server/database/postgres";
 import { ai_chats, chat_files } from "~/server/database/schema";
 import { useCurrentUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
-import { publisher } from "../socket";
 import { oss } from "../oss/download";
+import { publisher } from "../socket";
 
 export const AiChartInsertSchema = createInsertSchema(ai_chats);
 
@@ -23,7 +23,8 @@ export const openai = new OpenAI({
 });
 
 const SendBodySchema = z.object({
-  content: z.string(),
+  chat_id: z.string().optional(),
+  content: z.string().optional(),
   images: z.array(z.string()).optional(),
 });
 
@@ -32,10 +33,18 @@ export type ChatFile = typeof chat_files.$inferInsert;
 export default defineEventHandler(async (event) => {
   const user = await useCurrentUser(event);
   if (!user) throw createError({ status: 403 });
-  const { content, images } = await readValidatedBody(
-    event,
-    SendBodySchema.parse,
-  );
+  const body = await readValidatedBody(event, SendBodySchema.parse);
+  if (body.chat_id) {
+    const item = await database.query.ai_chats.findFirst({
+      where: eq(ai_chats.id, body.chat_id),
+      with: { files: true },
+    });
+    if (!item) throw createError({ status: 404 });
+    body.content = item.content;
+    body.images = item.files.map((item) => item.key);
+  }
+  const { content, images } = body;
+  if (!content) throw createError({ status: 400 });
   const [input_chat] = await database
     .insert(ai_chats)
     .values({
@@ -85,6 +94,38 @@ export type Chat = output<typeof AiChartInsertSchema> & {
   files?: ChatFile[];
 };
 
+const chat_to_history = (item: Chat) => {
+  if (!item.files?.length || item.role !== "user") {
+    const message: ChatCompletionMessageParam = pick(item, ["role", "content"]);
+    return message;
+  }
+  // 处理带有图片的消息
+  const content: ChatCompletionContentPart[] = item.files.map((file) => {
+    const uri = oss.signatureUrl(file.key!);
+    const content: ChatCompletionContentPart = {
+      type: "image_url",
+      image_url: {
+        url: uri,
+      },
+    };
+    return content;
+  });
+  const message: ChatCompletionMessageParam = {
+    role: item.role,
+    content: [{ type: "text", text: item.content }, ...content],
+  };
+  return message;
+};
+
+const send_to_client = async (item: Chat) => {
+  const message = {
+    ...item,
+    content: await parseMarkdown(item.content),
+    user_id: undefined,
+  };
+  await publisher.publish(item.user_id!, JSON.stringify(message));
+};
+
 export const send_message_openai = async (input: Chat, output: Chat) => {
   /**
    * 历史消息
@@ -99,29 +140,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
    * 处理后的发送参数
    */
   const history_messages = [...history.reverse(), input].map((item) => {
-    if (!item.files?.length || item.role !== "user") {
-      const message: ChatCompletionMessageParam = pick(item, [
-        "role",
-        "content",
-      ]);
-      return message;
-    }
-    // 处理带有图片的消息
-    const content: ChatCompletionContentPart[] = item.files.map((file) => {
-      const uri = oss.signatureUrl(file.key!);
-      const content: ChatCompletionContentPart = {
-        type: "image_url",
-        image_url: {
-          url: uri,
-        },
-      };
-      return content;
-    });
-    const message: ChatCompletionMessageParam = {
-      role: item.role,
-      content: [{ type: "text", text: item.content }, ...content],
-    };
-    return message;
+    return chat_to_history(item);
   });
   try {
     /**
@@ -137,12 +156,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
      * 实时发送响应给客户端
      */
     const publish = throttle(async () => {
-      const message = {
-        ...output,
-        content: await parseMarkdown(output.content),
-        user_id: undefined,
-      };
-      await publisher.publish(input.user_id, JSON.stringify(message));
+      await send_to_client(output);
     }, 200);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -155,7 +169,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     output.content = String(e);
     console.error("OpenAI 异常", e, input, output);
   }
-  await new Promise<void>((resolve) => setTimeout(resolve, 250));
+  await new Promise<void>((resolve) => setTimeout(resolve, 300));
   const [theEnd] = await database
     .update(ai_chats)
     .set({
@@ -163,12 +177,5 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     })
     .where(eq(ai_chats.id, output.id!))
     .returning();
-  await publisher.publish(
-    input.user_id,
-    JSON.stringify({
-      ...theEnd,
-      content: await parseMarkdown(theEnd.content),
-      user_id: undefined,
-    }),
-  );
+  await send_to_client(theEnd);
 };

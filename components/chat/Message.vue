@@ -26,19 +26,28 @@ const emit = defineEmits<{
 }>();
 
 const handleCommand = async (command: string) => {
+  const { message } = props;
   if (command === "删除") {
     await $fetch(`/api/chat/message`, {
       method: "DELETE",
-      query: { id: props.message.id },
+      query: { id: message.id },
     });
-    emit("delete", props.message);
+    emit("delete", message);
     return;
+  }
+  if (command === "重新发送") {
+    const { body } = document;
+    body.scrollTop = body.scrollHeight;
+    await $fetch(`/api/chat/send`, {
+      method: "POST",
+      body: { chat_id: message.id },
+    });
   }
 };
 </script>
 
 <template>
-  <ElDropdown trigger="contextmenu" @command="handleCommand">
+  <ElDropdown trigger="hover" placement="top" @command="handleCommand">
     <section
       class="relative cursor-auto rounded px-3 py-2"
       :class="{
@@ -62,8 +71,12 @@ const handleCommand = async (command: string) => {
     <template #dropdown>
       <ElDropdownMenu>
         <ElDropdownItem command="删除">
-          <UIcon name="i-tabler-trash" style="font-size: 16px" class="mr-1" />
+          <UIcon name="i-tabler-trash" style="font-size: 16px" class="mr-2" />
           删除
+        </ElDropdownItem>
+        <ElDropdownItem v-if="message.role === 'user'" command="重新发送">
+          <UIcon name="i-tabler-reload" style="font-size: 16px" class="mr-2" />
+          重新发送
         </ElDropdownItem>
       </ElDropdownMenu>
     </template>

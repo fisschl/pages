@@ -1,4 +1,4 @@
-import { uuidLong } from "@fisschl/uuid";
+import { base58 } from "@scure/base";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import type { H3Event } from "h3";
@@ -7,10 +7,19 @@ import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
 import { users } from "~/server/database/schema";
 import { verifyPassword } from "~/server/utils/password";
+import { timeBytes } from "~/server/utils/uuid";
 
 export const UserInsertSchema = createInsertSchema(users);
 
 export type User = typeof users.$inferSelect;
+
+export const generateToken = () => {
+  const time = timeBytes();
+  const random = new Uint8Array(16);
+  crypto.getRandomValues(random);
+  const bytes = new Uint8Array([...time, ...random]);
+  return base58.encode(bytes);
+};
 
 /**
  * 登录
@@ -43,11 +52,11 @@ export const useToken = (event: H3Event) => {
   if (header) return header;
   const query = getQuery(event);
   if (query.token && isString(query.token)) return query.token;
-  const _token = uuidLong();
-  setCookie(event, "token", _token, {
+  const token = generateToken();
+  setCookie(event, "token", token, {
     maxAge: 30 * DAY,
   });
-  return _token;
+  return token;
 };
 
 export const useCurrentUser = async (

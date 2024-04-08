@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@element-plus/nuxt": "^1.0.8",
-    "@fisschl/uuid": "^0.1.0",
     "@iconify-json/tabler": "^1.1.109",
     "@nuxt/ui": "^2.15.1",
     "@pinia/nuxt": "^0.5.1",
+    "@scure/base": "^1.1.6",
     "@shikijs/markdown-it": "^1.2.4",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",

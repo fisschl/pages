@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import { uuid } from "@fisschl/uuid";
+import { uuid } from "../utils/uuid";
 
 const dateTime = (name: string) => {
   return timestamp(name, { withTimezone: true, mode: "string" }).defaultNow();
@@ -55,7 +55,7 @@ export const chat_files = pgTable(
   {
     id: varchar("id").primaryKey().$default(uuid),
     chat_id: varchar("chat_id").references(() => ai_chats.id),
-    key: varchar("key"),
+    key: varchar("key").notNull(),
   },
   ({ chat_id }) => ({
     chat_id_idx: index().on(chat_id),
