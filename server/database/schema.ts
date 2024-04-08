@@ -1,22 +1,16 @@
-import { base58 } from "@scure/base";
 import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import { typeid } from "typeid-js";
+import { uuid } from "@fisschl/uuid";
 
 const dateTime = (name: string) => {
   return timestamp(name, { withTimezone: true, mode: "string" }).defaultNow();
-};
-
-export const $id = () => {
-  const bytes = typeid().toUUIDBytes();
-  return base58.encode(bytes);
 };
 
 /**
  * 用户
  */
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().$default($id),
+  id: varchar("id").primaryKey().$default(uuid),
   update_at: dateTime("update_at").notNull(),
   name: varchar("name").unique().notNull(),
   password: varchar("password").notNull(),
@@ -34,7 +28,7 @@ export const users_relations = relations(users, ({ many }) => ({
 export const ai_chats = pgTable(
   "ai_chats",
   {
-    id: varchar("id").primaryKey().$default($id),
+    id: varchar("id").primaryKey().$default(uuid),
     update_at: dateTime("update_at").notNull(),
     user_id: varchar("user_id")
       .notNull()
@@ -57,7 +51,7 @@ export const ai_chats_relations = relations(ai_chats, ({ one, many }) => ({
 }));
 
 export const chat_files = pgTable("chat_files", {
-  id: varchar("id").primaryKey().$default($id),
+  id: varchar("id").primaryKey().$default(uuid),
   chat_id: varchar("chat_id").references(() => ai_chats.id),
   key: varchar("key"),
 });

@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, lt } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
@@ -91,14 +91,14 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
    */
   const history = await database.query.ai_chats.findMany({
     where: eq(ai_chats.user_id, input.user_id),
-    orderBy: asc(ai_chats.update_at),
+    orderBy: desc(ai_chats.update_at),
     limit: 9,
     with: { files: true },
   });
   /**
    * 处理后的发送参数
    */
-  const history_messages = [...history, input].map((item) => {
+  const history_messages = [...history.reverse(), input].map((item) => {
     if (!item.files?.length || item.role !== "user") {
       const message: ChatCompletionMessageParam = pick(item, [
         "role",

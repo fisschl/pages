@@ -1,3 +1,4 @@
+import { uuidLong } from "@fisschl/uuid";
 import { eq } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import type { H3Event } from "h3";
@@ -6,7 +7,6 @@ import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
 import { users } from "~/server/database/schema";
 import { verifyPassword } from "~/server/utils/password";
-import { $token } from "~/server/utils/token";
 
 export const UserInsertSchema = createInsertSchema(users);
 
@@ -43,7 +43,7 @@ export const useToken = (event: H3Event) => {
   if (header) return header;
   const query = getQuery(event);
   if (query.token && isString(query.token)) return query.token;
-  const _token = $token();
+  const _token = uuidLong();
   setCookie(event, "token", _token, {
     maxAge: 30 * DAY,
   });
