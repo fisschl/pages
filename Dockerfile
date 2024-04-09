@@ -1,8 +1,10 @@
 FROM node:latest AS builder
 WORKDIR /root
-COPY .npmrc .
+RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g pnpm
+COPY .npmrc .
 COPY package.json .
+COPY prisma prisma
 RUN pnpm install --prod
 COPY . .
 RUN pnpm build

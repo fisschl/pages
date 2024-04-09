@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useUserStore } from "~/composables/user";
-import { join, basename } from "pathe";
 import { ofetch } from "ofetch";
-import type { ObjectMeta } from "ali-oss";
-import type { SerializeObject } from "nitropack";
+import { basename, join } from "pathe";
+import type { UnwrapRef } from "vue";
+import { useUserStore } from "~/composables/user";
 
 const user = useUserStore();
 await user.checkLogin();
@@ -19,6 +18,8 @@ const { data, refresh } = await useFetch("/api/oss/list", {
   headers,
 });
 
+export type ObjectMeta = NonNullable<UnwrapRef<typeof data>>["objects"][number];
+
 const handleDelete = async (key: string) => {
   await ofetch("/api/oss/delete", {
     method: "DELETE",
@@ -32,7 +33,7 @@ const handleDelete = async (key: string) => {
   await refresh();
 };
 
-const current = ref<SerializeObject<ObjectMeta>>();
+const current = ref<ObjectMeta>();
 const isDetailShow = ref(false);
 const handleClickItem = async (e: MouseEvent) => {
   if (!(e.target instanceof Element)) return;

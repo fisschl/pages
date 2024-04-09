@@ -1,9 +1,7 @@
-import { and, desc, eq, lt } from "drizzle-orm";
 import type { input } from "zod";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { ai_chats } from "~/server/database/schema";
-import { useCurrentUser } from "../auth/index.post";
+import { checkUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 
 const QuerySchema = z.object({
@@ -13,17 +11,13 @@ const QuerySchema = z.object({
 export type MessagesQuery = input<typeof QuerySchema>;
 
 export default defineEventHandler(async (event) => {
-  const user = await useCurrentUser(event);
-  if (!user) throw createError({ status: 403 });
+  const user = await checkUser(event);
   const { update_at } = await getValidatedQuery(event, QuerySchema.parse);
-  const history = await database.query.ai_chats.findMany({
-    where: and(
-      eq(ai_chats.user_id, user.id),
-      lt(ai_chats.update_at, update_at),
-    ),
-    orderBy: desc(ai_chats.update_at),
-    limit: 16,
-    with: { files: true },
+  const history = await database.ai_chat.findMany({
+    where: { user_id: user.id, update_at: { lt: update_at } },
+    orderBy: { update_at: "desc" },
+    take: 16,
+    include: { chat_file: true },
   });
   for (const item of history) {
     item.content = await parseMarkdown(item.content);

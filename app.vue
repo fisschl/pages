@@ -2,12 +2,14 @@
 import { useUserStore } from "./composables/user";
 // @ts-expect-error element-plus locale mjs file
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
-
-const store = useUserStore();
+import type { UnwrapRef } from "vue";
 
 const headers = useRequestHeaders(["cookie"]);
 const { data } = await useFetch("/api/auth", { headers });
+const store = useUserStore();
 if (data.value) store.user = data.value;
+
+export type User = NonNullable<UnwrapRef<typeof data>>;
 </script>
 
 <template>

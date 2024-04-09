@@ -1,4 +1,4 @@
-import type { User } from "~/server/api/auth/index.post";
+import type { User } from "~/app.vue";
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();

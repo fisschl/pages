@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        String    @id @db.VarChar(255)
+  create_at DateTime  @default(now()) @db.Timestamptz()
+  update_at DateTime  @updatedAt @db.Timestamptz()
+  name      String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  avatar    String?   @db.VarChar(255)
+  role      String?   @db.VarChar(255)
+  ai_chat   ai_chat[]
+}
+
+enum ChatRole {
+  user
+  assistant
+}
+
+model ai_chat {
+  id        String      @id @db.VarChar(255)
+  create_at DateTime    @default(now()) @db.Timestamptz()
+  update_at DateTime    @updatedAt @db.Timestamptz()
+  user_id   String      @db.VarChar(255)
+  user      user        @relation(fields: [user_id], references: [id])
+  role      ChatRole
+  content   String
+  chat_file chat_file[]
+
+  @@index([user_id, create_at(sort: Desc)])
+}
+
+model chat_file {
+  id      String  @id @db.VarChar(255)
+  key     String  @db.VarChar(255)
+  chat_id String  @db.VarChar(255)
+  chat    ai_chat @relation(fields: [chat_id], references: [id])
+
+  @@index([chat_id])
+}

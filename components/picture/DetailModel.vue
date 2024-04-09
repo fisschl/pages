@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { ObjectMeta } from "ali-oss";
-import type { SerializeObject } from "nitropack";
 import { extname } from "pathe";
+import type { ObjectMeta } from "~/pages/main/store.vue";
 
 const visible = defineModel<boolean>("visible");
 const emit = defineEmits<{
@@ -10,7 +9,7 @@ const emit = defineEmits<{
 const props = defineProps<{
   path: string;
   prefix: string;
-  item: SerializeObject<ObjectMeta>;
+  item: ObjectMeta;
 }>();
 
 const handleDeleteItem = async () => {
@@ -56,7 +55,7 @@ const videoExtensions = [".mp4", ".webm", ".ogg", ".ogv"];
         v-if="imageExtensions.includes(extname(item.name))"
         :src="cdn"
         :alt="item.name"
-      >
+      />
       <video
         v-else-if="videoExtensions.includes(extname(item.name))"
         autoplay

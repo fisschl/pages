@@ -10,7 +10,7 @@ export const MessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string(),
   update_at: z.string().optional(),
-  files: z.array(ChatFileSchema).optional(),
+  chat_file: z.array(ChatFileSchema).optional(),
 });
 
 export type Message = output<typeof MessageSchema>;
@@ -61,7 +61,7 @@ const handleCommand = async (command: string) => {
         v-html="message.content"
       />
       <img
-        v-for="file in message.files"
+        v-for="file in message.chat_file"
         :key="file.key"
         class="mt-2 inline-block size-16 object-cover"
         :src="`https://cdn.fisschl.world/${file.key}`"
