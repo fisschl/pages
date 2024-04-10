@@ -7,6 +7,7 @@ import {
   string,
   type Output,
 } from "valibot";
+import type { VNode } from "~/utils/snabbdom";
 
 export const ChatFileSchema = object({
   key: string(),
@@ -51,6 +52,25 @@ const handleCommand = async (command: string) => {
     });
   }
 };
+
+const { content } = props.message;
+const articleElement = ref<HTMLElement>();
+const lastVNode = ref<VNode>();
+
+const createInnerElement = () => {
+  const element = document.createElement("p");
+  articleElement.value?.replaceChildren(element);
+  return element;
+};
+
+const updateContent = async (content: string) => {
+  if (!articleElement.value) return;
+  const { patch, parse } = await import("~/utils/snabbdom");
+  const node = parse(content);
+  lastVNode.value = patch(lastVNode.value || createInnerElement(), node);
+};
+
+watch(() => props.message.content, updateContent);
 </script>
 
 <template>
@@ -64,8 +84,9 @@ const handleCommand = async (command: string) => {
       :data-id="message.id"
     >
       <article
+        ref="articleElement"
         class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
-        v-html="message.content"
+        v-html="content"
       />
       <img
         v-for="file in message.chat_file"

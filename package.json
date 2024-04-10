@@ -48,6 +48,7 @@
     "prettier": "^3.2.5",
     "prisma": "^5.12.1",
     "redis": "^4.6.13",
+    "snabbdom": "^3.6.2",
     "superjson": "^2.2.1",
     "tailwindcss": "^3.4.3",
     "ufo": "^1.5.3",
