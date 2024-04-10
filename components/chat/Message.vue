@@ -55,11 +55,11 @@ const handleCommand = async (command: string) => {
 
 const { content } = props.message;
 const articleElement = ref<HTMLElement>();
-const lastVNode = ref<VNode>();
+const lastVNode = shallowRef<VNode>();
 
 const createInnerElement = () => {
   const element = document.createElement("p");
-  articleElement.value?.replaceChildren(element);
+  articleElement.value!.replaceChildren(element);
   return element;
 };
 
