@@ -6,7 +6,8 @@
     "build": "nuxt build",
     "preview": "nuxt preview --host",
     "cz": "git add . && czg",
-    "postinstall": "nuxt prepare && prisma generate",
+    "postinstall": "nuxt prepare",
+    "begin": "prisma generate",
     "work": "powershell ./build.ps1"
   },
   "dependencies": {
@@ -44,7 +45,7 @@
     "openai": "^4.33.0",
     "pathe": "^1.1.2",
     "pinia": "^2.1.7",
-    "pixi.js": "^8.0.5",
+    "pixi.js": "^8.1.0",
     "prettier": "^3.2.5",
     "prisma": "^5.12.1",
     "redis": "^4.6.13",

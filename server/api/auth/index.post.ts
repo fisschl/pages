@@ -34,12 +34,16 @@ export default defineEventHandler(async (event) => {
   if (!user) throw createError({ status: 401 });
   const ok = await verifyPassword(body.password, user.password);
   if (!ok) throw createError({ status: 401 });
-  await writeCache(user.id, user);
+  const update_user = await database.user.update({
+    where: { id: user.id },
+    data: { last_login: new Date() },
+  });
+  await writeCache(update_user.id, update_user);
   const token = useToken(event);
   await redis.hset(token, { user: user.id });
   await redis.expire(token, 30 * DAY);
-  user.password = "******";
-  return user;
+  update_user.password = "******";
+  return update_user;
 });
 
 /**

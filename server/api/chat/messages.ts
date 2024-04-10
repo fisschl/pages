@@ -1,10 +1,10 @@
+import { object, optional, parse, string, type Input } from "valibot";
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
-import { type Input, fallback, object, string, parse } from "valibot";
 
 const QuerySchema = object({
-  create_at: fallback(string(), () => new Date().toISOString()),
+  create_at: optional(string(), () => new Date().toISOString()),
 });
 
 export type MessagesQuery = Input<typeof QuerySchema>;

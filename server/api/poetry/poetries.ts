@@ -1,5 +1,5 @@
 import { pick } from "lodash-es";
-import { fallback, object, optional, parse, string } from "valibot";
+import { object, optional, parse, string } from "valibot";
 import { meilisearch } from "~/server/database/meilisearch";
 
 export interface Poetry {
@@ -14,15 +14,15 @@ export interface Poetry {
 
 export const poetriesIndex = meilisearch.index("poetries");
 
-export const meilisearchQueryFilter = (key: string, items?: string[]) => {
-  const res = items?.filter(Boolean);
-  if (!res || !res.length) return undefined;
-  return `${key} IN [${res.join()}]`;
+export const searchQueryFilter = (key: string, items?: string[]) => {
+  const list = items?.filter(Boolean);
+  if (!list?.length) return undefined;
+  return `${key} IN [${list.join()}]`;
 };
 
 const RequestSchema = object({
-  keyword: fallback(string(), ""),
-  offset: fallback(string(), "0"),
+  keyword: optional(string()),
+  offset: string(),
   library: optional(string()),
 });
 
@@ -32,8 +32,8 @@ export default defineEventHandler(async (event) => {
   );
   const res = await poetriesIndex.search<Poetry>(keyword, {
     limit: 32,
-    offset: parseInt(offset) || 0,
-    filter: meilisearchQueryFilter("library", library?.split(",")),
+    offset: parseInt(offset),
+    filter: searchQueryFilter("library", library?.split(",")),
     attributesToCrop: ["content"],
     cropLength: 32,
     attributesToHighlight: ["content"],
