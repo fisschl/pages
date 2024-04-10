@@ -15,7 +15,7 @@ export const expert_markdown = once(async () => {
   return markdown.use(shiki);
 });
 
-const markdown = MarkdownIt();
+const clean_markdown = MarkdownIt();
 
 export const parseMarkdown = async (text: string) => {
   try {
@@ -23,7 +23,7 @@ export const parseMarkdown = async (text: string) => {
     return markdown.render(text);
   } catch (err) {
     console.log("渲染 Markdown 异常", err, text);
-    return markdown.render(text);
+    return clean_markdown.render(text);
   }
 };
 

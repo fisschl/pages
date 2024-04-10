@@ -5,10 +5,7 @@ import {
   styleModule,
   toVNode,
   fragment,
-  type VNode,
 } from "snabbdom";
-
-export type { VNode };
 
 export const patch = init([classModule, propsModule, styleModule], undefined, {
   experimental: { fragments: true },

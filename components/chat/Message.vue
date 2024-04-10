@@ -7,7 +7,7 @@ import {
   string,
   type Output,
 } from "valibot";
-import type { VNode } from "~/utils/snabbdom";
+import type { VNode } from "snabbdom";
 
 export const ChatFileSchema = object({
   key: string(),
