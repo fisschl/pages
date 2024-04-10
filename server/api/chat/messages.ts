@@ -4,19 +4,19 @@ import { parseMarkdown } from "../markdown";
 import { type Input, fallback, object, string, parse } from "valibot";
 
 const QuerySchema = object({
-  update_at: fallback(string(), () => new Date().toISOString()),
+  create_at: fallback(string(), () => new Date().toISOString()),
 });
 
 export type MessagesQuery = Input<typeof QuerySchema>;
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
-  const { update_at } = await getValidatedQuery(event, (value) =>
+  const { create_at } = await getValidatedQuery(event, (value) =>
     parse(QuerySchema, value),
   );
   const history = await database.ai_chat.findMany({
-    where: { user_id: user.id, update_at: { lt: update_at } },
-    orderBy: { update_at: "desc" },
+    where: { user_id: user.id, create_at: { lt: create_at } },
+    orderBy: { create_at: "desc" },
     take: 16,
     include: { chat_file: true },
   });

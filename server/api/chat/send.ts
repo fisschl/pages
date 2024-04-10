@@ -129,7 +129,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
    */
   const history = await database.ai_chat.findMany({
     where: { user_id: input.user_id },
-    orderBy: { update_at: "desc" },
+    orderBy: { create_at: "desc" },
     take: 9,
     include: { chat_file: true },
   });

@@ -17,7 +17,7 @@ export const MessageSchema = object({
   id: string(),
   role: picklist(["user", "assistant"]),
   content: string(),
-  update_at: optional(string()),
+  create_at: optional(string()),
   chat_file: optional(array(ChatFileSchema)),
 });
 

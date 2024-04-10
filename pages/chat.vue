@@ -96,7 +96,7 @@ whenever(
   async () => {
     if (!list.value?.length) return;
     const res = await fetchData({
-      update_at: first(list.value)?.update_at,
+      create_at: first(list.value)?.create_at,
     });
     if (!res.length) return (isAll.value = true);
     await nextTick();
