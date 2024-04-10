@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { pick } from "lodash-es";
-import { type output, z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import { pick } from "lodash-es";
+import { object, string, type Output, minLength } from "valibot";
 
-const schema = z.object({
-  name: z.string().min(3, "请填写用户名"),
-  password: z.string().min(6, "请填写密码"),
+const schema = object({
+  name: string([minLength(3, "请输入用户名")]),
+  password: string([minLength(3, "请输入密码")]),
 });
 
-type Schema = output<typeof schema>;
+type Schema = Output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({});
 

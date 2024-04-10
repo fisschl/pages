@@ -3,6 +3,7 @@ import { debounce, first, remove } from "lodash-es";
 import { MessageSchema, type Message } from "~/components/chat/Message.vue";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
+import { safeParse } from "valibot";
 
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
@@ -56,13 +57,13 @@ const { eventSource, status, open } = useEventSource(
 useEventListener(eventSource, "message", (e) => {
   if (!(e instanceof MessageEvent)) return;
   const data = JSON.parse(e.data);
-  const res = MessageSchema.safeParse(data);
+  const res = safeParse(MessageSchema, data);
   if (!res.success) {
-    console.log("不符合 SSE 响应规则", data);
+    console.log("不符合 SSE 响应规则", data, res.issues);
     return;
   }
-  console.log("SSE 响应", data);
-  handleNewMessage(data);
+  console.log("SSE 响应", res.output);
+  handleNewMessage(res.output);
 });
 
 const inputText = ref<string>();

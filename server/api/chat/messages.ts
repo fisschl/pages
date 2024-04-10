@@ -1,18 +1,19 @@
-import type { input } from "zod";
-import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
+import { type Input, fallback, object, string, parse } from "valibot";
 
-const QuerySchema = z.object({
-  update_at: z.string().default(() => new Date().toISOString()),
+const QuerySchema = object({
+  update_at: fallback(string(), () => new Date().toISOString()),
 });
 
-export type MessagesQuery = input<typeof QuerySchema>;
+export type MessagesQuery = Input<typeof QuerySchema>;
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
-  const { update_at } = await getValidatedQuery(event, QuerySchema.parse);
+  const { update_at } = await getValidatedQuery(event, (value) =>
+    parse(QuerySchema, value),
+  );
   const history = await database.ai_chat.findMany({
     where: { user_id: user.id, update_at: { lt: update_at } },
     orderBy: { update_at: "desc" },

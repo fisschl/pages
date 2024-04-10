@@ -1,19 +1,26 @@
 <script lang="ts">
-import { z, type output } from "zod";
+import {
+  array,
+  object,
+  optional,
+  picklist,
+  string,
+  type Output,
+} from "valibot";
 
-export const ChatFileSchema = z.object({
-  key: z.string(),
+export const ChatFileSchema = object({
+  key: string(),
 });
 
-export const MessageSchema = z.object({
-  id: z.string(),
-  role: z.enum(["user", "assistant"]),
-  content: z.string(),
-  update_at: z.string().optional(),
-  chat_file: z.array(ChatFileSchema).optional(),
+export const MessageSchema = object({
+  id: string(),
+  role: picklist(["user", "assistant"]),
+  content: string(),
+  update_at: optional(string()),
+  chat_file: optional(array(ChatFileSchema)),
 });
 
-export type Message = output<typeof MessageSchema>;
+export type Message = Output<typeof MessageSchema>;
 </script>
 
 <script setup lang="ts">

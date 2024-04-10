@@ -1,5 +1,5 @@
-import { useCurrentUser } from "./index.post";
+import { useUser } from "./index.post";
 
 export default defineEventHandler(async (event) => {
-  return useCurrentUser(event);
+  return useUser(event);
 });

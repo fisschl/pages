@@ -1,6 +1,6 @@
 import OSS from "ali-oss";
 import { createError, defineEventHandler } from "h3";
-import { useCurrentUser } from "../auth/index.post";
+import { useUser } from "../auth/index.post";
 
 const { STS } = OSS;
 const sts = new STS({
@@ -9,7 +9,7 @@ const sts = new STS({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await useCurrentUser(event);
+  const user = await useUser(event);
   if (!user) throw createError({ status: 403 });
   const policy = {
     Version: "1",

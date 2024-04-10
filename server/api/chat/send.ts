@@ -5,9 +5,9 @@ import type {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from "openai/resources/index";
-import { z } from "zod";
+import { array, object, optional, parse, string } from "valibot";
 import { database } from "~/server/database/postgres";
-import { useCurrentUser } from "../auth/index.post";
+import { useUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
 import { publisher } from "../socket";
@@ -17,16 +17,18 @@ export const openai = new OpenAI({
   baseURL: process.env["OPENAI_PROXY_URL"],
 });
 
-const SendBodySchema = z.object({
-  chat_id: z.string().optional(),
-  content: z.string().optional(),
-  images: z.array(z.string()).optional(),
+const SendBodySchema = object({
+  chat_id: optional(string()),
+  content: optional(string()),
+  images: optional(array(string())),
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await useCurrentUser(event);
+  const user = await useUser(event);
   if (!user) throw createError({ status: 403 });
-  const body = await readValidatedBody(event, SendBodySchema.parse);
+  const body = await readValidatedBody(event, (value) =>
+    parse(SendBodySchema, value),
+  );
   if (body.chat_id) {
     const item = await database.ai_chat.findFirst({
       where: { id: body.chat_id, user_id: user.id },
