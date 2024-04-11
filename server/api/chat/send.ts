@@ -152,15 +152,15 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     /**
      * 实时发送响应给客户端
      */
-    const publish = throttle(async () => {
-      await send_to_client(output);
+    const publish = throttle(() => {
+      send_to_client(output);
     }, 200);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
       const [{ delta }] = choices;
       if (!delta.content) continue;
       output.content += delta.content;
-      await publish();
+      publish();
     }
   } catch (e) {
     output.content = String(e);

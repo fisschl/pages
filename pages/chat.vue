@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { debounce, first, remove } from "lodash-es";
-import { MessageSchema, type Message } from "~/components/chat/Message.vue";
+import {
+  MessageSchema,
+  updateContentEmitter,
+  type Message,
+} from "~/components/chat/Message.vue";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { safeParse } from "valibot";
@@ -45,8 +49,12 @@ const isShowScrollButton = computed(() => {
 const handleNewMessage = (message: Message) => {
   if (!list.value) return;
   const item = list.value?.find((item) => item.id === message.id);
-  if (!item) list.value?.push(message);
-  else Object.assign(item, message);
+  if (!item) {
+    list.value?.push(message);
+  } else {
+    Object.assign(item, message);
+    updateContentEmitter.emit(item.id, item.content);
+  }
   if (!directions.top && !isShowScrollButton.value) scrollToBottom();
 };
 

@@ -8,6 +8,8 @@ import {
   type Output,
 } from "valibot";
 import type { VNode } from "snabbdom";
+import mitt from "mitt";
+import { useLifeCycle } from "~/composables/setup";
 
 export const ChatFileSchema = object({
   key: string(),
@@ -22,6 +24,8 @@ export const MessageSchema = object({
 });
 
 export type Message = Output<typeof MessageSchema>;
+
+export const updateContentEmitter = mitt<Record<string, string>>();
 </script>
 
 <script setup lang="ts">
@@ -53,7 +57,6 @@ const handleCommand = async (command: string) => {
   }
 };
 
-const { content } = props.message;
 const articleElement = ref<HTMLElement>();
 const lastVNode = shallowRef<VNode>();
 
@@ -70,7 +73,11 @@ const updateContent = async (content: string) => {
   lastVNode.value = patch(lastVNode.value || createInnerElement(), node);
 };
 
-watch(() => props.message.content, updateContent);
+useLifeCycle(() => {
+  const { id } = props.message;
+  updateContentEmitter.on(id, updateContent);
+  return () => updateContentEmitter.off(id);
+});
 </script>
 
 <template>
@@ -84,9 +91,10 @@ watch(() => props.message.content, updateContent);
       :data-id="message.id"
     >
       <article
+        v-once
         ref="articleElement"
         class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
-        v-html="content"
+        v-html="message.content"
       />
       <img
         v-for="file in message.chat_file"

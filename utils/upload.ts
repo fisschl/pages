@@ -1,6 +1,6 @@
 import OSS from "ali-oss";
 
-export const refreshSTSToken = async () => {
+const refreshSTSToken = async () => {
   const res = await $fetch("/api/oss/sts");
   return {
     accessKeyId: res.AccessKeyId,

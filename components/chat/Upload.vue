@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { join, parse } from "pathe";
-import { upload_file } from "~/utils/upload";
 import { useFileDialog } from "@vueuse/core";
 import { nanoid } from "nanoid";
+import { join, parse } from "pathe";
 
 const files = defineModel<string[]>("files");
 
@@ -54,6 +53,7 @@ onChange(async (list) => {
       type: "image/webp",
     });
     const key = join(prefix, webp.name);
+    const { upload_file } = await import("~/utils/upload");
     await upload_file(key, webp);
     if (!files.value) files.value = [];
     await nextTick();

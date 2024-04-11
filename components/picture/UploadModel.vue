@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { join } from "pathe";
-import { upload_file } from "~/utils/upload";
 import { useFileDialog } from "@vueuse/core";
 
 const visible = defineModel<boolean>("visible");
@@ -29,12 +28,13 @@ const { open, onChange } = useFileDialog({
 });
 onChange(async (files) => {
   if (!files?.length) return;
-  const waitList = Array.from(files).map(async (file) => {
+  for (const file of files) {
     const state = reactive<FileUpload>({
       file: file,
       progress: 0,
     });
     list.push(state);
+    const { upload_file } = await import("~/utils/upload");
     await upload_file(
       join(props.prefix, formData.path, file.name),
       file,
@@ -42,9 +42,8 @@ onChange(async (files) => {
     );
     const index = list.indexOf(state);
     list.splice(index, 1);
-  });
-  await Promise.all(waitList);
-  toast.add({ title: `${waitList.length} 个文件上传成功` });
+  }
+  toast.add({ title: `${files.length} 个文件上传成功` });
   emit("change");
 });
 </script>

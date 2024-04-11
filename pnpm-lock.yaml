@@ -86,6 +86,9 @@ dependencies:
   meilisearch:
     specifier: ^0.38.0
     version: 0.38.0
+  mitt:
+    specifier: ^3.0.1
+    version: 3.0.1
   mongodb:
     specifier: ^6.5.0
     version: 6.5.0
