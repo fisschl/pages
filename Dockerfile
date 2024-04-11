@@ -1,4 +1,4 @@
-FROM node:latest AS builder
+FROM registry.cn-shanghai.aliyuncs.com/fisschl/pnpm:latest AS builder
 WORKDIR /root
 RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g pnpm
