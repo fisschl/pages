@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "#ui/types";
 import { pick } from "lodash-es";
-import { object, string, type Output, minLength } from "valibot";
+import { z } from "zod";
 
-const schema = object({
-  name: string([minLength(3, "请输入用户名")]),
-  password: string([minLength(3, "请输入密码")]),
+const schema = z.object({
+  name: z.string({ required_error: "用户名不能为空" }).min(3, "用户名太短了"),
+  password: z.string({ required_error: "密码不能为空" }).min(6, "密码太短了"),
 });
 
-type Schema = Output<typeof schema>;
+type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({});
 
@@ -26,9 +25,8 @@ const register = async (data: Schema) => {
   toast.add({ title: res.message });
 };
 
-export type NuxtSubmit = (event: FormSubmitEvent<Schema>) => Promise<void>;
-
-const onSubmit: NuxtSubmit = async ({ data }) => {
+const onSubmit = async () => {
+  const data = schema.parse(state);
   if (isRegister.value) await register(data);
   const res = await $fetch("/api/auth", {
     method: "POST",

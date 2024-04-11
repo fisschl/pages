@@ -1,17 +1,15 @@
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
 import { oss } from "../oss/download";
-import { object, parse, string } from "valibot";
+import { z } from "zod";
 
-const QuerySchema = object({
-  id: string(),
+const request_schema = z.object({
+  id: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
   await checkUser(event);
-  const { id } = await getValidatedQuery(event, (value) =>
-    parse(QuerySchema, value),
-  );
+  const { id } = await getValidatedQuery(event, request_schema.parse);
   const files = await database.chat_file.findMany({
     where: { chat_id: id },
   });

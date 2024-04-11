@@ -1,8 +1,8 @@
 import { createClient } from "redis";
-import { object, parse, string } from "valibot";
+import { z } from "zod";
 
-export const SSEQuerySchema = object({
-  key: string(),
+export const request_schema = z.object({
+  key: z.string(),
 });
 
 export const subscriber = createClient({
@@ -11,16 +11,10 @@ export const subscriber = createClient({
 
 export const publisher = subscriber.duplicate();
 
-export const checkConnection = async () => {
+export default defineEventHandler(async (event) => {
   if (!subscriber.isOpen) await subscriber.connect();
   if (!publisher.isOpen) await publisher.connect();
-};
-
-export default defineEventHandler(async (event) => {
-  await checkConnection();
-  const { key } = await getValidatedQuery(event, (value) =>
-    parse(SSEQuerySchema, value),
-  );
+  const { key } = await getValidatedQuery(event, request_schema.parse);
   const sse = createEventStream(event);
   const push = async (message: string) => {
     await sse.push(message);

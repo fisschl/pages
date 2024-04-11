@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { debounce, first, remove } from "lodash-es";
+import { debounce, remove } from "lodash-es";
 import {
-  MessageSchema,
+  message_schema,
   updateContentEmitter,
   type Message,
 } from "~/components/chat/Message.vue";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
-import { safeParse } from "valibot";
 
 const userStore = useUserStore();
 const user = await userStore.checkLogin();
@@ -65,17 +64,20 @@ const { eventSource, status, open } = useEventSource(
 useEventListener(eventSource, "message", (e) => {
   if (!(e instanceof MessageEvent)) return;
   const data = JSON.parse(e.data);
-  const res = safeParse(MessageSchema, data);
+  // const res = safeParse(MessageSchema, data);
+  const res = message_schema.safeParse(data);
   if (!res.success) {
-    console.log("不符合 SSE 响应规则", data, res.issues);
+    console.log("不符合 SSE 响应规则", data, res.error);
     return;
   }
-  console.log("SSE 响应", res.output);
-  handleNewMessage(res.output);
+  console.log("SSE 响应", res.data);
+  handleNewMessage(res.data);
 });
 
 const inputText = ref<string>();
 const inputFiles = ref<string[]>();
+
+const loading = ref(false);
 
 const send = debounce(async () => {
   inputText.value = inputText.value?.trim();
@@ -84,10 +86,12 @@ const send = debounce(async () => {
   inputFiles.value = [];
   inputText.value = undefined;
   if (status.value === "CLOSED") open();
+  loading.value = true;
   await $fetch("/api/chat/send", {
     method: "POST",
     body: param,
   });
+  loading.value = false;
 }, 200);
 
 const handleKeydown = async (e: KeyboardEvent) => {
@@ -96,33 +100,43 @@ const handleKeydown = async (e: KeyboardEvent) => {
   await send();
 };
 
-const isAll = ref(false);
+const isLoadAll = ref(false);
 const message_component = useId();
-const loading = ref(false);
-whenever(
-  () => directions.top && scrollTop.value < 10 && !isAll.value,
-  async () => {
-    if (!list.value?.length) return;
-    loading.value = true;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    const res = await fetchData({
-      create_at: first(list.value)?.create_at,
-    });
+
+const shouldLoadMore = computed(() => {
+  if (!isMounted.value) return;
+  if (isLoadAll.value || !list.value?.length) return;
+  return directions.top && scrollTop.value < 10;
+});
+
+whenever(shouldLoadMore, async () => {
+  loading.value = true;
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  const [item] = list.value!;
+  const res = await fetchData({
+    create_at: item.create_at,
+  });
+  if (!res.length) {
     loading.value = false;
-    if (!res.length) return (isAll.value = true);
-    await nextTick();
-    // 记忆滚动位置
-    const firstElement = document.querySelector("." + message_component);
-    const oldRect = firstElement?.getBoundingClientRect();
-    list.value.unshift(...res);
-    await nextTick();
-    const newRect = firstElement?.getBoundingClientRect();
-    if (!oldRect || !newRect) return scrollToBottom();
-    // 恢复滚动位置
-    const { body } = document;
-    body.scrollBy({ top: newRect.top - oldRect.top });
-  },
-);
+    isLoadAll.value = true;
+    return;
+  }
+  await nextTick();
+  // 记忆滚动位置
+  const firstElement = document.querySelector(`#${item.id}`);
+  const oldRect = firstElement?.getBoundingClientRect();
+  list.value!.unshift(...res);
+  await nextTick();
+  const newRect = firstElement?.getBoundingClientRect();
+  if (!oldRect || !newRect) {
+    loading.value = false;
+    return scrollToBottom();
+  }
+  // 恢复滚动位置
+  const { body } = document;
+  body.scrollBy({ top: newRect.top - oldRect.top });
+  loading.value = false;
+});
 
 const handleDelete = (message: Message) => {
   if (!list.value) return;
@@ -141,9 +155,6 @@ const handleDelete = (message: Message) => {
         条历史记录。 若使用时发生异常，请联系管理员。
       </blockquote>
     </article>
-    <div v-if="loading" class="fixed left-1/2 top-8 -translate-x-1/2">
-      <Icon name="i-tabler-loader" />
-    </div>
     <div class="flex flex-1 flex-col items-start gap-5">
       <ChatMessage
         v-for="item in list"
@@ -181,5 +192,38 @@ const handleDelete = (message: Message) => {
       class="fixed bottom-10 left-1/2 -translate-x-1/2"
       @click="scrollToBottom"
     />
+    <Transition :enter-from-class="$style.enter" :leave-to-class="$style.enter">
+      <div
+        v-if="loading"
+        class="bg-gray-100 p-2 shadow dark:bg-gray-800"
+        :class="$style.loader"
+      >
+        <Icon
+          name="i-tabler-loader"
+          class="animate-spin"
+          style="font-size: 18px"
+        />
+      </div>
+    </Transition>
   </UContainer>
 </template>
+
+<style module>
+.loader {
+  position: fixed;
+  left: 50%;
+  top: 2rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: 200ms;
+  opacity: 1;
+}
+
+.loader.enter {
+  top: 6px;
+  opacity: 0;
+}
+</style>

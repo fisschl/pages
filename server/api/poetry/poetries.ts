@@ -1,6 +1,6 @@
 import { pick } from "lodash-es";
-import { object, optional, parse, string } from "valibot";
 import { meilisearch } from "~/server/database/meilisearch";
+import { z } from "zod";
 
 export interface Poetry {
   id: string;
@@ -20,19 +20,20 @@ export const searchQueryFilter = (key: string, items?: string[]) => {
   return `${key} IN [${list.join()}]`;
 };
 
-const RequestSchema = object({
-  keyword: optional(string()),
-  offset: string(),
-  library: optional(string()),
+const request_schema = z.object({
+  keyword: z.string().optional(),
+  offset: z.coerce.number(),
+  library: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { keyword, offset, library } = await getValidatedQuery(event, (value) =>
-    parse(RequestSchema, value),
+  const { keyword, offset, library } = await getValidatedQuery(
+    event,
+    request_schema.parse,
   );
   const res = await poetriesIndex.search<Poetry>(keyword, {
     limit: 32,
-    offset: parseInt(offset),
+    offset: offset,
     filter: searchQueryFilter("library", library?.split(",")),
     attributesToCrop: ["content"],
     cropLength: 32,

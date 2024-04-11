@@ -1,15 +1,16 @@
 import { format } from "prettier";
 import { parseMarkdown } from "./markdown";
-import { object, parse, string } from "valibot";
+import { z } from "zod";
 
-const RequestSchema = object({
-  text: string(),
-  extension: string(),
+const request_schema = z.object({
+  text: z.string(),
+  extension: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { text, extension } = await readValidatedBody(event, (value) =>
-    parse(RequestSchema, value),
+  const { text, extension } = await readValidatedBody(
+    event,
+    request_schema.parse,
   );
   const result = await format(text, {
     filepath: `file.${extension}`,

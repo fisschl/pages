@@ -1,29 +1,22 @@
 <script lang="ts">
-import {
-  array,
-  object,
-  optional,
-  picklist,
-  string,
-  type Output,
-} from "valibot";
 import type { VNode } from "snabbdom";
 import mitt from "mitt";
 import { useLifeCycle } from "~/composables/setup";
+import { z } from "zod";
 
-export const ChatFileSchema = object({
-  key: string(),
+export const file_schema = z.object({
+  key: z.string(),
 });
 
-export const MessageSchema = object({
-  id: string(),
-  role: picklist(["user", "assistant"]),
-  content: string(),
-  create_at: optional(string()),
-  chat_file: optional(array(ChatFileSchema)),
+export const message_schema = z.object({
+  id: z.string(),
+  role: z.enum(["user", "assistant"]),
+  content: z.string(),
+  create_at: z.string().optional(),
+  chat_file: z.array(file_schema).optional(),
 });
 
-export type Message = Output<typeof MessageSchema>;
+export type Message = z.output<typeof message_schema>;
 
 export const updateContentEmitter = mitt<Record<string, string>>();
 </script>
@@ -81,14 +74,18 @@ useLifeCycle(() => {
 </script>
 
 <template>
-  <ElDropdown trigger="hover" placement="top" @command="handleCommand">
+  <ElDropdown
+    trigger="hover"
+    :id="message.id"
+    placement="top"
+    @command="handleCommand"
+  >
     <section
       class="relative cursor-auto rounded px-3 py-2"
       :class="{
         'bg-stone-400/10 dark:bg-stone-500/10': message.role === 'assistant',
         'bg-violet-500/10 dark:bg-violet-500/20': message.role === 'user',
       }"
-      :data-id="message.id"
     >
       <article
         v-once

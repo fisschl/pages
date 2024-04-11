@@ -1,10 +1,10 @@
 import Shiki from "@shikijs/markdown-it";
 import { once } from "lodash-es";
 import MarkdownIt from "markdown-it";
-import { object, parse, string } from "valibot";
+import { z } from "zod";
 
-const RequestSchema = object({
-  text: string(),
+const request_schema = z.object({
+  text: z.string(),
 });
 
 export const expert_markdown = once(async () => {
@@ -28,9 +28,7 @@ export const parseMarkdown = async (text: string) => {
 };
 
 export default defineEventHandler(async (event) => {
-  const { text } = await readValidatedBody(event, (value) =>
-    parse(RequestSchema, value),
-  );
+  const { text } = await readValidatedBody(event, request_schema.parse);
   const result = await parseMarkdown(text);
   return { text: result };
 });

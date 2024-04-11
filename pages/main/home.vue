@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { throttle } from "lodash-es";
-import { object, optional, string } from "valibot";
+import { z } from "zod";
 import { useQuery } from "~/composables/route";
 
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
-const QuerySchema = object({
-  keyword: optional(string()),
-  library: optional(string()),
-});
+const query_schema = z
+  .object({
+    keyword: z.string(),
+    library: z.string(),
+  })
+  .partial();
 
-const { query, setQuery } = useQuery(QuerySchema);
+const { query, setQuery } = useQuery(query_schema);
 
 const library = computed(() => {
   const { library } = query.value;

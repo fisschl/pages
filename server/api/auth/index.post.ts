@@ -2,7 +2,7 @@ import type { user } from "@prisma/client";
 import { base58 } from "@scure/base";
 import type { H3Event } from "h3";
 import { isString } from "lodash-es";
-import { object, parse, string } from "valibot";
+import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { DAY, readCache, redis, writeCache } from "~/server/database/redis";
 import { verifyPassword } from "~/server/utils/password";
@@ -16,18 +16,16 @@ export const generateToken = () => {
   return base58.encode(bytes);
 };
 
-const BodySchema = object({
-  name: string(),
-  password: string(),
+const request_schema = z.object({
+  name: z.string(),
+  password: z.string(),
 });
 
 /**
  * 登录
  */
 export default defineEventHandler(async (event) => {
-  const body = await readValidatedBody(event, (value) =>
-    parse(BodySchema, value),
-  );
+  const body = await readValidatedBody(event, request_schema.parse);
   const user = await database.user.findUnique({
     where: { name: body.name },
   });

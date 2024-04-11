@@ -1,23 +1,24 @@
 import { getQuery } from "ufo";
-import { object, parse, string } from "valibot";
-import { SSEQuerySchema, checkConnection, publisher, subscriber } from ".";
+import { publisher, request_schema, subscriber } from ".";
+import { z } from "zod";
 
 const query_key = (url: string) => {
   const query = getQuery(url);
-  const { key } = parse(SSEQuerySchema, query);
+  const { key } = request_schema.parse(query);
   return key;
 };
 
 const effects = new Map<string, () => unknown>();
 
-const MessageSchema = object({
-  key: string(),
-  value: string(),
+const message_schema = z.object({
+  key: z.string(),
+  value: z.string(),
 });
 
 export default defineWebSocketHandler({
   open: async (peer) => {
-    await checkConnection();
+    if (!subscriber.isOpen) await subscriber.connect();
+    if (!publisher.isOpen) await publisher.connect();
     const { id, url } = peer;
     const key = query_key(url);
     const push = async (message: string) => {
@@ -30,7 +31,7 @@ export default defineWebSocketHandler({
   },
   message: async (peer, event) => {
     const text = event.text();
-    const { key, value } = parse(MessageSchema, JSON.parse(text));
+    const { key, value } = message_schema.parse(JSON.parse(text));
     await publisher.publish(key, value);
   },
   close: async (peer) => {
