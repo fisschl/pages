@@ -98,14 +98,17 @@ const handleKeydown = async (e: KeyboardEvent) => {
 
 const isAll = ref(false);
 const message_component = useId();
-
+const loading = ref(false);
 whenever(
-  () => directions.top && scrollTop.value < 100 && !isAll.value,
+  () => directions.top && scrollTop.value < 10 && !isAll.value,
   async () => {
     if (!list.value?.length) return;
+    loading.value = true;
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     const res = await fetchData({
       create_at: first(list.value)?.create_at,
     });
+    loading.value = false;
     if (!res.length) return (isAll.value = true);
     await nextTick();
     // 记忆滚动位置
@@ -138,6 +141,9 @@ const handleDelete = (message: Message) => {
         条历史记录。 若使用时发生异常，请联系管理员。
       </blockquote>
     </article>
+    <div v-if="loading" class="fixed left-1/2 top-8 -translate-x-1/2">
+      <Icon name="i-tabler-loader" />
+    </div>
     <div class="flex flex-1 flex-col items-start gap-5">
       <ChatMessage
         v-for="item in list"
