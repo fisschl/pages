@@ -2,14 +2,18 @@ import {
   init,
   classModule,
   propsModule,
+  attributesModule,
+  datasetModule,
   styleModule,
   toVNode,
   fragment,
 } from "snabbdom";
 
-export const patch = init([classModule, propsModule, styleModule], undefined, {
-  experimental: { fragments: true },
-});
+export const patch = init(
+  [classModule, propsModule, attributesModule, datasetModule, styleModule],
+  undefined,
+  { experimental: { fragments: true } },
+);
 
 export const parser = new DOMParser();
 
