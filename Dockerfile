@@ -6,6 +6,7 @@ COPY .npmrc .
 COPY package.json .
 COPY prisma prisma
 RUN pnpm install --prod
+RUN pnpm begin
 COPY . .
 RUN pnpm build
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { throttle } from "lodash-es";
+import { object, optional, string } from "valibot";
 import { useQuery } from "~/composables/route";
-import { object, string, fallback, optional } from "valibot";
 
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
 const QuerySchema = object({
-  keyword: fallback(string(), ""),
+  keyword: optional(string()),
   library: optional(string()),
 });
 
