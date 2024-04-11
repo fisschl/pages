@@ -7,7 +7,6 @@
     "preview": "nuxt preview --host",
     "cz": "git add . && czg",
     "postinstall": "nuxt prepare",
-    "begin": "prisma generate",
     "work": "powershell ./build.ps1"
   },
   "dependencies": {
