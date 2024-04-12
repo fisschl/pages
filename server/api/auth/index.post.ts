@@ -3,7 +3,7 @@ import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { DAY, readCache, redis, writeCache } from "~/server/database/redis";
+import { DAY, redis, useCache, writeCache } from "~/server/database/redis";
 import { uuid } from "../../utils/uuid";
 import { argon2Verify } from "hash-wasm";
 
@@ -59,14 +59,13 @@ export const useUser = async (event: H3Event): Promise<user | undefined> => {
   const token = useToken(event);
   const user_id = await redis.hget(token, "user");
   if (!user_id) return;
-  const cache_user = await readCache<user>(user_id);
-  if (cache_user) return cache_user;
-  const user = await database.user.findUnique({
-    where: { id: user_id },
+  const user = await useCache(user_id, async () => {
+    return database.user.findUnique({
+      where: { id: user_id },
+    });
   });
   if (!user) return;
   user.password = "******";
-  await writeCache(user.id, user);
   return user;
 };
 

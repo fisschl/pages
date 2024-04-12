@@ -12,9 +12,5 @@ export const useUserStore = defineStore("pages-user", () => {
   };
   const token = useCookie("token");
 
-  const avatar = computed(() => {
-    if (!user.value?.avatar) return;
-    return `https://cdn.fisschl.world/${user.value.avatar}`;
-  });
-  return { user, checkLogin, token, avatar };
+  return { user, checkLogin, token };
 });

@@ -6,18 +6,14 @@ import { hashPassword } from "./index.post";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
-  const body = await readBody(event);
+  const body = await readBody<Partial<typeof user>>(event);
   // 密码应被散列
   if (body.password) {
     body.password = await hashPassword(body.password);
-  } else {
-    body.password = undefined;
   }
   // 对名称进行反 XSS
   if (body.name) {
     body.name = sanitize(body.name);
-  } else {
-    body.name = undefined;
   }
   body.role = undefined;
   const item = await database.user.update({

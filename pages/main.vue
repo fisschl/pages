@@ -41,7 +41,11 @@ const user = useUserStore();
             square
             class="mb-3 mt-4 self-center"
           >
-            <UAvatar v-if="user.avatar" size="lg" :src="user.avatar" />
+            <UAvatar
+              v-if="user.user?.avatar"
+              size="lg"
+              :src="`https://cdn.fisschl.world/${user.user.avatar}`"
+            />
             <UAvatar v-else size="lg" icon="i-tabler-user" />
           </UButton>
           <UVerticalNavigation

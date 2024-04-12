@@ -24,6 +24,7 @@ export const upload_file = async (
       ...res,
       refreshSTSToken,
       refreshSTSTokenInterval: 300000,
+      secure: true,
     });
   }
   const filename = encodeURIComponent(file.name);
