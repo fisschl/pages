@@ -6,7 +6,6 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@vueuse/nuxt",
     "@pinia/nuxt",
-    "@element-plus/nuxt",
     process.env.NODE_ENV === "development" ? "@nuxt/eslint" : false,
   ],
 
@@ -32,11 +31,5 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/graph/**": { ssr: false },
-  },
-
-  nitro: {
-    experimental: {
-      websocket: true,
-    },
   },
 });

@@ -10,7 +10,6 @@
     "work": "powershell ./build.ps1"
   },
   "dependencies": {
-    "@element-plus/nuxt": "^1.0.8",
     "@iconify-json/tabler": "^1.1.109",
     "@nuxt/ui": "^2.15.1",
     "@pinia/nuxt": "^0.5.1",
@@ -26,14 +25,12 @@
     "ali-oss": "^6.20.0",
     "change-case": "^5.4.4",
     "date-fns": "^3.6.0",
-    "dompurify": "^3.1.0",
     "dotenv": "^16.4.5",
     "element-plus": "^2.7.0",
     "h3": "^1.11.1",
     "hash-wasm": "^4.11.0",
     "howler": "^2.2.4",
     "ioredis": "^5.3.2",
-    "jsdom": "^24.0.0",
     "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "meilisearch": "^0.38.0",

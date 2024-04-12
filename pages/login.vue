@@ -1,13 +1,15 @@
-<script setup lang="ts">
+<script lang="ts">
 import { pick } from "lodash-es";
 import { z } from "zod";
 
-const schema = z.object({
+export const login_schema = z.object({
   name: z.string({ required_error: "用户名不能为空" }).min(3, "用户名太短了"),
   password: z.string({ required_error: "密码不能为空" }).min(6, "密码太短了"),
 });
+</script>
 
-type Schema = z.output<typeof schema>;
+<script setup lang="ts">
+type Schema = z.output<typeof login_schema>;
 
 const state = reactive<Partial<Schema>>({});
 
@@ -26,7 +28,7 @@ const register = async (data: Schema) => {
 };
 
 const onSubmit = async () => {
-  const data = schema.parse(state);
+  const data = login_schema.parse(state);
   if (isRegister.value) await register(data);
   const res = await $fetch("/api/auth", {
     method: "POST",
@@ -47,7 +49,12 @@ const route = useRoute();
   <main
     class="flex h-screen w-screen items-center justify-center overflow-hidden"
   >
-    <UForm :state="state" :schema="schema" class="space-y-4" @submit="onSubmit">
+    <UForm
+      :state="state"
+      :schema="login_schema"
+      class="space-y-4"
+      @submit="onSubmit"
+    >
       <UFormGroup label="用户名" name="name">
         <UInput v-model="state.name" />
       </UFormGroup>

@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useUserStore } from "./composables/user";
-// @ts-expect-error element-plus locale mjs file
-import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 import type { UnwrapRef } from "vue";
 
 const headers = useRequestHeaders(["cookie"]);
@@ -18,10 +16,8 @@ export type User = NonNullable<UnwrapRef<typeof data>>;
       <Title> 沅有茝兮醴有兰 </Title>
     </Head>
     <Body class="h-dvh overflow-auto bg-neutral-50 dark:bg-neutral-900">
-      <ElConfigProvider :locale="zhCn">
-        <NuxtPage />
-        <UNotifications />
-      </ElConfigProvider>
+      <NuxtPage />
+      <UNotifications />
     </Body>
   </Html>
 </template>

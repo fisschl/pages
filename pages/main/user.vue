@@ -1,106 +1,91 @@
 <script setup lang="ts">
-import type {
-  FormInstance,
-  FormRules,
-  UploadRequestHandler,
-} from "element-plus";
+import { cloneDeep, pick } from "lodash-es";
 import { useUserStore } from "~/composables/user";
+import { login_schema } from "../login.vue";
+import { z } from "zod";
 
 const store = useUserStore();
 await store.checkLogin();
 
-const form = ref<FormInstance>();
 const state = reactive({
   ...store.user,
 });
-const rules = reactive<FormRules<typeof state>>({
-  name: [{ required: true, message: "请输入用户名" }],
-});
-const { changedList, submitChanges } = useForm(state, async (params) => {
-  await form.value?.validate();
-  const res = await $fetch("/api/user", {
-    method: "PUT",
-    body: params,
-  });
-  store.user = res;
+
+const schema = login_schema.extend({
+  avatar: z.string(),
 });
 
-const handleUpload: UploadRequestHandler = async ({ file }) => {
+const lastState = reactive(cloneDeep(state));
+const isChange = (prop: keyof typeof state) => {
+  return state[prop] !== lastState[prop];
+};
+const submit = async <T extends keyof z.input<typeof schema>>(prop: T) => {
+  const verify = schema.pick({ [prop]: true });
+  const verifyResult = verify.safeParse(state);
+  if (!verifyResult.success) return;
+  const res = await $fetch("/api/user", {
+    method: "PUT",
+    body: pick(state, prop),
+  });
+  store.user = res;
+  lastState[prop] = state[prop];
+};
+
+const imagePicker = useFileDialog({ accept: "image/*" });
+imagePicker.onChange(async (files) => {
+  if (!files?.length) return;
   if (!store.user) return;
+  const [file] = files;
   const key = `home/${store.user.id}/avatar/${file.name}`;
   await upload_file(key, file);
   state.avatar = key;
-};
+  await submit("avatar");
+});
 
-const handleChangePassword = async () => {
-  const { value } = await ElMessageBox.prompt("请输入新密码", "提示");
-  if (!value) {
-    ElMessage.info("取消");
-    return;
-  }
-  await $fetch("/api/user", {
-    method: "PUT",
-    body: { password: value },
-  });
-  ElMessage.success("修改成功");
-};
+const handleChangeAvatar = () => imagePicker.open();
 </script>
 
 <template>
   <UContainer class="py-6">
-    <ElForm
-      ref="form"
-      :model="state"
-      label-width="80"
-      :rules="rules"
-      @submit.prevent="submitChanges"
-    >
-      <ElFormItem label="头像" prop="avatar">
-        <ElAvatar
-          v-if="state.avatar"
+    <UForm :state="state" :schema="login_schema" class="space-y-4">
+      <UFormGroup label="头像" name="avatar">
+        <UAvatar
           :src="`https://cdn.fisschl.world/${state.avatar}`"
-          size="large"
-          class="mr-3"
+          class="cursor-pointer"
+          size="lg"
+          @click="handleChangeAvatar"
         />
-        <ElUpload
-          accept="image/*"
-          :show-file-list="false"
-          :http-request="handleUpload"
-        >
-          <ElButton>
-            <UIcon
-              name="i-tabler-upload"
-              style="font-size: 16px"
-              class="mr-2"
-            />
-            上传头像
-          </ElButton>
-        </ElUpload>
-      </ElFormItem>
-      <ElFormItem label="用户名" prop="name">
-        <ElInput
-          v-model="state.name"
-          style="max-width: 20rem"
-          placeholder="请输入用户名"
-          class="mr-3"
-        />
-      </ElFormItem>
-      <ElButton
-        :disabled="!changedList.length"
-        native-type="submit"
-        style="margin-left: 80px"
-        type="primary"
-      >
-        <UIcon name="i-tabler-checks" style="font-size: 18px" class="mr-2" />
-        保存修改
-      </ElButton>
-      <ElDivider />
-      <ElFormItem label="密码">
-        <ElButton @click="handleChangePassword">
-          <UIcon name="i-tabler-pencil" style="font-size: 16px" class="mr-2" />
-          修改密码
-        </ElButton>
-      </ElFormItem>
-    </ElForm>
+      </UFormGroup>
+      <UFormGroup label="用户名" name="name">
+        <div class="flex">
+          <UInput
+            v-model="state.name"
+            placeholder="请输入用户名"
+            class="mr-3"
+          />
+          <UButton
+            v-if="isChange('name')"
+            icon="i-tabler-check"
+            @click="submit('name')"
+          />
+        </div>
+      </UFormGroup>
+      <UFormGroup label="密码" name="password">
+        <div class="flex">
+          <UInput
+            v-model="state.password"
+            style="max-width: 20rem"
+            placeholder="请输入密码"
+            class="mr-3"
+            type="password"
+          />
+          <UButton
+            v-if="isChange('password')"
+            icon="i-tabler-check"
+            @click="submit('password')"
+          />
+        </div>
+      </UFormGroup>
+    </UForm>
   </UContainer>
 </template>

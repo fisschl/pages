@@ -1,5 +1,4 @@
 import { database } from "~/server/database/postgres";
-import { sanitize } from "~/server/utils/purify";
 import { uuid } from "../../utils/uuid";
 import { z } from "zod";
 import { argon2id } from "hash-wasm";
@@ -29,7 +28,6 @@ export const hashPassword = async (password: string) => {
  */
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
-  body.name = sanitize(body.name);
   const password = await hashPassword(body.password);
   if (!password) throw createError({ status: 400 });
   body.password = password;
