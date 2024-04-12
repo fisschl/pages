@@ -1,28 +1,6 @@
-<script lang="ts">
-import type { VNode } from "snabbdom";
-import mitt from "mitt";
-import { useLifeCycle } from "~/composables/setup";
-import { z } from "zod";
-import type { DropdownItem } from "#ui/types";
-
-export const file_schema = z.object({
-  key: z.string(),
-});
-
-export const message_schema = z.object({
-  id: z.string(),
-  role: z.enum(["user", "assistant"]),
-  content: z.string(),
-  create_at: z.string().optional(),
-  chat_file: z.array(file_schema).optional(),
-});
-
-export type Message = z.output<typeof message_schema>;
-
-export const updateContentEmitter = mitt<Record<string, string>>();
-</script>
-
 <script setup lang="ts">
+import type { DropdownItem } from "#ui/types";
+import type { Message } from "./type";
 const props = defineProps<{
   message: Message;
 }>();
@@ -31,30 +9,10 @@ const emit = defineEmits<{
   delete: [Message];
 }>();
 
-const articleElement = ref<HTMLElement>();
-const lastVNode = shallowRef<VNode>();
+const options: DropdownItem[][] = [];
 
-const createInnerElement = () => {
-  const element = document.createElement("p");
-  articleElement.value!.replaceChildren(element);
-  return element;
-};
-
-const updateContent = async (content: string) => {
-  if (!articleElement.value) return;
-  const { patch, parse } = await import("~/utils/snabbdom");
-  const node = parse(content);
-  lastVNode.value = patch(lastVNode.value || createInnerElement(), node);
-};
-
-useLifeCycle(() => {
-  const { id } = props.message;
-  updateContentEmitter.on(id, updateContent);
-  return () => updateContentEmitter.off(id);
-});
-
-const options: DropdownItem[][] = [
-  [
+if (props.message.role === "user") {
+  options.unshift([
     {
       label: "重新发送",
       icon: "i-tabler-reload",
@@ -67,25 +25,24 @@ const options: DropdownItem[][] = [
           body: { chat_id: message.id },
         });
       },
-      shortcuts: ["R"],
     },
-  ],
-  [
-    {
-      label: "删除",
-      icon: "i-tabler-trash",
-      click: async () => {
-        const { message } = props;
-        await $fetch(`/api/chat/message`, {
-          method: "DELETE",
-          query: { id: message.id },
-        });
-        emit("delete", message);
-      },
-      shortcuts: ["Delete"],
+  ]);
+}
+options.push([
+  {
+    label: "删除",
+    icon: "i-tabler-trash",
+    click: async () => {
+      const { message } = props;
+      console.log("delete", message);
+      await $fetch(`/api/chat/message`, {
+        method: "DELETE",
+        query: { id: message.id },
+      });
+      emit("delete", message);
     },
-  ],
-];
+  },
+]);
 </script>
 
 <template>
@@ -99,7 +56,6 @@ const options: DropdownItem[][] = [
     >
       <article
         v-once
-        ref="articleElement"
         class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
         v-html="message.content"
       />

@@ -78,11 +78,11 @@ const updateKeyword = async (value: string) => {
   <UContainer class="pt-3">
     <div class="mb-4 flex gap-2">
       <UInput
-        :modelValue="query.keyword"
-        @update:modelValue="updateKeyword"
+        :model-value="query.keyword"
         placeholder="搜索"
         icon="i-tabler-search"
         class="flex-1"
+        @update:model-value="updateKeyword"
       />
     </div>
     <div class="mb-3 flex flex-wrap gap-x-5 gap-y-3">

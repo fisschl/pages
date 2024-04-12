@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ofetch } from "ofetch";
 import { basename, join } from "pathe";
 import type { UnwrapRef } from "vue";
 import { useUserStore } from "~/composables/user";
 
-const user = useUserStore();
-await user.checkLogin();
+const { user, checkLogin } = useUserStore();
+await checkLogin();
 
-const prefix = `home/${user.user?.id}/store`;
+const prefix = `home/${user?.id}/store`;
 const path = ref("/");
 
 const headers = useRequestHeaders(["cookie"]);
@@ -21,14 +20,9 @@ const { data, refresh } = await useFetch("/api/oss/list", {
 export type ObjectMeta = NonNullable<UnwrapRef<typeof data>>["objects"][number];
 
 const handleDelete = async (key: string) => {
-  await ofetch("/api/oss/delete", {
+  await $fetch("/api/oss/delete", {
     method: "DELETE",
-    query: {
-      key: key,
-    },
-    headers: {
-      token: user.token || "",
-    },
+    query: { key: key },
   });
   await refresh();
 };

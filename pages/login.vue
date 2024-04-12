@@ -46,9 +46,7 @@ const route = useRoute();
 </script>
 
 <template>
-  <main
-    class="flex h-screen w-screen items-center justify-center overflow-hidden"
-  >
+  <main class="flex h-dvh w-screen items-center justify-center overflow-hidden">
     <UForm
       :state="state"
       :schema="login_schema"
