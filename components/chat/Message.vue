@@ -3,6 +3,7 @@ import type { VNode } from "snabbdom";
 import mitt from "mitt";
 import { useLifeCycle } from "~/composables/setup";
 import { z } from "zod";
+import type { DropdownItem } from "#ui/types";
 
 export const file_schema = z.object({
   key: z.string(),
@@ -30,26 +31,6 @@ const emit = defineEmits<{
   delete: [Message];
 }>();
 
-const handleCommand = async (command: string) => {
-  const { message } = props;
-  if (command === "删除") {
-    await $fetch(`/api/chat/message`, {
-      method: "DELETE",
-      query: { id: message.id },
-    });
-    emit("delete", message);
-    return;
-  }
-  if (command === "重新发送") {
-    const { body } = document;
-    body.scrollTop = body.scrollHeight;
-    await $fetch(`/api/chat/send`, {
-      method: "POST",
-      body: { chat_id: message.id },
-    });
-  }
-};
-
 const articleElement = ref<HTMLElement>();
 const lastVNode = shallowRef<VNode>();
 
@@ -71,15 +52,44 @@ useLifeCycle(() => {
   updateContentEmitter.on(id, updateContent);
   return () => updateContentEmitter.off(id);
 });
+
+const options: DropdownItem[][] = [
+  [
+    {
+      label: "重新发送",
+      icon: "i-tabler-reload",
+      click: async () => {
+        const { message } = props;
+        const { body } = document;
+        body.scrollTop = body.scrollHeight;
+        await $fetch(`/api/chat/send`, {
+          method: "POST",
+          body: { chat_id: message.id },
+        });
+      },
+      shortcuts: ["R"],
+    },
+  ],
+  [
+    {
+      label: "删除",
+      icon: "i-tabler-trash",
+      click: async () => {
+        const { message } = props;
+        await $fetch(`/api/chat/message`, {
+          method: "DELETE",
+          query: { id: message.id },
+        });
+        emit("delete", message);
+      },
+      shortcuts: ["Delete"],
+    },
+  ],
+];
 </script>
 
 <template>
-  <ElDropdown
-    trigger="hover"
-    :id="message.id"
-    placement="top"
-    @command="handleCommand"
-  >
+  <UDropdown :id="message.id" mode="hover" :items="options" :open-delay="200">
     <section
       class="relative cursor-auto rounded px-3 py-2"
       :class="{
@@ -101,17 +111,5 @@ useLifeCycle(() => {
         alt="..."
       />
     </section>
-    <template #dropdown>
-      <ElDropdownMenu>
-        <ElDropdownItem command="删除">
-          <UIcon name="i-tabler-trash" style="font-size: 16px" class="mr-2" />
-          删除
-        </ElDropdownItem>
-        <ElDropdownItem v-if="message.role === 'user'" command="重新发送">
-          <UIcon name="i-tabler-reload" style="font-size: 16px" class="mr-2" />
-          重新发送
-        </ElDropdownItem>
-      </ElDropdownMenu>
-    </template>
-  </ElDropdown>
+  </UDropdown>
 </template>
