@@ -8,9 +8,9 @@ export const timeBytes = () => {
   return new Uint8Array(buffer);
 };
 
-export const uuid = () => {
+export const uuid = (suffix = 8) => {
   const time = timeBytes();
-  const random = new Uint8Array(8);
+  const random = new Uint8Array(suffix);
   crypto.getRandomValues(random);
   const bytes = new Uint8Array([...time, ...random]);
   return base58.encode(bytes);

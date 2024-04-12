@@ -6,7 +6,7 @@ export const useQuery = <T extends ZodType>(schema: T) => {
   const route = useRoute();
   const router = useRouter();
   const query = computed<z.output<T>>(() => {
-    return schema.parse(schema, route.query);
+    return schema.parse(route.query);
   });
   const setQuery = async (
     param: Partial<Record<keyof z.output<T>, QueryValue>>,

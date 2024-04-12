@@ -1,20 +1,11 @@
 import type { user } from "@prisma/client";
-import { base58 } from "@scure/base";
 import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { DAY, readCache, redis, writeCache } from "~/server/database/redis";
-import { verifyPassword } from "~/server/utils/password";
-import { timeBytes } from "~/server/utils/uuid";
-
-export const generateToken = () => {
-  const time = timeBytes();
-  const random = new Uint8Array(16);
-  crypto.getRandomValues(random);
-  const bytes = new Uint8Array([...time, ...random]);
-  return base58.encode(bytes);
-};
+import { uuid } from "../../utils/uuid";
+import { argon2Verify } from "hash-wasm";
 
 const request_schema = z.object({
   name: z.string(),
@@ -30,18 +21,21 @@ export default defineEventHandler(async (event) => {
     where: { name: body.name },
   });
   if (!user) throw createError({ status: 401 });
-  const ok = await verifyPassword(body.password, user.password);
-  if (!ok) throw createError({ status: 401 });
-  const update_user = await database.user.update({
-    where: { id: user.id },
-    data: { last_login: new Date() },
+  const ok = await argon2Verify({
+    password: body.password,
+    hash: user.password,
   });
-  await writeCache(update_user.id, update_user);
+  if (!ok) throw createError({ status: 401 });
+  user.last_login = new Date();
+  await database.user.update({
+    where: { id: user.id },
+    data: { last_login: user.last_login },
+  });
+  await writeCache(user.id, user);
   const token = useToken(event);
   await redis.hset(token, { user: user.id });
   await redis.expire(token, 30 * DAY);
-  update_user.password = "******";
-  return update_user;
+  return { message: "登录成功" };
 });
 
 /**
@@ -54,7 +48,7 @@ export const useToken = (event: H3Event) => {
   if (header) return header;
   const query = getQuery(event);
   if (query.token && isString(query.token)) return query.token;
-  const token = generateToken();
+  const token = uuid(16);
   setCookie(event, "token", token, {
     maxAge: 30 * DAY,
   });

@@ -35,13 +35,11 @@ const onSubmit = async () => {
     toast.add({ title: "用户名或密码错误" });
   });
   if (!res) return;
-  store.user = res;
   const { from } = route.query;
   if (!from || typeof from !== "string") return;
   location.href = from;
 };
 
-const store = useUserStore();
 const route = useRoute();
 </script>
 

@@ -18,5 +18,6 @@ export default defineEventHandler(async (event) => {
     await oss.delete(key);
     await database.chat_file.delete({ where: { id } });
   }
+  await database.ai_chat.delete({ where: { id } });
   return { message: "删除成功" };
 });
