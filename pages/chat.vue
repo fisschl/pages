@@ -36,11 +36,10 @@ const { directions, y: scrollTop } = useScroll(() => {
   return isMounted.value ? document.body : undefined;
 });
 
-const scrollToBottom = () => {
+onMounted(() => {
   const { body } = document;
   body.scrollTop = body.scrollHeight;
-};
-onMounted(scrollToBottom);
+});
 
 const scroll_top_throttled = refThrottled(scrollTop, 200);
 
@@ -79,7 +78,10 @@ useEventListener(eventSource, "message", async (e) => {
   console.log("SSE 响应", res.data);
   await handleNewMessage(res.data);
   await nextTick();
-  if (!directions.top && !isShowScrollButton.value) scrollToBottom();
+  if (!directions.top && !isShowScrollButton.value) {
+    const { body } = document;
+    body.scrollTop = body.scrollHeight;
+  }
 });
 
 const inputText = ref<string>();
@@ -136,7 +138,9 @@ whenever(shouldLoadMore, async () => {
   if (!oldRect || !newRect) {
     loading.value = false;
     await nextTick();
-    return scrollToBottom();
+    const { body } = document;
+    body.scrollTop = body.scrollHeight;
+    return;
   }
   // 恢复滚动位置
   const { body } = document;
@@ -144,23 +148,45 @@ whenever(shouldLoadMore, async () => {
   loading.value = false;
 });
 
-const handleDelete = (message: Message) => {
-  if (!list.value) return;
-  remove(list.value, (item) => item.id === message.id);
+const handleListItemClick = async (e: MouseEvent) => {
+  const { target } = e;
+  if (!(target instanceof Element)) return;
+  const button = target.closest("button");
+  if (!button) return;
+  const li = button.closest("li");
+  if (!li || !li.id) return;
+  const message = list.value?.find((item) => item.id === li.id);
+  if (!message) return;
+  const { body } = document;
+  switch (button.title) {
+    case "删除":
+      await $fetch(`/api/chat/message`, {
+        method: "DELETE",
+        query: { id: message.id },
+      });
+      if (!list.value) break;
+      remove(list.value, (item) => item.id === message.id);
+      break;
+    case "重新发送":
+      body.scrollTop = body.scrollHeight;
+      await $fetch(`/api/chat/send`, {
+        method: "POST",
+        body: { chat_id: message.id },
+      });
+      break;
+  }
 };
 </script>
 
 <template>
   <MainHeader />
   <UContainer>
-    <div class="flex min-h-dvh flex-1 flex-col items-start gap-5">
-      <ChatMessage
-        v-for="item in list"
-        :key="item.id"
-        :message="item"
-        @delete="handleDelete"
-      />
-    </div>
+    <ol
+      class="mt-5 flex min-h-dvh flex-1 flex-col items-start"
+      @click="handleListItemClick"
+    >
+      <ChatMessage v-for="item in list" :key="item.id" :message="item" />
+    </ol>
     <UDivider class="mb-4 mt-5 !w-auto" />
     <UTextarea
       v-model="inputText"
@@ -182,45 +208,6 @@ const handleDelete = (message: Message) => {
       <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
   </UContainer>
-  <UButton
-    v-if="isShowScrollButton"
-    size="lg"
-    variant="soft"
-    icon="i-tabler-chevrons-down"
-    class="fixed bottom-10 left-1/2 -translate-x-1/2"
-    @click="scrollToBottom"
-  />
-  <Transition :enter-from-class="$style.enter" :leave-to-class="$style.enter">
-    <div
-      v-if="loading"
-      class="z-30 bg-gray-100 p-2 shadow dark:bg-gray-800"
-      :class="$style.loader"
-    >
-      <Icon
-        name="i-tabler-loader"
-        class="animate-spin"
-        style="font-size: 18px"
-      />
-    </div>
-  </Transition>
+  <ChatBottomButton v-if="isShowScrollButton" />
+  <ChatLoading :loading="loading" />
 </template>
-
-<style module>
-.loader {
-  position: fixed;
-  left: 50%;
-  top: 2rem;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: 200ms;
-  opacity: 1;
-}
-
-.loader.enter {
-  top: 6px;
-  opacity: 0;
-}
-</style>

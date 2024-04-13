@@ -1,54 +1,15 @@
 <script setup lang="ts">
-import type { DropdownItem } from "#ui/types";
 import type { Message } from "./type";
-const props = defineProps<{
+
+defineProps<{
   message: Message;
 }>();
-
-const emit = defineEmits<{
-  delete: [Message];
-}>();
-
-const options: DropdownItem[][] = [];
-
-if (props.message.role === "user") {
-  options.unshift([
-    {
-      label: "重新发送",
-      icon: "i-tabler-reload",
-      click: async () => {
-        const { message } = props;
-        const { body } = document;
-        body.scrollTop = body.scrollHeight;
-        await $fetch(`/api/chat/send`, {
-          method: "POST",
-          body: { chat_id: message.id },
-        });
-      },
-    },
-  ]);
-}
-options.push([
-  {
-    label: "删除",
-    icon: "i-tabler-trash",
-    click: async () => {
-      const { message } = props;
-      console.log("delete", message);
-      await $fetch(`/api/chat/message`, {
-        method: "DELETE",
-        query: { id: message.id },
-      });
-      emit("delete", message);
-    },
-  },
-]);
 </script>
 
 <template>
-  <UDropdown :id="message.id" mode="hover" :items="options" :open-delay="200">
+  <li :id="message.id" class="mb-4">
     <section
-      class="relative cursor-auto rounded px-3 py-2"
+      class="relative mb-1 rounded px-3 py-2"
       :class="{
         'bg-stone-400/10 dark:bg-stone-500/10': message.role === 'assistant',
         'bg-violet-500/10 dark:bg-violet-500/20': message.role === 'user',
@@ -67,5 +28,22 @@ options.push([
         alt="..."
       />
     </section>
-  </UDropdown>
+    <section class="flex justify-end gap-3">
+      <UButton
+        v-if="message.role === 'user'"
+        icon="i-tabler-reload"
+        size="2xs"
+        variant="ghost"
+        title="重新发送"
+        color="teal"
+      />
+      <UButton
+        icon="i-tabler-trash"
+        size="2xs"
+        variant="ghost"
+        color="pink"
+        title="删除"
+      />
+    </section>
+  </li>
 </template>
