@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <li :id="message.id" class="mb-4">
+  <li :id="message.id" class="mb-4 max-w-full">
     <section
       class="relative mb-1 rounded px-3 py-2"
       :class="{
@@ -47,3 +47,5 @@ defineProps<{
     </section>
   </li>
 </template>
+
+<style module></style>
