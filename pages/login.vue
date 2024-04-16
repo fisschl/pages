@@ -17,7 +17,7 @@ const redirect = async (token: string) => {
   if (!from || typeof from !== "string") return;
   const uri = new URL(from);
   uri.searchParams.set("token", token);
-  await navigateTo(uri, { external: true });
+  await navigateTo(uri.toString(), { external: true });
 };
 
 const store = useUserStore();
