@@ -40,10 +40,6 @@ model ai_chat {
 }
 
 model chat_file {
-  id      String  @id @db.VarChar(255)
-  key     String  @db.VarChar(255)
-  chat_id String  @db.VarChar(255)
-  chat    ai_chat @relation(fields: [chat_id], references: [id])
-
-  @@index([chat_id])
+  key     String    @id @db.VarChar(255)
+  ai_chat ai_chat[]
 }

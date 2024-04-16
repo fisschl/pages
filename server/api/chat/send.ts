@@ -11,6 +11,7 @@ import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
 import { publisher } from "../socket";
 import { z } from "zod";
+import { uuid } from "~/server/utils/uuid";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -45,34 +46,19 @@ export default defineEventHandler(async (event) => {
       role: "user",
       content: content,
       user_id: user.id,
+      chat_file: {
+        connect: images?.map((item) => ({
+          key: item,
+        })),
+      },
     },
+    include: { chat_file: true },
   });
-  const files: chat_file[] = [];
-  if (images?.length) {
-    const items = images.map((item) => {
-      const res: chat_file = {
-        id: uuid(),
-        chat_id: input_chat.id,
-        key: item,
-      };
-      return res;
-    });
-    files.push(...items);
-  }
-  if (files.length) {
-    await database.chat_file.createMany({
-      data: files,
-    });
-  }
-  const current_message = {
-    ...input_chat,
-    files: files,
-  };
   await publisher.publish(
     user.id,
     JSON.stringify({
-      ...current_message,
-      content: await parseMarkdown(current_message.content),
+      ...input_chat,
+      content: await parseMarkdown(input_chat.content),
       user_id: undefined,
     }),
   );
@@ -84,7 +70,7 @@ export default defineEventHandler(async (event) => {
       user_id: input_chat.user_id,
     },
   });
-  await send_message_openai(current_message, result);
+  await send_message_openai(input_chat, result);
   return { message: "完成" };
 });
 
@@ -127,7 +113,10 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
    * 历史消息
    */
   const history = await database.ai_chat.findMany({
-    where: { user_id: input.user_id },
+    where: {
+      user_id: input.user_id,
+      create_at: { lt: input.create_at },
+    },
     orderBy: { create_at: "desc" },
     take: 9,
     include: { chat_file: true },

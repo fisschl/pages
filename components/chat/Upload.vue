@@ -49,10 +49,16 @@ onChange(async (list) => {
       }, "image/webp");
     });
     const parseName = parse(file.name);
-    const webp = new File([blob], parseName.name + "_" + nanoid(8) + ".webp", {
-      type: "image/webp",
-    });
+    const webp = new File(
+      [blob],
+      parseName.name.slice(0, 8) + "_" + nanoid(16) + ".webp",
+      { type: "image/webp" },
+    );
     const key = join(prefix, webp.name);
+    await $fetch("/api/chat/file", {
+      method: "POST",
+      body: { key },
+    });
     const { upload_file } = await import("~/utils/upload");
     await upload_file(key, webp);
     if (!files.value) files.value = [];
@@ -63,7 +69,5 @@ onChange(async (list) => {
 </script>
 
 <template>
-  <UButton color="sky" icon="i-tabler-photo-up" variant="soft" @click="open">
-    选择图片
-  </UButton>
+  <UButton color="sky" icon="i-tabler-photo-up" variant="soft" @click="open" />
 </template>
