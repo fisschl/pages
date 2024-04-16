@@ -2,8 +2,9 @@ FROM registry.cn-shanghai.aliyuncs.com/fisschl/pnpm:latest AS builder
 WORKDIR /root
 COPY .npmrc .
 COPY package.json .
+RUN pnpm install --prod
 COPY prisma prisma
-RUN pnpm install --prod && pnpm prisma generate
+RUN pnpm prisma generate
 COPY . .
 RUN pnpm build
 
