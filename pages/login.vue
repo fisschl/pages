@@ -37,9 +37,12 @@ const onSubmit = async () => {
     toast.add({ title: "用户名或密码错误" });
   });
   if (!res) return;
+  const { token } = res;
   const { from } = route.query;
   if (!from || typeof from !== "string") return;
-  location.href = from;
+  const uri = new URL(from);
+  uri.searchParams.set("token", token);
+  location.href = uri.toString();
 };
 
 const route = useRoute();

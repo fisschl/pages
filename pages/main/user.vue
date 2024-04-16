@@ -43,6 +43,12 @@ imagePicker.onChange(async (files) => {
 });
 
 const handleChangeAvatar = () => imagePicker.open();
+
+const logout = async () => {
+  store.token = undefined;
+  store.user = undefined;
+  await navigateTo("/");
+};
 </script>
 
 <template>
@@ -86,6 +92,15 @@ const handleChangeAvatar = () => imagePicker.open();
           />
         </div>
       </UFormGroup>
+      <UButton
+        icon="i-tabler-logout"
+        color="pink"
+        class="!my-6"
+        variant="soft"
+        @click="logout"
+      >
+        退出登录
+      </UButton>
     </UForm>
   </UContainer>
 </template>

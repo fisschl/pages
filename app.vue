@@ -7,6 +7,16 @@ const { data } = await useFetch("/api/auth", { headers });
 const store = useUserStore();
 if (data.value) store.user = data.value;
 
+const route = useRoute();
+const router = useRouter();
+
+onMounted(() => {
+  if (!route.query.token) return;
+  router.replace({
+    query: { ...route.query, token: undefined },
+  });
+});
+
 export type User = NonNullable<UnwrapRef<typeof data>>;
 </script>
 

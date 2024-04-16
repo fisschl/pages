@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   const token = useToken(event);
   await redis.hset(token, { user: user.id });
   await redis.expire(token, 30 * DAY);
-  return { message: "登录成功" };
+  return { token };
 });
 
 /**
