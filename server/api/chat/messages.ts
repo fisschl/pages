@@ -24,10 +24,5 @@ export default defineEventHandler(async (event) => {
   for (const item of history) {
     item.content = await parseMarkdown(item.content);
   }
-  return history.reverse().map((item) => {
-    return {
-      ...item,
-      user_id: undefined,
-    };
-  });
+  return history.reverse();
 });
