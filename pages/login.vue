@@ -1,6 +1,7 @@
 <script lang="ts">
 import { pick } from "lodash-es";
 import { z } from "zod";
+import { useUserStore } from "~/composables/user";
 
 export const login_schema = z.object({
   name: z.string({ required_error: "用户名不能为空" }).min(3, "用户名太短了"),
@@ -9,6 +10,21 @@ export const login_schema = z.object({
 </script>
 
 <script setup lang="ts">
+const { query } = useRoute();
+
+const redirect = async (token: string) => {
+  const { from } = query;
+  if (!from || typeof from !== "string") return;
+  const uri = new URL(from);
+  uri.searchParams.set("token", token);
+  location.href = uri.toString();
+};
+
+const store = useUserStore();
+if (store.token && store.user) {
+  await redirect(store.token);
+}
+
 type Schema = z.output<typeof login_schema>;
 
 const state = reactive<Partial<Schema>>({});
@@ -38,14 +54,8 @@ const onSubmit = async () => {
   });
   if (!res) return;
   const { token } = res;
-  const { from } = route.query;
-  if (!from || typeof from !== "string") return;
-  const uri = new URL(from);
-  uri.searchParams.set("token", token);
-  location.href = uri.toString();
+  await redirect(token);
 };
-
-const route = useRoute();
 </script>
 
 <template>
