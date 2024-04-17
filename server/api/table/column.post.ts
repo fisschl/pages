@@ -30,5 +30,6 @@ export default defineEventHandler(async (event) => {
   return columns_collection.findOneAndUpdate(
     { _id: new ObjectId(_id) },
     { $set: body },
+    { returnDocument: "after" },
   );
 });

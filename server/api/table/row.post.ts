@@ -12,5 +12,6 @@ export default defineEventHandler(async (event) => {
   return rows_collection.findOneAndUpdate(
     { _id: new ObjectId(_id) },
     { $set: body },
+    { returnDocument: "after" },
   );
 });

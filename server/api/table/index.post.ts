@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
     return table_collection.findOneAndUpdate(
       { _id: new ObjectId(_id), user_id: user.id },
       { $set: body },
+      { returnDocument: "after" },
     );
   }
   // 创建表
