@@ -8,5 +8,5 @@ const request_schema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { _id } = await getValidatedQuery(event, request_schema.parse);
-  return rows_collection.find({ table_id: new ObjectId(_id) }).toArray();
+  return rows_collection.find({ _table_id: new ObjectId(_id) }).toArray();
 });

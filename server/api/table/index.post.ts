@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   // 预填充列
   const columns = Array.from({ length: 20 }).map((item, index) => {
     return {
-      table_id: insertedId,
+      _table_id: insertedId,
       title: `C_${index}`,
     };
   });
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   // 预填充行
   const rows = Array.from({ length: 64 }).map(() => {
     return {
-      table_id: insertedId,
+      _table_id: insertedId,
     };
   });
   await rows_collection.insertMany(rows);

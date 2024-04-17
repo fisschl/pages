@@ -11,10 +11,10 @@ export default defineEventHandler(async (event) => {
   const { _id } = await getValidatedQuery(event, id_schema.parse);
   const user = await checkUser(event);
   await columns_collection.deleteMany({
-    table_id: new ObjectId(_id),
+    _table_id: new ObjectId(_id),
   });
   await rows_collection.deleteMany({
-    table_id: new ObjectId(_id),
+    _table_id: new ObjectId(_id),
   });
   return table_collection.deleteOne({
     _id: new ObjectId(_id),

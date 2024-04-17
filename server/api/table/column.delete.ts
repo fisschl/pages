@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   });
   if (!column) throw createError({ status: 404 });
   await rows_collection.updateMany(
-    { table_id: column._id },
+    { _table_id: column._id },
     { $unset: { [_id]: true } },
   );
   return columns_collection.deleteOne({
