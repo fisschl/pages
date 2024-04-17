@@ -1,13 +1,17 @@
 import { mongodb } from "~/server/database/mongo";
 import { checkUser } from "../auth/index.post";
 import { ObjectId } from "mongodb";
+import { table_create_schema } from "~/server/api/table/tables";
 
 export const table_collection = mongodb.collection("table");
 export const rows_collection = mongodb.collection("rows");
 export const columns_collection = mongodb.collection("columns");
 
 export default defineEventHandler(async (event) => {
-  const { _id, ...body } = await readBody<Record<string, string>>(event);
+  const { _id, ...body } = await readValidatedBody(
+    event,
+    table_create_schema.parse,
+  );
   const user = await checkUser(event);
   if (_id) {
     // 增量更新表数据
@@ -24,11 +28,10 @@ export default defineEventHandler(async (event) => {
   };
   const { insertedId } = await table_collection.insertOne(table);
   // 预填充列
-  const columns = Array.from({ length: 10 }).map((item, index) => {
+  const columns = Array.from({ length: 20 }).map((item, index) => {
     return {
       table_id: insertedId,
       title: `C_${index}`,
-      type: "单行文本",
     };
   });
   await columns_collection.insertMany(columns);

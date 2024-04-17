@@ -2,12 +2,12 @@
 import type { VerticalNavigationLink } from "#ui/types";
 import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import type { Table } from "~/server/api/table/tables";
 
 const headers = useRequestHeaders(["cookie"]);
-const { data, refresh } = await useFetch<Record<string, string>[]>(
-  "/api/table/tables",
-  { headers },
-);
+const { data, refresh } = await useFetch<Table[]>("/api/table/tables", {
+  headers,
+});
 
 const handleCreate = async () => {
   await $fetch("/api/table", {
