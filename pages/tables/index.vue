@@ -12,7 +12,7 @@ const { data, refresh } = await useFetch<Record<string, string>[]>(
 const handleCreate = async () => {
   await $fetch("/api/table", {
     method: "POST",
-    body: { name: "新建表格" },
+    body: {},
   });
   await refresh();
 };

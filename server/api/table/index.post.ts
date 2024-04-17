@@ -1,20 +1,24 @@
-import { z } from "zod";
 import { mongodb } from "~/server/database/mongo";
 import { checkUser } from "../auth/index.post";
-
-const request_schema = z.object({
-  name: z.string(),
-});
+import { ObjectId } from "mongodb";
 
 export const table_collection = mongodb.collection("table");
 export const rows_collection = mongodb.collection("rows");
 export const columns_collection = mongodb.collection("columns");
 
 export default defineEventHandler(async (event) => {
-  const { name } = await readValidatedBody(event, request_schema.parse);
+  const { _id, ...body } = await readBody<Record<string, string>>(event);
   const user = await checkUser(event);
+  if (_id) {
+    // 增量更新表数据
+    return table_collection.findOneAndUpdate(
+      { _id: new ObjectId(_id), user_id: user.id },
+      { $set: body },
+    );
+  }
+  // 创建表
   const table = {
-    name,
+    name: body.name || "未命名",
     user_id: user.id,
     create_at: new Date(),
   };
