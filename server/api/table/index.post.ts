@@ -15,9 +15,14 @@ export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   if (_id) {
     // 增量更新表数据
+    const data = {
+      ...body,
+      create_at: undefined,
+      update_at: new Date(),
+    };
     return table_collection.findOneAndUpdate(
       { _id: new ObjectId(_id), user_id: user.id },
-      { $set: body },
+      { $set: data },
       { returnDocument: "after" },
     );
   }

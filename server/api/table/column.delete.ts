@@ -1,5 +1,9 @@
 import { ObjectId } from "mongodb";
-import { columns_collection, rows_collection } from "./index.post";
+import {
+  columns_collection,
+  rows_collection,
+  table_collection,
+} from "./index.post";
 import { z } from "zod";
 
 export const id_schema = z.object({
@@ -15,6 +19,10 @@ export default defineEventHandler(async (event) => {
   await rows_collection.updateMany(
     { _table_id: column._id },
     { $unset: { [_id]: true } },
+  );
+  await table_collection.updateOne(
+    { _id: column._table_id },
+    { $set: { update_at: new Date() } },
   );
   return columns_collection.deleteOne({
     _id: column._id,

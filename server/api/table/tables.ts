@@ -7,6 +7,7 @@ export const table_schema = z.object({
   user_id: z.string(),
   name: z.string(),
   create_at: z.string(),
+  update_at: z.string(),
 });
 
 export const table_create_schema = table_schema.partial();
@@ -17,6 +18,6 @@ export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
   return table_collection
     .find({ user_id: user.id })
-    .sort({ create_at: -1 })
+    .sort({ update_at: -1 })
     .toArray();
 });

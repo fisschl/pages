@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { columns_collection } from "./index.post";
+import { columns_collection, table_collection } from "./index.post";
 import { z } from "zod";
 
 export const column_schema = z.object({
@@ -17,6 +17,10 @@ export default defineEventHandler(async (event) => {
   const { _id, _table_id, ...body } = await readValidatedBody(
     event,
     column_create_schema.parse,
+  );
+  await table_collection.updateOne(
+    { _id: new ObjectId(_table_id) },
+    { $set: { update_at: new Date() } },
   );
   if (!_id) {
     // 创建列
