@@ -132,7 +132,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
      * 发送消息给 OpenAI
      */
     const stream = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4-turbo",
       messages: history_messages,
       stream: true,
       max_tokens: 2048,
