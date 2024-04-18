@@ -8,6 +8,7 @@ export const column_schema = z.object({
   title: z.string(),
   type: z.string().optional(),
   width: z.number().optional(),
+  order: z.number().optional(),
 });
 
 export const column_create_schema = column_schema.partial();
@@ -17,11 +18,12 @@ export default defineEventHandler(async (event) => {
     event,
     column_create_schema.parse,
   );
-  if (_table_id && !_id) {
+  if (!_id) {
     // 创建列
+    if (!_table_id) throw createError({ status: 400 });
     const column = {
-      _table_id: new ObjectId(_table_id),
       ...body,
+      _table_id: new ObjectId(_table_id),
     };
     await columns_collection.insertOne(column);
     return column;

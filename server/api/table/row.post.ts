@@ -2,11 +2,17 @@ import { ObjectId } from "mongodb";
 import { rows_collection } from "./index.post";
 
 export default defineEventHandler(async (event) => {
-  const { _id, ...body } = await readBody<Record<string, string>>(event);
+  const { _id, _table_id, ...body } =
+    await readBody<Record<string, string>>(event);
   if (!_id) {
     // 创建行
-    await rows_collection.insertOne(body);
-    return body;
+    if (!_table_id) throw createError({ status: 400 });
+    const row = {
+      ...body,
+      _table_id: new ObjectId(_table_id),
+    };
+    await rows_collection.insertOne(row);
+    return row;
   }
   // 更新行
   return rows_collection.findOneAndUpdate(
