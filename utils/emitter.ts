@@ -30,6 +30,6 @@ export class Emitter<T extends Record<string, unknown>> {
   async emit<K extends keyof T>(key: K, e: T[K]) {
     const list = this.listeners[key];
     if (!list) return;
-    await Promise.all(list.map((handler) => handler(e)));
+    return Promise.all(list.map((handler) => handler(e)));
   }
 }
