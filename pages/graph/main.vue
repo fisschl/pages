@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Application, Graphics } from "pixi.js";
+import { Application, BitmapText, Graphics } from "pixi.js";
 
 const mainContainer = ref<HTMLElement>();
 
@@ -22,16 +22,33 @@ class Connection extends Graphics {
 
 onMounted(async () => {
   const app = new Application();
-  await app.init({ resizeTo: mainContainer.value });
+  await app.init({
+    hello: true,
+    resizeTo: mainContainer.value,
+    autoDensity: true,
+    backgroundAlpha: 0,
+    resolution: window.devicePixelRatio,
+    antialias: true,
+  });
   mainContainer.value?.appendChild(app.canvas);
 
   const conn = new Connection();
-  conn.connect(30, 30, 180, 180).stroke({ width: 2, color: 0xffffff });
+  conn.connect(30, 30, 180, 180).stroke({ width: 1, color: 0xffffff });
 
   app.stage.addChild(conn);
+
+  const text = new BitmapText({
+    text: "你好，世界",
+    style: {
+      fill: 0xffffff,
+      fontSize: 16,
+    },
+  });
+  text.position.set(100, 100);
+  app.stage.addChild(text);
 });
 </script>
 
 <template>
-  <main ref="mainContainer" class="h-dvh w-screen overflow-hidden"/>
+  <main ref="mainContainer" class="h-dvh w-screen overflow-hidden" />
 </template>
