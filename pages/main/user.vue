@@ -20,12 +20,11 @@ const isChange = (prop: keyof typeof state) => {
   return state[prop] !== lastState[prop];
 };
 const submit = async <T extends keyof z.input<typeof schema>>(prop: T) => {
-  const verify = schema.pick({ [prop]: true });
-  const verifyResult = verify.safeParse(state);
-  if (!verifyResult.success) return;
+  const verify = schema.partial().safeParse(pick(state, prop));
+  if (!verify.success) return;
   const res = await $fetch("/api/user", {
     method: "PUT",
-    body: pick(state, prop),
+    body: verify.data,
   });
   store.user = res;
   lastState[prop] = state[prop];
@@ -94,7 +93,7 @@ const logout = async () => {
       </UFormGroup>
       <UButton
         icon="i-tabler-logout"
-        color="pink"
+        color="red"
         class="!my-6"
         variant="soft"
         @click="logout"

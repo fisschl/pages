@@ -45,10 +45,13 @@ const links = computed<DropdownItem[][]>(() => [
 const user = useUserStore();
 
 const items = computed(() => {
-  const qs = new URLSearchParams({ from: location.href });
   const Profile: DropdownItem = {
     label: "登录",
-    to: `/login?${qs}`,
+    click: () => {
+      const qs = new URLSearchParams({ from: location.href });
+      const to = `/login?${qs}`;
+      return navigateTo(to);
+    },
   };
   if (user.user?.avatar) {
     Profile.avatar = {
