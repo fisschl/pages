@@ -1,4 +1,4 @@
-import type { user } from "@prisma/client";
+import type {  user } from "@prisma/client";
 import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { z } from "zod";

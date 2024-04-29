@@ -28,7 +28,7 @@ defineProps<{
         alt="..."
       />
     </section>
-    <section class="flex justify-end gap-3">
+    <section class="flex gap-1">
       <UButton
         v-if="message.role === 'user'"
         icon="i-tabler-reload"
@@ -37,11 +37,12 @@ defineProps<{
         title="重新发送"
         color="teal"
       />
+      <span class="flex-1"></span>
       <UButton
         icon="i-tabler-trash"
         size="2xs"
         variant="ghost"
-        color="pink"
+        color="red"
         title="删除"
       />
     </section>

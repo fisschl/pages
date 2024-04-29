@@ -44,7 +44,7 @@ const changeMusicOpen = async () => {
     variant="soft"
     icon="i-tabler-brand-netease-music"
     :class="{ 'animate-pulse': playing }"
-    :color="playing ? 'violet' : 'primary'"
+    :color="playing ? 'primary' : 'violet'"
     @click="changeMusicOpen"
   />
 </template>

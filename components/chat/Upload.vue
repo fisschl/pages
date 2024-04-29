@@ -69,5 +69,11 @@ onChange(async (list) => {
 </script>
 
 <template>
-  <UButton color="sky" icon="i-tabler-photo-up" variant="soft" @click="open" />
+  <UButton
+    color="sky"
+    icon="i-tabler-photo-up"
+    variant="soft"
+    title="上传图片"
+    @click="open"
+  />
 </template>

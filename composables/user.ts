@@ -3,6 +3,17 @@ import type { User } from "~/app.vue";
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
   const route = useRoute();
+  const router = useRouter();
+
+  const tokenAccept = async () => {
+    if (!route.query.token) return;
+    const query = {
+      ...route.query,
+      token: undefined,
+    };
+    await router.replace({ query });
+  };
+
   const checkLogin = async () => {
     if (user.value) return user.value;
     await navigateTo({
@@ -12,5 +23,5 @@ export const useUserStore = defineStore("pages-user", () => {
   };
   const token = useCookie("token");
 
-  return { user, checkLogin, token };
+  return { user, checkLogin, tokenAccept, token };
 });

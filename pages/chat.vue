@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { debounce, remove } from "lodash-es";
-import { message_schema, type Message } from "~/components/chat/type";
+import { type Message, message_schema } from "~/components/chat/type";
 import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 
@@ -22,11 +22,10 @@ await checkLogin();
 const headers = useRequestHeaders(["cookie"]);
 
 const fetchData = async (param?: MessagesQuery) => {
-  const res = await $fetch<Message[]>("/api/chat/messages", {
+  return await $fetch<Message[]>("/api/chat/messages", {
     query: param,
     headers,
   });
-  return res;
 };
 
 const { data: list } = await useAsyncData(() => fetchData());
@@ -53,7 +52,7 @@ const isShowScrollButton = computed(() => {
 
 const handleNewMessage = async (message: Message) => {
   if (!list.value) return;
-  const item = list.value?.find((item) => item.id === message.id);
+  const item = list.value?.findLast((item) => item.id === message.id);
   if (!item) {
     list.value.push(message);
     return;
@@ -187,7 +186,7 @@ const handleListItemClick = async (e: MouseEvent) => {
     >
       <ChatMessage v-for="item in list" :key="item.id" :message="item" />
     </ol>
-    <UDivider class="mb-4 mt-5 !w-auto" />
+    <UDivider class="mb-4 mt-5" />
     <UTextarea
       v-model="inputText"
       autoresize

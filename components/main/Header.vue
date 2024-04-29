@@ -1,22 +1,15 @@
-<script setup lang="ts">
-const isNavigationVisible = ref(false);
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <header
-    class="gap-3 bg-zinc-100/50 px-4 py-2 shadow-sm backdrop-blur dark:bg-zinc-900/50"
+    class="bg-zinc-100/50 shadow-sm backdrop-blur dark:bg-zinc-900/50"
     :class="$style.header"
   >
-    <h1 class="flex-1">大道之行也 天下为公</h1>
-    <MainMusicButton />
-    <UButton
-      variant="soft"
-      color="indigo"
-      square
-      icon="i-tabler-menu"
-      @click="isNavigationVisible = true"
-    />
-    <MainNavigation v-model:visible="isNavigationVisible" />
+    <UContainer class="flex items-center gap-2 py-2">
+      <h1 class="flex-1">大道之行也 天下为公</h1>
+      <MainMusicButton />
+      <MainNavigation />
+    </UContainer>
   </header>
 </template>
 
@@ -25,7 +18,5 @@ const isNavigationVisible = ref(false);
   position: sticky;
   top: 0;
   z-index: 10;
-  display: flex;
-  align-items: center;
 }
 </style>
