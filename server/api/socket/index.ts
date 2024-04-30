@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
 
   sse.onClosed(async () => {
     await channel.cancel(consume.consumerTag);
+    await channel.close();
   });
 
   return sse.send();
