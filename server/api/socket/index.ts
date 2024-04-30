@@ -11,8 +11,11 @@ export default defineEventHandler(async (event) => {
   const sse = createEventStream(event);
 
   const channel = await useChannel();
-  const queue = await channel.assertQueue("", { exclusive: true });
-  await channel.assertExchange(key, "fanout", { durable: false });
+  const queue = await channel.assertQueue("", {
+    exclusive: true,
+    autoDelete: true,
+  });
+  await channel.assertExchange(key, "fanout", { autoDelete: true });
   await channel.bindQueue(queue.queue, key, "");
 
   const consume = await channel.consume(queue.queue, async (message) => {
@@ -22,6 +25,7 @@ export default defineEventHandler(async (event) => {
 
   sse.onClosed(async () => {
     await channel.cancel(consume.consumerTag);
+    await channel.deleteQueue(queue.queue);
     await channel.close();
   });
 
@@ -30,9 +34,9 @@ export default defineEventHandler(async (event) => {
 
 export const usePublisher = async (key: string) => {
   const channel = await useChannel();
-  await channel.assertExchange(key, "fanout", { durable: false });
+  await channel.assertExchange(key, "fanout", { autoDelete: true });
 
-  const publish =  (message: string) => {
+  const publish = (message: string) => {
     channel.publish(key, "", Buffer.from(message));
   };
 
