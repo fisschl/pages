@@ -5,7 +5,7 @@ import { login_schema } from "../login.vue";
 import { z } from "zod";
 
 const store = useUserStore();
-await store.checkLogin();
+useShouldLogin();
 
 const state = reactive({
   ...store.user,

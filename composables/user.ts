@@ -1,4 +1,10 @@
-import type { User } from "~/app.vue";
+export interface User {
+  id: string;
+  name: string;
+  password: string;
+  avatar: string | null;
+  role: string | null;
+}
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
@@ -13,15 +19,34 @@ export const useUserStore = defineStore("pages-user", () => {
     };
     await router.replace({ query });
   };
-
-  const checkLogin = async () => {
-    if (user.value) return user.value;
-    await navigateTo({
-      path: "/login",
-      query: { from: route.fullPath },
-    });
-  };
   const token = useCookie("token");
 
-  return { user, checkLogin, tokenAccept, token };
+  return { user, tokenAccept, token };
 });
+
+export const useShouldLogin = () => {
+  const user = useUserStore();
+
+  onMounted(async () => {
+    if (user.user) return;
+    await navigateTo({
+      path: "/login",
+      query: { from: location.href },
+    });
+  });
+
+  return user.user!;
+};
+
+export const useTokenAccept = () => {
+  const route = useRoute();
+  const router = useRouter();
+  onMounted(async () => {
+    if (!route.query.token) return;
+    const query = {
+      ...route.query,
+      token: undefined,
+    };
+    await router.replace({ query });
+  });
+};

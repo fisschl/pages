@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { basename, join } from "pathe";
 import type { UnwrapRef } from "vue";
-import { useUserStore } from "~/composables/user";
 
-const { user, checkLogin } = useUserStore();
-await checkLogin();
+const user = useShouldLogin();
 
-const prefix = `home/${user?.id}/store`;
+const prefix = `home/${user.id}/store`;
 const path = ref("/");
 
 const headers = useRequestHeaders(["cookie"]);

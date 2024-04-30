@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import "~/assets/main.css";
 import { useUserStore } from "./composables/user";
-import type { UnwrapRef } from "vue";
 
 const headers = useRequestHeaders(["cookie"]);
 const { data } = await useFetch("/api/auth", { headers });
-export type User = NonNullable<UnwrapRef<typeof data>>;
 const store = useUserStore();
-onMounted(store.tokenAccept);
 if (data.value) store.user = data.value;
+
+useTokenAccept();
 </script>
 
 <template>

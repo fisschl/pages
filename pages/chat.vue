@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { debounce, remove } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
-import { useUserStore } from "~/composables/user";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 
 onMounted(async () => {
@@ -16,8 +15,7 @@ onBeforeUnmount(async () => {
   await hide();
 });
 
-const { user, checkLogin } = useUserStore();
-await checkLogin();
+const user = useShouldLogin();
 
 const headers = useRequestHeaders(["cookie"]);
 
@@ -62,25 +60,11 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-const {} = useWebSocket(`/api/socket?key=${user!.id}`,{
-  
-})
-onMounted(() => {
-  if (eventSource.value) eventSource.value.close();
-  eventSource.value = new EventSource(`/api/socket?key=${user?.id}`);
-});
-onBeforeUnmount(() => {
-  eventSource.value?.close();
-});
+const { subscribe } = useSocket(user.id);
 
-useEventListener(eventSource, "message", async (e) => {
-  if (!(e instanceof MessageEvent)) return;
-  const data = JSON.parse(e.data);
+subscribe(async (data) => {
   const res = message_schema.safeParse(data);
-  if (!res.success) {
-    console.log("不符合 SSE 响应规则", data, res.error);
-    return;
-  }
+  if (!res.success) return;
   await handleNewMessage(res.data);
   await nextTick();
   if (!directions.top && !isShowScrollButton.value) {
@@ -208,8 +192,8 @@ const handleListItemClick = async (e: MouseEvent) => {
       />
       <span class="flex-1"></span>
       <section class="flex items-center">
-        <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UBadge color="teal" variant="soft" class="mr-3"> gpt-4-turbo </UBadge>
+        <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton icon="i-tabler-send" class="px-6" @click="send">
           发送
         </UButton>

@@ -7,7 +7,7 @@ import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
 import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
-import { usePublisher } from "../socket";
+import { publish } from "~/server/database/rabbitmq";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -49,13 +49,12 @@ export default defineEventHandler(async (event) => {
     },
     include: { chat_file: true },
   });
-  const { publish } = await usePublisher(user.id);
   const input_message = {
     ...input_chat,
     content: await parseMarkdown(input_chat.content),
     user_id: undefined,
   };
-  publish(JSON.stringify(input_message));
+  publish(user.id, JSON.stringify(input_message));
   const result = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -109,7 +108,6 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
   const history_messages = [...history.reverse(), input].map((item) => {
     return chat_to_history(item);
   });
-  const { publish } = await usePublisher(input.user_id);
   try {
     /**
      * 发送消息给 OpenAI
@@ -129,7 +127,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
-      publish(JSON.stringify(message));
+      publish(input.user_id, JSON.stringify(message));
     }, 200);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -152,6 +150,6 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     content: await parseMarkdown(result.content),
     user_id: undefined,
   };
-  publish(JSON.stringify(message));
+  publish(input.user_id, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
 };

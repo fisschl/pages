@@ -1,7 +1,9 @@
 import { z } from "zod";
-import { useChannel } from "~/server/database/rabbitmq";
+import { publish, rabbit } from "~/server/database/rabbitmq";
 import { getQuery } from "ufo";
-import type { Channel } from "amqplib";
+import { destr } from "destr";
+import { isObject } from "lodash-es";
+import { EventEmitter } from "node:events";
 
 export const request_schema = z.object({
   key: z.string(),
@@ -13,18 +15,13 @@ const query_key = (url: string) => {
   return key;
 };
 
-interface State {
-  close: () => unknown;
-  channel: Channel;
-}
-
-const status = new Map<string, State>();
+const emitter = new EventEmitter();
 
 export default defineWebSocketHandler({
   open: async (peer) => {
     const key = query_key(peer.url);
 
-    const channel = await useChannel();
+    const channel = await (await rabbit).createChannel();
     const queue = await channel.assertQueue("", {
       exclusive: true,
       autoDelete: true,
@@ -37,39 +34,19 @@ export default defineWebSocketHandler({
       peer.send(message.content.toString());
     });
 
-    const close = async () => {
+    emitter.once(`${peer.id}:close`, async () => {
       await channel.cancel(consume.consumerTag);
       await channel.close();
-      status.delete(peer.id);
-    };
-
-    status.set(peer.id, { channel, close });
+    });
   },
   message: async (peer, event) => {
-    const text = event.text();
-    const items = JSON.parse(text);
-    if (!items) return;
-    const state = status.get(peer.id);
-    if (!state) return;
-    const { channel } = state;
-    Object.entries(items).forEach(([key, value]) => {
-      channel.publish(key, "", Buffer.from(JSON.stringify(value)));
+    const items = destr(event.text());
+    if (!isObject(items)) return;
+    Object.entries(items).forEach(async ([key, value]) => {
+      await publish(key, JSON.stringify(value));
     });
   },
   close: async (peer) => {
-    const state = status.get(peer.id);
-    if (!state) return;
-    await state.close();
+    emitter.emit(`${peer.id}:close`);
   },
 });
-
-export const usePublisher = async (key: string) => {
-  const channel = await useChannel();
-  await channel.assertExchange(key, "fanout", { autoDelete: true });
-
-  const publish = (message: string) => {
-    channel.publish(key, "", Buffer.from(message));
-  };
-
-  return { publish };
-};
