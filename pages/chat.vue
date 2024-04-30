@@ -62,9 +62,16 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-const { eventSource, status, open } = useEventSource(
-  `/api/socket?key=${user?.id}`,
-);
+const {} = useWebSocket(`/api/socket?key=${user!.id}`,{
+  
+})
+onMounted(() => {
+  if (eventSource.value) eventSource.value.close();
+  eventSource.value = new EventSource(`/api/socket?key=${user?.id}`);
+});
+onBeforeUnmount(() => {
+  eventSource.value?.close();
+});
 
 useEventListener(eventSource, "message", async (e) => {
   if (!(e instanceof MessageEvent)) return;
@@ -91,7 +98,6 @@ const send = debounce(async () => {
   if (!param.content) return;
   inputFiles.value = [];
   inputText.value = undefined;
-  if (status.value === "CLOSED") open();
   await $fetch("/api/chat/send", {
     method: "POST",
     body: param,

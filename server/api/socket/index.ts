@@ -1,34 +1,66 @@
 import { z } from "zod";
 import { useChannel } from "~/server/database/rabbitmq";
+import { getQuery } from "ufo";
+import type { Channel } from "amqplib";
 
 export const request_schema = z.object({
   key: z.string(),
 });
 
-export default defineEventHandler(async (event) => {
-  const { key } = await getValidatedQuery(event, request_schema.parse);
+const query_key = (url: string) => {
+  const query = getQuery(url);
+  const { key } = request_schema.parse(query);
+  return key;
+};
 
-  const sse = createEventStream(event);
+interface State {
+  close: () => unknown;
+  channel: Channel;
+}
 
-  const channel = await useChannel();
-  const queue = await channel.assertQueue("", {
-    exclusive: true,
-    autoDelete: true,
-  });
-  await channel.assertExchange(key, "fanout", { autoDelete: true });
-  await channel.bindQueue(queue.queue, key, "");
+const status = new Map<string, State>();
 
-  const consume = await channel.consume(queue.queue, async (message) => {
-    if (!message) return;
-    await sse.push(message.content.toString());
-  });
+export default defineWebSocketHandler({
+  open: async (peer) => {
+    const key = query_key(peer.url);
 
-  sse.onClosed(async () => {
-    await channel.cancel(consume.consumerTag);
-    await channel.close();
-  });
+    const channel = await useChannel();
+    const queue = await channel.assertQueue("", {
+      exclusive: true,
+      autoDelete: true,
+    });
+    await channel.assertExchange(key, "fanout", { autoDelete: true });
+    await channel.bindQueue(queue.queue, key, "");
 
-  return sse.send();
+    const consume = await channel.consume(queue.queue, (message) => {
+      if (!message) return;
+      peer.send(message.content.toString());
+    });
+
+    const close = async () => {
+      await channel.cancel(consume.consumerTag);
+      await channel.close();
+      status.delete(peer.id);
+    };
+
+    status.set(peer.id, { channel, close });
+  },
+  message: async (peer, event) => {
+    const text = event.text();
+    const items = JSON.parse(text);
+    if (!items) return;
+    const state = status.get(peer.id);
+    if (!state) return;
+    const { channel } = state;
+    Object.entries(items).forEach(([key, value]) => {
+      channel.publish(key, "", Buffer.from(JSON.stringify(value)));
+    });
+  },
+  close: async (peer) => {
+    const state = status.get(peer.id);
+    if (!state) return;
+    await state.close();
+  },
 });
 
 export const usePublisher = async (key: string) => {
