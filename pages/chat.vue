@@ -74,7 +74,6 @@ useEventListener(eventSource, "message", async (e) => {
     console.log("不符合 SSE 响应规则", data, res.error);
     return;
   }
-  console.log("SSE 响应", res.data);
   await handleNewMessage(res.data);
   await nextTick();
   if (!directions.top && !isShowScrollButton.value) {
@@ -194,17 +193,21 @@ const handleListItemClick = async (e: MouseEvent) => {
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <section class="flex flex-1 items-start">
-        <img
-          v-for="item in inputFiles"
-          :key="item"
-          class="mr-2 size-12 object-cover"
-          :src="`https://cdn.fisschl.world/${item}`"
-          alt="..."
-        />
+      <img
+        v-for="item in inputFiles"
+        :key="item"
+        class="mr-2 size-12 object-cover"
+        :src="`https://cdn.fisschl.world/${item}`"
+        alt="..."
+      />
+      <span class="flex-1"></span>
+      <section class="flex items-center">
+        <ChatUpload v-model:files="inputFiles" class="mr-3" />
+        <UBadge color="teal" variant="soft" class="mr-3"> gpt-4-turbo </UBadge>
+        <UButton icon="i-tabler-send" class="px-6" @click="send">
+          发送
+        </UButton>
       </section>
-      <ChatUpload v-model:files="inputFiles" class="mr-3" />
-      <UButton icon="i-tabler-send" class="px-6" @click="send"> 发送 </UButton>
     </div>
   </UContainer>
   <ChatBottomButton v-if="isShowScrollButton" />

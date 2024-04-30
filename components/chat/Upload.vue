@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { useFileDialog } from "@vueuse/core";
-import { nanoid } from "nanoid";
-import { join, parse } from "pathe";
-
 const files = defineModel<string[]>("files");
-
-const user = useUserStore();
-const prefix = `home/${user.user?.id}/chat`;
 
 const { open, onChange } = useFileDialog({
   accept: "image/*",
   multiple: true,
   reset: true,
 });
+
 onChange(async (list) => {
   if (!list?.length) return;
   for (const file of list) {
@@ -48,16 +43,10 @@ onChange(async (list) => {
         resolve(blob);
       }, "image/webp");
     });
-    const parseName = parse(file.name);
-    const webp = new File(
-      [blob],
-      parseName.name.slice(0, 8) + "_" + nanoid(16) + ".webp",
-      { type: "image/webp" },
-    );
-    const key = join(prefix, webp.name);
-    await $fetch("/api/chat/file", {
+    const webp = new File([blob], "peace.webp", { type: "image/webp" });
+    const { key } = await $fetch("/api/chat/file", {
       method: "POST",
-      body: { key },
+      body: { name: webp.name },
     });
     const { upload_file } = await import("~/utils/upload");
     await upload_file(key, webp);

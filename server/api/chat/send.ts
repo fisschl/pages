@@ -1,10 +1,6 @@
 import type { ai_chat, chat_file } from "@prisma/client";
 import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
-import type {
-  ChatCompletionContentPart,
-  ChatCompletionMessageParam,
-} from "openai/resources/index";
 import { database } from "~/server/database/postgres";
 import { useUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
@@ -80,23 +76,20 @@ export type Chat = ai_chat & {
 
 const chat_to_history = (item: Chat) => {
   if (!item.chat_file?.length || item.role !== "user") {
-    const message: ChatCompletionMessageParam = pick(item, ["role", "content"]);
-    return message;
+    return pick(item, ["role", "content"]);
   }
   // 处理带有图片的消息
-  const content: ChatCompletionContentPart[] = item.chat_file.map((file) => {
-    const uri = oss.signatureUrl(file.key!);
-    const content: ChatCompletionContentPart = {
+  const content = item.chat_file.map((file) => {
+    const uri = oss.signatureUrl(file.key);
+    return {
       type: "image_url",
       image_url: { url: uri },
-    };
-    return content;
+    } satisfies OpenAI.ChatCompletionContentPartImage;
   });
-  const message: ChatCompletionMessageParam = {
+  return {
     role: item.role,
     content: [{ type: "text", text: item.content }, ...content],
-  };
-  return message;
+  } satisfies OpenAI.ChatCompletionMessageParam;
 };
 
 const send_to_client = async (item: Chat) => {

@@ -26,7 +26,6 @@ export default defineNuxtConfig({
 
   routeRules: {
     "/": { redirect: "/main/home" },
-    "/graph/**": { ssr: false },
     "/api/**": { cors: true },
   },
 });

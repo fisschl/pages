@@ -1,6 +1,7 @@
 import { database } from "~/server/database/postgres";
 import { checkUser } from "../auth/index.post";
 import { z } from "zod";
+import { oss } from "~/server/api/oss/download";
 
 const request_schema = z.object({
   id: z.string(),
@@ -9,6 +10,17 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   await checkUser(event);
   const { id } = await getValidatedQuery(event, request_schema.parse);
+  const files = await database.chat_file.findMany({
+    where: {
+      ai_chat: {
+        every: { id },
+      },
+    },
+  });
+  for (const item of files) {
+    await oss.delete(item.key);
+    await database.chat_file.delete({ where: { key: item.key } });
+  }
   await database.ai_chat.delete({
     where: { id },
   });
