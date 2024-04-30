@@ -1,27 +1,39 @@
-import { createClient } from "redis";
 import { z } from "zod";
+import { useChannel } from "~/server/database/rabbitmq";
 
 export const request_schema = z.object({
   key: z.string(),
 });
 
-export const subscriber = createClient({
-  url: process.env.REDIS_URL,
-});
-
-export const publisher = subscriber.duplicate();
-
 export default defineEventHandler(async (event) => {
-  if (!subscriber.isOpen) await subscriber.connect();
-  if (!publisher.isOpen) await publisher.connect();
   const { key } = await getValidatedQuery(event, request_schema.parse);
+
   const sse = createEventStream(event);
-  const push = async (message: string) => {
-    await sse.push(message);
-  };
-  await subscriber.subscribe(key, push);
-  sse.onClosed(async () => {
-    await subscriber.unsubscribe(key, push);
+
+  const channel = await useChannel();
+  const queue = await channel.assertQueue("", { exclusive: true });
+  await channel.assertExchange(key, "fanout", { durable: false });
+  await channel.bindQueue(queue.queue, key, "");
+
+  const consume = await channel.consume(queue.queue, async (message) => {
+    if (!message) return;
+    await sse.push(message.content.toString());
   });
+
+  sse.onClosed(async () => {
+    await channel.cancel(consume.consumerTag);
+  });
+
   return sse.send();
 });
+
+export const usePublisher = async (key: string) => {
+  const channel = await useChannel();
+  await channel.assertExchange(key, "fanout", { durable: false });
+
+  const publish =  (message: string) => {
+    channel.publish(key, "", Buffer.from(message));
+  };
+
+  return { publish };
+};

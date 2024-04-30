@@ -5,9 +5,9 @@ import { database } from "~/server/database/postgres";
 import { useUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
-import { publisher } from "../socket";
 import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
+import { usePublisher } from "../socket";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
   const user = await useUser(event);
   if (!user) throw createError({ status: 403 });
   const body = await readValidatedBody(event, request_schema.parse);
-  if (!publisher.isOpen) await publisher.connect();
   if (body.chat_id) {
     const item = await database.ai_chat.findFirst({
       where: { id: body.chat_id, user_id: user.id },
@@ -50,14 +49,13 @@ export default defineEventHandler(async (event) => {
     },
     include: { chat_file: true },
   });
-  await publisher.publish(
-    user.id,
-    JSON.stringify({
-      ...input_chat,
-      content: await parseMarkdown(input_chat.content),
-      user_id: undefined,
-    }),
-  );
+  const { publish } = await usePublisher(user.id);
+  const input_message = {
+    ...input_chat,
+    content: await parseMarkdown(input_chat.content),
+    user_id: undefined,
+  };
+  publish(JSON.stringify(input_message));
   const result = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -92,15 +90,6 @@ const chat_to_history = (item: Chat) => {
   } satisfies OpenAI.ChatCompletionMessageParam;
 };
 
-const send_to_client = async (item: Chat) => {
-  const message = {
-    ...item,
-    content: await parseMarkdown(item.content),
-    user_id: undefined,
-  };
-  await publisher.publish(item.user_id!, JSON.stringify(message));
-};
-
 export const send_message_openai = async (input: Chat, output: Chat) => {
   /**
    * 历史消息
@@ -120,6 +109,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
   const history_messages = [...history.reverse(), input].map((item) => {
     return chat_to_history(item);
   });
+  const { publish } = await usePublisher(input.user_id);
   try {
     /**
      * 发送消息给 OpenAI
@@ -133,15 +123,20 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     /**
      * 实时发送响应给客户端
      */
-    const publish = throttle(() => {
-      send_to_client(output);
+    const publish_throttle = throttle(async () => {
+      const message = {
+        ...output,
+        content: await parseMarkdown(output.content),
+        user_id: undefined,
+      };
+      publish(JSON.stringify(message));
     }, 200);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
       const [{ delta }] = choices;
       if (!delta.content) continue;
       output.content += delta.content;
-      publish();
+      publish_throttle();
     }
   } catch (e) {
     output.content = String(e);
@@ -152,5 +147,11 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     where: { id: output.id },
     data: { content: output.content },
   });
-  await send_to_client(result);
+  const message = {
+    ...result,
+    content: await parseMarkdown(result.content),
+    user_id: undefined,
+  };
+  publish(JSON.stringify(message));
+  await new Promise<void>((resolve) => setTimeout(resolve, 300));
 };

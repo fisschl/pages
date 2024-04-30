@@ -1,9 +1,10 @@
-import { publisher, request_schema } from ".";
+import { request_schema, usePublisher } from ".";
 
 export default defineEventHandler(async (event) => {
   const { key } = await getValidatedQuery(event, request_schema.parse);
   const data = await readRawBody(event);
   if (!data) throw createError({ status: 400 });
-  await publisher.publish(key, JSON.stringify(data));
+  const { publish } = await usePublisher(key);
+  publish(data);
   return { message: "成功" };
 });
