@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     process.env.OSS_STS_ROLE_ARN!,
     JSON.stringify(policy),
     3000,
-    process.env.OSS_SESSION_TOKEN,
+    "upload",
   );
   return result.credentials;
 });
