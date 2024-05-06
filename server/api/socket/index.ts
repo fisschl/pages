@@ -36,6 +36,8 @@ export default defineWebSocketHandler({
 
     emitter.once(`${peer.id}:close`, async () => {
       await channel.cancel(consume.consumerTag);
+      await channel.unbindQueue(queue.queue, key, "");
+      await channel.deleteQueue(queue.queue);
       await channel.close();
     });
   },
