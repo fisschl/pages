@@ -35,10 +35,10 @@ export const cacheKey = (key: unknown): string => {
   if (Array.isArray(key)) {
     return key.map(cacheKey).filter(Boolean).join(":");
   }
-  if (key === null || key === undefined) return "";
-  if (typeof key === "number") return key.toString();
-  if (typeof key === "boolean") return key.toString();
   if (typeof key === "string") return key;
+  if (key === null || key === undefined) return "";
+  if (typeof key === "number" || typeof key === "boolean")
+    return key.toString();
   return hash(key);
 };
 

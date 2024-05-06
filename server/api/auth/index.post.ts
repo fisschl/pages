@@ -1,9 +1,9 @@
-import type {  user } from "@prisma/client";
+import type { user } from "@prisma/client";
 import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { DAY, redis, useCache, writeCache } from "~/server/database/redis";
+import { DAY, redis, useCache } from "~/server/database/redis";
 import { uuid } from "../../utils/uuid";
 import { argon2Verify } from "hash-wasm";
 
@@ -26,12 +26,6 @@ export default defineEventHandler(async (event) => {
     hash: user.password,
   });
   if (!ok) throw createError({ status: 401 });
-  user.last_login = new Date();
-  await database.user.update({
-    where: { id: user.id },
-    data: { last_login: user.last_login },
-  });
-  await writeCache(user.id, user);
   const token = useToken(event);
   await redis.hset(token, { user: user.id });
   await redis.expire(token, 30 * DAY);

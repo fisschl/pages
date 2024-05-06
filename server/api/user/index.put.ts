@@ -1,5 +1,5 @@
 import { database } from "~/server/database/postgres";
-import { redis } from "~/server/database/redis";
+import { writeCache } from "~/server/database/redis";
 import { checkUser } from "../auth/index.post";
 import { hashPassword } from "./index.post";
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     where: { id: user.id },
   });
   if (!item) throw createError({ status: 400 });
-  await redis.del(item.id);
+  await writeCache(item.id, item);
   item.password = "******";
   return item;
 });
