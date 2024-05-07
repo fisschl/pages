@@ -7,7 +7,7 @@ import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
 import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
-import { publish } from "~/server/database/rabbitmq";
+import { publisher } from "~/server/database/mqtt";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(input_chat.content),
     user_id: undefined,
   };
-  publish(user.id, JSON.stringify(input_message));
+  publisher.publish(user.id, JSON.stringify(input_message));
   const result = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -127,7 +127,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
-      publish(input.user_id, JSON.stringify(message));
+      publisher.publish(input.user_id, JSON.stringify(message));
     }, 200);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -150,6 +150,6 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     content: await parseMarkdown(result.content),
     user_id: undefined,
   };
-  publish(input.user_id, JSON.stringify(message));
+  publisher.publish(input.user_id, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
 };

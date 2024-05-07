@@ -1,36 +1,31 @@
 import { destr } from "destr";
 import { isObject } from "lodash-es";
+import type { MqttClient } from "mqtt";
+import mqtt from "mqtt";
 
 export type SocketHandler = (message: object) => unknown;
 
-export const useSocket = (key: string) => {
-  const socket = ref<WebSocket>();
-  const timer = ref<ReturnType<typeof setInterval>>();
+export const useSocket = (key: string, handler: SocketHandler) => {
+  const socket = shallowRef<MqttClient>();
 
   onMounted(() => {
-    socket.value = new WebSocket(`/api/socket?key=${key}`);
-    timer.value = setInterval(() => {
-      socket.value?.send("ping");
-    }, 5000);
+    socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, {
+      username: "public",
+      password: "public",
+    });
+    socket.value.subscribe(key);
+    socket.value.on("error", console.error);
+    socket.value.on("message", (topic, payload) => {
+      const message = destr(payload.toString());
+      if (!isObject(message)) return;
+      handler(message);
+    });
   });
 
   onBeforeUnmount(() => {
-    socket.value?.close();
-    clearInterval(timer.value);
+    socket.value?.removeAllListeners();
+    socket.value?.end();
   });
 
-  const subscribe = (handler: SocketHandler) => {
-    useEventListener(socket, "message", (e) => {
-      if (!(e instanceof MessageEvent)) return;
-      const message = destr(e.data);
-      if (!isObject(message)) return;
-      return handler(message);
-    });
-  };
-
-  const publish = async (items: Record<string, object>) => {
-    socket.value?.send(JSON.stringify(items));
-  };
-
-  return { socket, subscribe, publish };
+  return { socket };
 };

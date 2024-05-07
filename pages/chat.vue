@@ -60,9 +60,7 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-const { subscribe } = useSocket(user.id);
-
-subscribe(async (data) => {
+useSocket(user.id, async (data) => {
   const res = message_schema.safeParse(data);
   if (!res.success) return;
   await handleNewMessage(res.data);

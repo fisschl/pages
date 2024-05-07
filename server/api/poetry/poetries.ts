@@ -1,4 +1,4 @@
-import { pick } from "lodash-es";
+import { compact, pick } from "lodash-es";
 import { meilisearch } from "~/server/database/meilisearch";
 import { z } from "zod";
 
@@ -14,27 +14,27 @@ export interface Poetry {
 
 export const poetriesIndex = meilisearch.index("poetries");
 
-export const searchQueryFilter = (key: string, items?: string[]) => {
-  const list = items?.filter(Boolean);
-  if (!list?.length) return undefined;
-  return `${key} IN [${list.join()}]`;
-};
-
 const request_schema = z.object({
   keyword: z.string().optional(),
-  offset: z.coerce.number(),
-  library: z.string().optional(),
+  library: z
+    .string()
+    .optional()
+    .transform((param) => {
+      param = param?.split(",").filter(Boolean).join();
+      if (!param) return;
+      return `library IN [${param}]`;
+    }),
+  offset: z.coerce.number().default(0),
 });
 
 export default defineEventHandler(async (event) => {
-  const { keyword, offset, library } = await getValidatedQuery(
-    event,
-    request_schema.parse,
-  );
-  const res = await poetriesIndex.search<Poetry>(keyword, {
+  const body = await getValidatedQuery(event, request_schema.parse);
+  const filters: string[] = [];
+  if (body.library) filters.push(body.library);
+  const res = await poetriesIndex.search<Poetry>(body.keyword, {
     limit: 32,
-    offset: offset,
-    filter: searchQueryFilter("library", library?.split(",")),
+    offset: body.offset,
+    filter: compact([body.library]),
     attributesToCrop: ["content"],
     cropLength: 32,
     attributesToHighlight: ["content"],

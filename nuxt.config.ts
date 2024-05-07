@@ -28,10 +28,4 @@ export default defineNuxtConfig({
     "/": { redirect: "/main/home" },
     "/api/**": { cors: true },
   },
-
-  nitro: {
-    experimental: {
-      websocket: true,
-    },
-  },
 });
