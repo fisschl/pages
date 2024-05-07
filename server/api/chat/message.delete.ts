@@ -1,7 +1,7 @@
 import { database } from "~/server/database/postgres";
-import { checkUser } from "../auth/index.post";
 import { z } from "zod";
 import { oss } from "~/server/api/oss/download";
+import { checkUser } from "~/server/utils/user";
 
 const request_schema = z.object({
   id: z.string(),

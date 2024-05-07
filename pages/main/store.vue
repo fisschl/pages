@@ -2,17 +2,16 @@
 import { basename, join } from "pathe";
 import type { UnwrapRef } from "vue";
 
-const user = useShouldLogin();
+const user = await useShouldLogin();
 
-const prefix = `home/${user.id}/store`;
+const prefix = `home/${user?.id}/store`;
 const path = ref("/");
 
-const headers = useRequestHeaders(["cookie"]);
 const { data, refresh } = await useFetch("/api/oss/list", {
   query: computed(() => ({
     prefix: join(prefix, path.value),
   })),
-  headers,
+  headers: useRequestHeaders(["cookie"]),
 });
 
 export type ObjectMeta = NonNullable<UnwrapRef<typeof data>>["objects"][number];

@@ -1,6 +1,7 @@
 import OSS from "ali-oss";
 import { createError, defineEventHandler } from "h3";
-import { useUser } from "../auth/index.post";
+
+import { useUser } from "~/server/utils/user";
 
 const { STS } = OSS;
 const sts = new STS({

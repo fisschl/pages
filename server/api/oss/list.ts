@@ -1,7 +1,8 @@
 import { createError, defineEventHandler, getQuery } from "h3";
 import type { ListObjectResult, ObjectMeta } from "ali-oss";
 import { oss } from "./download";
-import { useUser } from "../auth/index.post";
+
+import { useUser } from "~/server/utils/user";
 
 const list_dir = async (prefix: string) => {
   const prefixes: string[] = [];

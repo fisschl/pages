@@ -1,7 +1,7 @@
 import { database } from "~/server/database/postgres";
 import { writeCache } from "~/server/database/redis";
-import { checkUser } from "../auth/index.post";
 import { hashPassword } from "./index.post";
+import { checkUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);

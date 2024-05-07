@@ -1,4 +1,5 @@
 import { base58 } from "@scure/base";
+import { randomBytes } from "node:crypto";
 
 export const timeBytes = () => {
   const time = BigInt(Date.now());
@@ -9,9 +10,6 @@ export const timeBytes = () => {
 };
 
 export const uuid = (suffix = 8) => {
-  const time = timeBytes();
-  const random = new Uint8Array(suffix);
-  crypto.getRandomValues(random);
-  const bytes = new Uint8Array([...time, ...random]);
+  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(suffix)]);
   return base58.encode(bytes);
 };

@@ -2,6 +2,7 @@ import { database } from "~/server/database/postgres";
 import { uuid } from "../../utils/uuid";
 import { z } from "zod";
 import { argon2id } from "hash-wasm";
+import { randomBytes } from "node:crypto";
 
 const request_schema = z.object({
   name: z.string(),
@@ -10,11 +11,9 @@ const request_schema = z.object({
 });
 
 export const hashPassword = async (password: string) => {
-  const salt = new Uint8Array(16);
-  crypto.getRandomValues(salt);
   return await argon2id({
     password,
-    salt,
+    salt: randomBytes(16),
     parallelism: 1,
     iterations: 256,
     memorySize: 512,

@@ -2,12 +2,12 @@ import type { ai_chat, chat_file } from "@prisma/client";
 import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
 import { database } from "~/server/database/postgres";
-import { useUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 import { oss } from "../oss/download";
 import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
 import { publisher } from "~/server/database/mqtt";
+import { useUser } from "~/server/utils/user";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],

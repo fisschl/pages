@@ -1,7 +1,7 @@
 import { throttle } from "lodash-es";
-import { useUser } from "./index.post";
 import { database } from "~/server/database/postgres";
 import { writeCache } from "~/server/database/redis";
+import { useUser } from "~/server/utils/user";
 
 const update_last_login = throttle(async (user_id: string) => {
   const res = await database.user.update({

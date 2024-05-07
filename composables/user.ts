@@ -8,45 +8,34 @@ export interface User {
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
-  const route = useRoute();
-  const router = useRouter();
-
-  const tokenAccept = async () => {
-    if (!route.query.token) return;
-    const query = {
-      ...route.query,
-      token: undefined,
-    };
-    await router.replace({ query });
-  };
-  const token = useCookie("token");
-
-  return { user, tokenAccept, token };
+  return { user };
 });
 
-export const useShouldLogin = () => {
-  const user = useUserStore();
-
-  onMounted(async () => {
-    if (user.user) return;
-    await navigateTo({
-      path: "/login",
-      query: { from: location.href },
-    });
+export const useShouldLogin = async () => {
+  const { user } = useUserStore();
+  if (user) return user;
+  const url = useRequestURL();
+  await navigateTo({
+    path: "/login",
+    query: { from: url.toString() },
   });
-
-  return user.user!;
 };
 
-export const useTokenAccept = () => {
-  const route = useRoute();
+export const useAutoLogin = async () => {
+  const { query } = useRoute();
   const router = useRouter();
+  // 挂载时，清除掉 URL 里面的 token
   onMounted(async () => {
-    if (!route.query.token) return;
-    const query = {
-      ...route.query,
-      token: undefined,
-    };
-    await router.replace({ query });
+    if (!query.token) return;
+    await router.replace({
+      query: { ...query, token: undefined },
+    });
   });
+  // 请求用户信息
+  const headers: Record<string, string> = useRequestHeaders(["cookie"]);
+  if (query.token && typeof query.token === "string")
+    headers.token = query.token;
+  const { data } = await useFetch("/api/auth", { headers });
+  const store = useUserStore();
+  if (data.value) store.user = data.value;
 };

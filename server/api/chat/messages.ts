@@ -1,7 +1,7 @@
 import { database } from "~/server/database/postgres";
-import { checkUser } from "../auth/index.post";
 import { parseMarkdown } from "../markdown";
 import { z } from "zod";
+import { checkUser } from "~/server/utils/user";
 
 const request_schema = z.object({
   create_at: z

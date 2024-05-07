@@ -5,7 +5,7 @@ import { login_schema } from "../login.vue";
 import { z } from "zod";
 
 const store = useUserStore();
-useShouldLogin();
+await useShouldLogin();
 
 const state = reactive({
   ...store.user,
@@ -43,8 +43,10 @@ imagePicker.onChange(async (files) => {
 
 const handleChangeAvatar = () => imagePicker.open();
 
+const cookie = useCookie("token");
+
 const logout = async () => {
-  store.token = undefined;
+  cookie.value = undefined;
   store.user = undefined;
   await navigateTo("/");
 };

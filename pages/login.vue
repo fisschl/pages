@@ -21,9 +21,8 @@ const redirect = async (token: string) => {
 };
 
 const store = useUserStore();
-if (store.token && store.user) {
-  await redirect(store.token);
-}
+const cookie = useCookie("token");
+if (cookie.value && store.user) await redirect(cookie.value);
 
 type Schema = z.output<typeof login_schema>;
 

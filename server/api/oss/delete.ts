@@ -1,6 +1,7 @@
 import { createError, defineEventHandler, getQuery } from "h3";
 import { oss } from "./download";
-import { useUser } from "../auth/index.post";
+
+import { useUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
   const { key } = getQuery(event);

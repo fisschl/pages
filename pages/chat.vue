@@ -15,14 +15,12 @@ onBeforeUnmount(async () => {
   await hide();
 });
 
-const user = useShouldLogin();
-
-const headers = useRequestHeaders(["cookie"]);
+const user = await useShouldLogin();
 
 const fetchData = async (param?: MessagesQuery) => {
   return await $fetch<Message[]>("/api/chat/messages", {
     query: param,
-    headers,
+    headers: useRequestHeaders(["cookie"]),
   });
 };
 
@@ -60,7 +58,7 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-useSocket(user.id, async (data) => {
+useSocket(user?.id, async (data) => {
   const res = message_schema.safeParse(data);
   if (!res.success) return;
   await handleNewMessage(res.data);

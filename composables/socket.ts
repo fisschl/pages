@@ -5,10 +5,11 @@ import mqtt from "mqtt";
 
 export type SocketHandler = (message: object) => unknown;
 
-export const useSocket = (key: string, handler: SocketHandler) => {
+export const useSocket = (key: string | undefined, handler: SocketHandler) => {
   const socket = shallowRef<MqttClient>();
 
   onMounted(() => {
+    if (!key) return;
     socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, {
       username: "public",
       password: "public",

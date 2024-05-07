@@ -128,9 +128,6 @@ importers:
       tailwindcss:
         specifier: ^3.4.3
         version: 3.4.3
-      ufo:
-        specifier: ^1.5.3
-        version: 1.5.3
       vue:
         specifier: ^3.4.26
         version: 3.4.26(typescript@5.4.5)
