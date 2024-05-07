@@ -128,7 +128,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
         user_id: undefined,
       };
       publisher.publish(input.user_id, JSON.stringify(message));
-    }, 200);
+    }, 100);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
       const [{ delta }] = choices;
