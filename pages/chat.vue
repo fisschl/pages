@@ -15,7 +15,7 @@ onBeforeUnmount(async () => {
   await hide();
 });
 
-const user = await useShouldLogin();
+await useShouldLogin();
 
 const fetchData = async (param?: MessagesQuery) => {
   return await $fetch<Message[]>("/api/chat/messages", {
@@ -58,7 +58,7 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-useSocket(user?.id, async (data) => {
+useSocket(async (data) => {
   const res = message_schema.safeParse(data);
   if (!res.success) return;
   await handleNewMessage(res.data);

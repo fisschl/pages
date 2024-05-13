@@ -1,4 +1,3 @@
-import type { ai_chat, chat_file } from "@prisma/client";
 import { pick, throttle } from "lodash-es";
 import OpenAI from "openai";
 import { database } from "~/server/database/postgres";
@@ -35,7 +34,7 @@ export default defineEventHandler(async (event) => {
   }
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });
-  const input_chat = await database.ai_chat.create({
+  const input = await database.ai_chat.create({
     data: {
       id: uuid(),
       role: "user",
@@ -50,46 +49,20 @@ export default defineEventHandler(async (event) => {
     include: { chat_file: true },
   });
   const input_message = {
-    ...input_chat,
-    content: await parseMarkdown(input_chat.content),
+    ...input,
+    content: await parseMarkdown(input.content),
     user_id: undefined,
   };
-  publisher.publish(user.id, JSON.stringify(input_message));
-  const result = await database.ai_chat.create({
+  const token = useToken(event);
+  publisher.publish(`client/${token}`, JSON.stringify(input_message));
+  const output = await database.ai_chat.create({
     data: {
       id: uuid(),
       role: "assistant",
       content: "",
-      user_id: input_chat.user_id,
+      user_id: input.user_id,
     },
   });
-  await send_message_openai(input_chat, result);
-  return { message: "完成" };
-});
-
-export type Chat = ai_chat & {
-  chat_file?: chat_file[];
-};
-
-const chat_to_history = (item: Chat) => {
-  if (!item.chat_file?.length || item.role !== "user") {
-    return pick(item, ["role", "content"]);
-  }
-  // 处理带有图片的消息
-  const content = item.chat_file.map((file) => {
-    const uri = oss.signatureUrl(file.key);
-    return {
-      type: "image_url",
-      image_url: { url: uri },
-    } satisfies OpenAI.ChatCompletionContentPartImage;
-  });
-  return {
-    role: item.role,
-    content: [{ type: "text", text: item.content }, ...content],
-  } satisfies OpenAI.ChatCompletionMessageParam;
-};
-
-export const send_message_openai = async (input: Chat, output: Chat) => {
   /**
    * 历史消息
    */
@@ -106,7 +79,23 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
    * 处理后的发送参数
    */
   const history_messages = [...history.reverse(), input].map((item) => {
-    return chat_to_history(item);
+    if (!item.chat_file?.length || item.role !== "user") {
+      return pick(item, ["role", "content"]);
+    }
+    // 处理带有图片的消息
+    const content = item.chat_file.map((file) => {
+      const uri = oss.signatureUrl(file.key);
+      const part: OpenAI.ChatCompletionContentPartImage = {
+        type: "image_url",
+        image_url: { url: uri },
+      };
+      return part;
+    });
+    const param: OpenAI.ChatCompletionMessageParam = {
+      role: item.role,
+      content: [{ type: "text", text: item.content }, ...content],
+    };
+    return param;
   });
   try {
     /**
@@ -127,7 +116,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
-      publisher.publish(input.user_id, JSON.stringify(message));
+      publisher.publish(`client/${token}`, JSON.stringify(message));
     }, 100);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -150,6 +139,7 @@ export const send_message_openai = async (input: Chat, output: Chat) => {
     content: await parseMarkdown(result.content),
     user_id: undefined,
   };
-  publisher.publish(input.user_id, JSON.stringify(message));
+  publisher.publish(`client/${token}`, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
-};
+  return { message: "完成" };
+});
