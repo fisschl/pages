@@ -2,6 +2,7 @@
 import { debounce, remove } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
+import { useSocket } from "~/composables/socket";
 
 onMounted(async () => {
   const { music, play } = await import("~/components/main/MusicButton.vue");
@@ -15,7 +16,7 @@ onBeforeUnmount(async () => {
   await hide();
 });
 
-await useShouldLogin();
+const user = await useShouldLogin();
 
 const fetchData = async (param?: MessagesQuery) => {
   return await $fetch<Message[]>("/api/chat/messages", {
@@ -58,7 +59,15 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-useSocket(async (data) => {
+const token = useCookie("token");
+
+const { onMessage } = useSocket({
+  topic: user?.id || "public",
+  username: user?.id,
+  password: token.value || undefined,
+});
+
+onMessage(async (data) => {
   const res = message_schema.safeParse(data);
   if (!res.success) return;
   await handleNewMessage(res.data);

@@ -53,8 +53,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(input.content),
     user_id: undefined,
   };
-  const token = useToken(event);
-  publisher.publish(`client/${token}`, JSON.stringify(input_message));
+  publisher.publish(user.id, JSON.stringify(input_message));
   const output = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -116,7 +115,7 @@ export default defineEventHandler(async (event) => {
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
-      publisher.publish(`client/${token}`, JSON.stringify(message));
+      publisher.publish(user.id, JSON.stringify(message));
     }, 100);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -139,7 +138,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(result.content),
     user_id: undefined,
   };
-  publisher.publish(`client/${token}`, JSON.stringify(message));
+  publisher.publish(user.id, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   return { message: "完成" };
 });
