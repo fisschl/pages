@@ -1,4 +1,4 @@
-import { pick, throttle } from "lodash-es";
+import { last, pick, throttle } from "lodash-es";
 import OpenAI from "openai";
 import { database } from "~/server/database/postgres";
 import { parseMarkdown } from "../markdown";
@@ -124,9 +124,20 @@ export default defineEventHandler(async (event) => {
       output.content += delta.content;
       publish_throttle();
     }
-  } catch (e) {
-    output.content = String(e);
-    console.error("OpenAI 异常", e, input, output);
+  } catch (err) {
+    output.content = String(err);
+    await database.log.create({
+      data: {
+        id: uuid(),
+        tag: "OpenAI 异常",
+        content: JSON.stringify({
+          error: String(err),
+          input: input,
+          output: output,
+          message: last(history_messages),
+        }),
+      },
+    });
   }
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   const result = await database.ai_chat.update({
