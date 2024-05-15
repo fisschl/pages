@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-export const file_schema = z.object({
-  key: z.string(),
+export const image_schema = z.object({
+  id: z.string(),
+  image: z.string(),
 });
 
 export const message_schema = z.object({
@@ -9,7 +10,7 @@ export const message_schema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string(),
   create_at: z.string().optional(),
-  chat_file: z.array(file_schema).optional(),
+  images: z.array(image_schema).optional(),
 });
 
 export type Message = z.output<typeof message_schema>;

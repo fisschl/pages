@@ -2,7 +2,6 @@ import { last, pick, throttle } from "lodash-es";
 import OpenAI from "openai";
 import { database } from "~/server/database/postgres";
 import { parseMarkdown } from "../markdown";
-import { oss } from "../oss/download";
 import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
 import { publisher } from "~/server/database/mqtt";
@@ -26,11 +25,11 @@ export default defineEventHandler(async (event) => {
   if (body.chat_id) {
     const item = await database.ai_chat.findFirst({
       where: { id: body.chat_id, user_id: user.id },
-      include: { chat_file: true },
+      include: { images: true },
     });
     if (!item) throw createError({ status: 404 });
     body.content = item.content;
-    body.images = item.chat_file.map((item) => item.key);
+    body.images = item.images.map((item) => item.image);
   }
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });
@@ -40,13 +39,14 @@ export default defineEventHandler(async (event) => {
       role: "user",
       content: content,
       user_id: user.id,
-      chat_file: {
-        connect: images?.map((item) => ({
-          key: item,
+      images: {
+        create: images?.map((item) => ({
+          id: uuid(),
+          image: item,
         })),
       },
     },
-    include: { chat_file: true },
+    include: { images: true },
   });
   const input_message = {
     ...input,
@@ -72,21 +72,20 @@ export default defineEventHandler(async (event) => {
     },
     orderBy: { create_at: "desc" },
     take: 9,
-    include: { chat_file: true },
+    include: { images: true },
   });
   /**
    * 处理后的发送参数
    */
   const history_messages = [...history.reverse(), input].map((item) => {
-    if (!item.chat_file?.length || item.role !== "user") {
+    if (!item.images?.length || item.role !== "user") {
       return pick(item, ["role", "content"]);
     }
     // 处理带有图片的消息
-    const content = item.chat_file.map((file) => {
-      const uri = oss.signatureUrl(file.key);
+    const content = item.images.map((file) => {
       const part: OpenAI.ChatCompletionContentPartImage = {
         type: "image_url",
-        image_url: { url: uri },
+        image_url: { url: file.image },
       };
       return part;
     });
@@ -101,7 +100,7 @@ export default defineEventHandler(async (event) => {
      * 发送消息给 OpenAI
      */
     const stream = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o",
       messages: history_messages,
       stream: true,
       max_tokens: 2048,

@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     where: { user_id: user.id, create_at: { lt: create_at } },
     orderBy: { create_at: "desc" },
     take: 16,
-    include: { chat_file: true },
+    include: { images: true },
   });
   for (const item of history) {
     item.content = await parseMarkdown(item.content);

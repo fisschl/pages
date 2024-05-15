@@ -37,22 +37,9 @@ onChange(async (list) => {
     canvas.height = height;
     const ctx = canvas.getContext("2d")!;
     ctx.drawImage(image, 0, 0, width, height);
-    const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        resolve(blob);
-      }, "image/webp");
-    });
-    const webp = new File([blob], "peace.webp", { type: "image/webp" });
-    const { key } = await $fetch("/api/chat/file", {
-      method: "POST",
-      body: { name: webp.name },
-    });
-    const { upload_file } = await import("~/utils/upload");
-    await upload_file(key, webp);
-    if (!files.value) files.value = [];
-    await nextTick();
-    files.value.push(key);
+    const webp = canvas.toDataURL("image/webp");
+    if (files.value) files.value.push(webp);
+    else files.value = [webp];
   }
 });
 </script>

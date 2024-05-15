@@ -26,21 +26,16 @@ enum ChatRole {
 }
 
 model ai_chat {
-  id        String      @id @db.VarChar(255)
-  create_at DateTime    @default(now()) @db.Timestamptz()
-  update_at DateTime    @updatedAt @db.Timestamptz()
-  user_id   String      @db.VarChar(255)
-  user      user        @relation(fields: [user_id], references: [id])
+  id        String       @id @db.VarChar(255)
+  create_at DateTime     @default(now()) @db.Timestamptz()
+  update_at DateTime     @updatedAt @db.Timestamptz()
+  user_id   String       @db.VarChar(255)
+  user      user         @relation(fields: [user_id], references: [id])
   role      ChatRole
   content   String
-  chat_file chat_file[]
+  images    chat_image[]
 
   @@index([user_id, create_at(sort: Desc)])
-}
-
-model chat_file {
-  key     String    @id @db.VarChar(255)
-  ai_chat ai_chat[]
 }
 
 model log {
@@ -48,4 +43,11 @@ model log {
   create_at DateTime @default(now()) @db.Timestamptz()
   tag       String   @db.VarChar(255)
   content   String
+}
+
+model chat_image {
+  id        String    @id @db.VarChar(255)
+  create_at DateTime  @default(now()) @db.Timestamptz()
+  image     String
+  ai_chat   ai_chat[]
 }

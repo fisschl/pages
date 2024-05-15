@@ -6,7 +6,8 @@
     "build": "nuxt build",
     "preview": "nuxt preview --host",
     "postinstall": "nuxt prepare",
-    "work": "powershell ./build.ps1"
+    "work": "powershell ./build.ps1",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@iconify-json/tabler": "^1.1.111",

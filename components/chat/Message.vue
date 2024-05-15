@@ -21,10 +21,10 @@ defineProps<{
         v-html="message.content"
       />
       <img
-        v-for="file in message.chat_file"
-        :key="file.key"
+        v-for="file in message.images"
+        :key="file.id"
         class="mt-2 inline-block size-16 object-cover"
-        :src="`https://cdn.fisschl.world/${file.key}`"
+        :src="file.image"
         alt="..."
       />
     </section>

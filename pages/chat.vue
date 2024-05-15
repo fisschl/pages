@@ -192,7 +192,7 @@ const handleListItemClick = async (e: MouseEvent) => {
         v-for="item in inputFiles"
         :key="item"
         class="mr-2 size-12 object-cover"
-        :src="`https://cdn.fisschl.world/${item}`"
+        :src="item"
         alt="..."
       />
       <span class="flex-1"></span>

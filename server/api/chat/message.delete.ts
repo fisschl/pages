@@ -10,17 +10,13 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   await checkUser(event);
   const { id } = await getValidatedQuery(event, request_schema.parse);
-  const files = await database.chat_file.findMany({
+  await database.chat_image.deleteMany({
     where: {
       ai_chat: {
         every: { id },
       },
     },
   });
-  for (const item of files) {
-    await oss.delete(item.key);
-    await database.chat_file.delete({ where: { key: item.key } });
-  }
   await database.ai_chat.delete({
     where: { id },
   });
