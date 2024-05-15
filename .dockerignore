@@ -3,7 +3,6 @@
 node_modules
 .env
 .idea
-pnpm-lock.yaml
 build
 .gitignore
 eslint.config.mjs
