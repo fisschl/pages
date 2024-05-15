@@ -19,13 +19,16 @@ onBeforeUnmount(async () => {
 const user = await useShouldLogin();
 
 const fetchData = async (param?: MessagesQuery) => {
-  return await $fetch<Message[]>("/api/chat/messages", {
+  return await $fetch<{
+    list: Message[];
+    model: string;
+  }>("/api/chat/messages", {
     query: param,
     headers: useRequestHeaders(["cookie"]),
   });
 };
 
-const { data: list } = await useAsyncData(() => fetchData());
+const { data } = await useAsyncData(() => fetchData());
 
 const isMounted = useMounted();
 const { directions, y: scrollTop } = useScroll(() => {
@@ -48,10 +51,12 @@ const isShowScrollButton = computed(() => {
 });
 
 const handleNewMessage = async (message: Message) => {
-  if (!list.value) return;
-  const item = list.value?.findLast((item) => item.id === message.id);
+  if (!data.value) return;
+  const { list } = data.value;
+  if (!list) return;
+  const item = list.findLast((item) => item.id === message.id);
   if (!item) {
-    list.value.push(message);
+    list.push(message);
     return;
   }
   Object.assign(item, message);
@@ -105,18 +110,18 @@ const loading = ref(false);
 
 const shouldLoadMore = computed(() => {
   if (!isMounted.value || loading.value) return;
-  if (isLoadAll.value || !list.value?.length) return;
+  if (isLoadAll.value || !data.value?.list.length) return;
   return directions.top && scrollTop.value < 10;
 });
 
 whenever(shouldLoadMore, async () => {
   loading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const [item] = list.value!;
+  const [item] = data.value!.list;
   const res = await fetchData({
     create_at: item.create_at,
   });
-  if (!res.length) {
+  if (!res.list.length) {
     loading.value = false;
     isLoadAll.value = true;
     return;
@@ -125,7 +130,7 @@ whenever(shouldLoadMore, async () => {
   // 记忆滚动位置
   const firstElement = document.getElementById(item.id);
   const oldRect = firstElement?.getBoundingClientRect();
-  list.value!.unshift(...res);
+  data.value?.list!.unshift(...res.list);
   await nextTick();
   const newRect = firstElement?.getBoundingClientRect();
   if (!oldRect || !newRect) {
@@ -148,7 +153,7 @@ const handleListItemClick = async (e: MouseEvent) => {
   if (!button) return;
   const li = button.closest("li");
   if (!li || !li.id) return;
-  const message = list.value?.find((item) => item.id === li.id);
+  const message = data.value?.list.find((item) => item.id === li.id);
   if (!message) return;
   const { body } = document;
   switch (button.title) {
@@ -157,8 +162,7 @@ const handleListItemClick = async (e: MouseEvent) => {
         method: "DELETE",
         query: { id: message.id },
       });
-      if (!list.value) break;
-      remove(list.value, (item) => item.id === message.id);
+      remove(data.value!.list, (item) => item.id === message.id);
       break;
     case "重新发送":
       body.scrollTop = body.scrollHeight;
@@ -178,7 +182,7 @@ const handleListItemClick = async (e: MouseEvent) => {
       class="mt-5 flex min-h-dvh flex-1 flex-col items-start"
       @click="handleListItemClick"
     >
-      <ChatMessage v-for="item in list" :key="item.id" :message="item" />
+      <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
     </ol>
     <UDivider class="mb-4 mt-5" />
     <UTextarea
@@ -197,7 +201,9 @@ const handleListItemClick = async (e: MouseEvent) => {
       />
       <span class="flex-1"></span>
       <section class="flex items-center">
-        <UBadge color="teal" variant="soft" class="mr-3"> gpt-4-turbo </UBadge>
+        <UBadge color="teal" variant="soft" class="mr-3">
+          {{ data?.model }}
+        </UBadge>
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton icon="i-tabler-send" class="px-6" @click="send">
           发送

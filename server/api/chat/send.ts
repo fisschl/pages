@@ -6,6 +6,7 @@ import { z } from "zod";
 import { uuid } from "~/server/utils/uuid";
 import { publisher } from "~/server/database/mqtt";
 import { useUser } from "~/server/utils/user";
+export const OPENAI_MODEL = "gpt-4o";
 
 export const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -100,7 +101,7 @@ export default defineEventHandler(async (event) => {
      * 发送消息给 OpenAI
      */
     const stream = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODEL,
       messages: history_messages,
       stream: true,
       max_tokens: 2048,

@@ -2,6 +2,7 @@ import { database } from "~/server/database/postgres";
 import { parseMarkdown } from "../markdown";
 import { z } from "zod";
 import { checkUser } from "~/server/utils/user";
+import { OPENAI_MODEL } from "~/server/api/chat/send";
 
 const request_schema = z.object({
   create_at: z
@@ -24,5 +25,9 @@ export default defineEventHandler(async (event) => {
   for (const item of history) {
     item.content = await parseMarkdown(item.content);
   }
-  return history.reverse();
+  history.reverse();
+  return {
+    list: history,
+    model: OPENAI_MODEL,
+  };
 });
