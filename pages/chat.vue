@@ -110,7 +110,7 @@ const loading = ref(false);
 const shouldLoadMore = computed(() => {
   if (!isMounted.value || loading.value) return;
   if (isLoadAll.value || !data.value?.list.length) return;
-  return directions.top && top.value < 10;
+  return directions.top && source_top.value < 10;
 });
 
 whenever(shouldLoadMore, async () => {
