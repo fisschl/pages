@@ -8,14 +8,14 @@ export const useEcharts = (...options: MaybeRefOrGetter<EChartsOption>[]) => {
   const container = ref<HTMLElement>();
   const chart = ref<ECharts>();
   const colorMode = useColorMode();
-  watch(container, (element, prevElement) => {
+  watch(container, (element) => {
     if (!element) {
       chart.value?.dispose();
       return (chart.value = undefined);
     }
     chart.value = init(
       element,
-      colorMode.value === "dark" ? "dark" : "vintage",
+      colorMode.value === "dark" ? "dark" : undefined,
     );
     for (const option of options) {
       chart.value?.setOption(toValue(option));
