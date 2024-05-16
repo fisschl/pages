@@ -2,3 +2,8 @@ html:root {
   --el-font-family: "MiSans", sans-serif;
   font-family: var(--el-font-family);
 }
+
+#__nuxt {
+  height: 100dvh;
+  overflow: auto;
+}

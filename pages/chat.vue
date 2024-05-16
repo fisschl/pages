@@ -4,6 +4,7 @@ import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
+import { scrollTarget, scrollToBottom } from "~/utils/page_scroll";
 
 onMounted(async () => {
   const { music, play } = await import("~/components/main/MusicButton.vue");
@@ -32,21 +33,22 @@ const fetchData = async (param?: MessagesQuery) => {
 const { data } = await useAsyncData(() => fetchData());
 
 const isMounted = useMounted();
-const { directions, y: scrollTop } = useScroll(() => {
-  return isMounted.value ? window : null;
+const { directions, y: source_top } = useScroll(() => {
+  return isMounted.value ? scrollTarget() : null;
 });
 
-onMounted(() => {
-  scrollTo({ top: document.documentElement.scrollHeight });
+onMounted(async () => {
+  scrollToBottom();
 });
 
-const scroll_top_throttled = refThrottled(scrollTop, 200);
+const top = refThrottled(source_top, 200);
 
 const isShowScrollButton = computed(() => {
   if (!isMounted.value) return;
-  const { documentElement } = document;
-  const { scrollHeight, clientHeight } = documentElement;
-  const bottom = scrollHeight - scroll_top_throttled.value - clientHeight;
+  const element = scrollTarget();
+  if (!element) return;
+  const { scrollHeight, clientHeight } = element;
+  const bottom = scrollHeight - top.value - clientHeight;
   return bottom > 100;
 });
 
@@ -77,8 +79,7 @@ onMessage(async (data) => {
   if (!res.success) return;
   await handleNewMessage(res.data);
   await nextTick();
-  if (!directions.top && !isShowScrollButton.value)
-    scrollTo({ top: document.documentElement.scrollHeight });
+  if (!directions.top && !isShowScrollButton.value) scrollToBottom();
 });
 
 const inputText = ref<string>();
@@ -109,7 +110,7 @@ const loading = ref(false);
 const shouldLoadMore = computed(() => {
   if (!isMounted.value || loading.value) return;
   if (isLoadAll.value || !data.value?.list.length) return;
-  return directions.top && scrollTop.value < 10;
+  return directions.top && top.value < 10;
 });
 
 whenever(shouldLoadMore, async () => {
@@ -134,11 +135,12 @@ whenever(shouldLoadMore, async () => {
   if (!oldRect || !newRect) {
     loading.value = false;
     await nextTick();
-    scrollTo({ top: document.documentElement.scrollHeight });
+    scrollToBottom();
     return;
   }
   // 恢复滚动位置
-  scrollBy({ top: newRect.top - oldRect.top });
+  const target = scrollTarget();
+  target?.scrollBy({ top: newRect.top - oldRect.top });
   loading.value = false;
 });
 
@@ -160,7 +162,7 @@ const handleListItemClick = async (e: MouseEvent) => {
       remove(data.value!.list, (item) => item.id === message.id);
       break;
     case "重新发送":
-      scrollTo({ top: document.documentElement.scrollHeight });
+      scrollToBottom();
       await $fetch(`/api/chat/send`, {
         method: "POST",
         body: { chat_id: message.id },

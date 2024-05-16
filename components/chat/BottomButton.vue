@@ -1,10 +1,5 @@
 <script setup lang="ts">
-const scrollToBottom = () => {
-  scrollTo({
-    top: document.body.scrollHeight,
-    behavior: "smooth",
-  });
-};
+import { scrollToBottom } from "~/utils/page_scroll";
 </script>
 
 <template>
