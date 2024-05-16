@@ -37,7 +37,7 @@ const { directions, y: scrollTop } = useScroll(() => {
 });
 
 onMounted(() => {
-  scrollTo({ top: document.body.scrollHeight });
+  scrollTo({ top: document.documentElement.scrollHeight });
 });
 
 const scroll_top_throttled = refThrottled(scrollTop, 200);
@@ -78,7 +78,7 @@ onMessage(async (data) => {
   await handleNewMessage(res.data);
   await nextTick();
   if (!directions.top && !isShowScrollButton.value)
-    scrollTo({ top: document.body.scrollHeight });
+    scrollTo({ top: document.documentElement.scrollHeight });
 });
 
 const inputText = ref<string>();
@@ -134,7 +134,7 @@ whenever(shouldLoadMore, async () => {
   if (!oldRect || !newRect) {
     loading.value = false;
     await nextTick();
-    scrollTo({ top: document.body.scrollHeight });
+    scrollTo({ top: document.documentElement.scrollHeight });
     return;
   }
   // 恢复滚动位置
@@ -160,7 +160,7 @@ const handleListItemClick = async (e: MouseEvent) => {
       remove(data.value!.list, (item) => item.id === message.id);
       break;
     case "重新发送":
-      scrollTo({ top: document.body.scrollHeight });
+      scrollTo({ top: document.documentElement.scrollHeight });
       await $fetch(`/api/chat/send`, {
         method: "POST",
         body: { chat_id: message.id },
@@ -168,10 +168,6 @@ const handleListItemClick = async (e: MouseEvent) => {
       break;
   }
 };
-
-const ChatInfo = defineAsyncComponent(
-  () => import("~/components/chat/Info.vue"),
-);
 </script>
 
 <template>
