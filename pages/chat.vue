@@ -173,6 +173,10 @@ const handleListItemClick = async (e: MouseEvent) => {
       break;
   }
 };
+
+const ChatInfo = defineAsyncComponent(
+  () => import("~/components/chat/Info.vue"),
+);
 </script>
 
 <template>
@@ -184,7 +188,7 @@ const handleListItemClick = async (e: MouseEvent) => {
     >
       <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
     </ol>
-    <UDivider class="mb-4 mt-5" />
+    <UDivider class="mb-4 mt-5" :label="data?.model" />
     <UTextarea
       v-model="inputText"
       autoresize
@@ -201,9 +205,9 @@ const handleListItemClick = async (e: MouseEvent) => {
       />
       <span class="flex-1"></span>
       <section class="flex items-center">
-        <UBadge color="teal" variant="soft" class="mr-3">
-          {{ data?.model }}
-        </UBadge>
+        <Suspense>
+          <ChatInfo class="mr-3" />
+        </Suspense>
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton icon="i-tabler-send" class="px-6" @click="send">
           发送
