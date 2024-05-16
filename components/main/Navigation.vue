@@ -35,8 +35,8 @@ const links = computed<DropdownItem[][]>(() => [
   [
     {
       label: "代码仓库",
-      icon: "i-tabler-brand-git",
-      to: "https://gitea.bronya.world",
+      icon: "i-tabler-brand-github",
+      to: "https://github.com/fisschl/pages",
       target: "_blank",
     },
   ],
