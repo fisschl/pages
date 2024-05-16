@@ -3,6 +3,7 @@ import { debounce, remove } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
+import ImageViewer from "~/components/ImageViewer.vue";
 
 onMounted(async () => {
   const { music, play } = await import("~/components/main/MusicButton.vue");
@@ -32,20 +33,19 @@ const { data } = await useAsyncData(() => fetchData());
 
 const isMounted = useMounted();
 const { directions, y: scrollTop } = useScroll(() => {
-  return isMounted.value ? document.body : undefined;
+  return isMounted.value ? window : null;
 });
 
 onMounted(() => {
-  const { body } = document;
-  body.scrollTop = body.scrollHeight;
+  scrollTo({ top: document.body.scrollHeight });
 });
 
 const scroll_top_throttled = refThrottled(scrollTop, 200);
 
 const isShowScrollButton = computed(() => {
   if (!isMounted.value) return;
-  const { body } = document;
-  const { scrollHeight, clientHeight } = body;
+  const { documentElement } = document;
+  const { scrollHeight, clientHeight } = documentElement;
   const bottom = scrollHeight - scroll_top_throttled.value - clientHeight;
   return bottom > 100;
 });
@@ -77,10 +77,8 @@ onMessage(async (data) => {
   if (!res.success) return;
   await handleNewMessage(res.data);
   await nextTick();
-  if (!directions.top && !isShowScrollButton.value) {
-    const { body } = document;
-    body.scrollTop = body.scrollHeight;
-  }
+  if (!directions.top && !isShowScrollButton.value)
+    scrollTo({ top: document.body.scrollHeight });
 });
 
 const inputText = ref<string>();
@@ -136,13 +134,11 @@ whenever(shouldLoadMore, async () => {
   if (!oldRect || !newRect) {
     loading.value = false;
     await nextTick();
-    const { body } = document;
-    body.scrollTop = body.scrollHeight;
+    scrollTo({ top: document.body.scrollHeight });
     return;
   }
   // 恢复滚动位置
-  const { body } = document;
-  body.scrollBy({ top: newRect.top - oldRect.top });
+  scrollBy({ top: newRect.top - oldRect.top });
   loading.value = false;
 });
 
@@ -155,7 +151,6 @@ const handleListItemClick = async (e: MouseEvent) => {
   if (!li || !li.id) return;
   const message = data.value?.list.find((item) => item.id === li.id);
   if (!message) return;
-  const { body } = document;
   switch (button.title) {
     case "删除":
       await $fetch(`/api/chat/message`, {
@@ -165,7 +160,7 @@ const handleListItemClick = async (e: MouseEvent) => {
       remove(data.value!.list, (item) => item.id === message.id);
       break;
     case "重新发送":
-      body.scrollTop = body.scrollHeight;
+      scrollTo({ top: document.body.scrollHeight });
       await $fetch(`/api/chat/send`, {
         method: "POST",
         body: { chat_id: message.id },
@@ -196,18 +191,17 @@ const ChatInfo = defineAsyncComponent(
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <img
+      <ImageViewer
         v-for="item in inputFiles"
         :key="item"
         class="mr-2 size-12 object-cover"
         :src="item"
-        alt="..."
       />
       <span class="flex-1"></span>
       <section class="flex items-center">
-        <Suspense>
+        <ClientOnly>
           <ChatInfo class="mr-3" />
-        </Suspense>
+        </ClientOnly>
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton icon="i-tabler-send" class="px-6" @click="send">
           发送

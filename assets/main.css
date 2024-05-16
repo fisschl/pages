@@ -1,5 +1,4 @@
 html:root {
   --el-font-family: "MiSans", sans-serif;
-  overflow: hidden;
   font-family: var(--el-font-family);
 }

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const scrollToBottom = () => {
-  const { body } = document;
-  body.scrollTop = body.scrollHeight;
+  scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  });
 };
 </script>
 

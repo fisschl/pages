@@ -8,9 +8,11 @@
     "postinstall": "nuxt prepare",
     "work": "powershell ./build.ps1",
     "db:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
+    "@fancyapps/ui": "^5.0.36",
     "@iconify-json/tabler": "^1.1.111",
     "@nuxt/ui": "^2.16.0",
     "@nuxtjs/tailwindcss": "^6.12.0",

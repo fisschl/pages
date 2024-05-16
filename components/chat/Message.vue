@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ImageViewer from "../ImageViewer.vue";
 import type { Message } from "./type";
 
 defineProps<{
@@ -20,12 +21,11 @@ defineProps<{
         class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
         v-html="message.content"
       />
-      <img
+      <ImageViewer
         v-for="file in message.images"
         :key="file.id"
         class="mt-2 inline-block size-16 object-cover"
         :src="file.image"
-        alt="..."
       />
     </section>
     <section class="flex gap-1">
@@ -48,5 +48,3 @@ defineProps<{
     </section>
   </li>
 </template>
-
-<style module></style>
