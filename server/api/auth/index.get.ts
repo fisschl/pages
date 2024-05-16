@@ -13,7 +13,7 @@ const update_last_login = throttle(async (user_id: string) => {
 
 export default defineEventHandler(async (event) => {
   const user = await useUser(event);
-  if (!user) return;
+  if (!user) return { message: "未登录" };
   update_last_login(user.id);
   return user;
 });

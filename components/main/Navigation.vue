@@ -55,7 +55,7 @@ const items = computed(() => {
   };
   if (user.user?.avatar) {
     Profile.avatar = {
-      src: `https://cdn.fisschl.world/${user.user.avatar}`,
+      src: user.user.avatar,
     };
     Profile.label = user.user.name;
     Profile.to = "/main/user";

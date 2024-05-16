@@ -1,10 +1,13 @@
-export interface User {
-  id: string;
-  name: string;
-  password: string;
-  avatar: string | null;
-  role: string | null;
-}
+import { z } from "zod";
+
+export const user_schema = z.object({
+  id: z.string(),
+  name: z.string(),
+  avatar: z.string().nullable().optional(),
+  role: z.string().nullable().optional(),
+});
+
+export type User = z.infer<typeof user_schema>;
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
@@ -36,6 +39,13 @@ export const useAutoLogin = async () => {
   if (query.token && typeof query.token === "string")
     headers.token = query.token;
   const { data } = await useFetch("/api/auth", { headers });
+  const res = user_schema.safeParse(data.value);
+  if (!res.success) return;
   const store = useUserStore();
-  if (data.value) store.user = data.value;
+  if (data.value) store.user = res.data;
 };
+
+export const login_schema = z.object({
+  name: z.string({ required_error: "用户名不能为空" }).min(3, "用户名太短了"),
+  password: z.string({ required_error: "密码不能为空" }).min(6, "密码太短了"),
+});

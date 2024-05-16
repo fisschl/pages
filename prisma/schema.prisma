@@ -13,7 +13,7 @@ model user {
   last_login DateTime  @default(now()) @db.Timestamptz()
   name       String    @unique @db.VarChar(255)
   password   String    @db.VarChar(255)
-  avatar     String?   @db.VarChar(255)
+  avatar     String?
   role       String?   @db.VarChar(255)
   ai_chat    ai_chat[]
 

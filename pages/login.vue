@@ -1,15 +1,8 @@
-<script lang="ts">
-import { pick } from "lodash-es";
-import { z } from "zod";
-import { useUserStore } from "~/composables/user";
-
-export const login_schema = z.object({
-  name: z.string({ required_error: "用户名不能为空" }).min(3, "用户名太短了"),
-  password: z.string({ required_error: "密码不能为空" }).min(6, "密码太短了"),
-});
-</script>
-
 <script setup lang="ts">
+import { pick } from "lodash-es";
+import type { z } from "zod";
+import { login_schema, useUserStore } from "~/composables/user";
+
 const { query } = useRoute();
 
 const redirect = async (token: string) => {

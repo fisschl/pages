@@ -2,6 +2,7 @@ import { database } from "~/server/database/postgres";
 import { writeCache } from "~/server/database/redis";
 import { hashPassword } from "./index.post";
 import { checkUser } from "~/server/utils/user";
+import { omit } from "lodash-es";
 
 export default defineEventHandler(async (event) => {
   const user = await checkUser(event);
@@ -17,6 +18,5 @@ export default defineEventHandler(async (event) => {
   });
   if (!item) throw createError({ status: 400 });
   await writeCache(item.id, item);
-  item.password = "******";
-  return item;
+  return omit(item, "password");
 });
