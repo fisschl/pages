@@ -179,7 +179,7 @@ const handleListItemClick = async (e: MouseEvent) => {
     >
       <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
     </ol>
-    <UDivider class="mb-4 mt-5" :label="data?.model" />
+    <UDivider class="mb-4 mt-1" :label="data?.model" />
     <UTextarea
       v-model="inputText"
       autoresize
