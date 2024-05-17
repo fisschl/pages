@@ -37,9 +37,7 @@ const { directions, y: source_top } = useScroll(() => {
   return isMounted.value ? scrollTarget() : null;
 });
 
-onMounted(async () => {
-  scrollToBottom();
-});
+onMounted(scrollToBottom);
 
 const top = refThrottled(source_top, 200);
 

@@ -31,6 +31,16 @@ const links = computed<DropdownItem[][]>(() => [
       icon: "i-tabler-brand-openai",
       to: "/chat",
     },
+    {
+      label: "文字识别",
+      icon: "i-tabler-texture",
+       to: "/main/ocr",
+    },
+    {
+      label: "智能对话",
+      icon: "i-tabler-language-hiragana",
+      to: "/main/translate",
+    },
   ],
   [
     {
