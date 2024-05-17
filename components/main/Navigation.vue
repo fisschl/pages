@@ -37,7 +37,7 @@ const links = computed<DropdownItem[][]>(() => [
        to: "/main/ocr",
     },
     {
-      label: "智能对话",
+      label: "翻译",
       icon: "i-tabler-language-hiragana",
       to: "/main/translate",
     },
