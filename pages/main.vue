@@ -2,7 +2,7 @@
 onMounted(async () => {
   const { music, play } = await import("~/components/main/MusicButton.vue");
   music.value = {
-    source: "https://cdn.fisschl.world/static/赴大荒.opus",
+    source: "https://static.bronya.world/opus/赴大荒.opus",
   };
   await play();
 });

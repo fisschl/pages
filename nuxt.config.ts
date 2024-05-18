@@ -17,8 +17,16 @@ export default defineNuxtConfig({
     head: {
       link: [
         {
+          rel: "preconnect",
+          href: "https://cdn.jsdelivr.net",
+        },
+        {
+          rel: "preconnect",
+          href: "https://static.bronya.world",
+        },
+        {
           rel: "stylesheet",
-          href: "https://cdn.fisschl.world/static/MiSans/font.css",
+          href: "https://static.bronya.world/font/font.css",
         },
       ],
     },
@@ -27,5 +35,11 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/api/**": { cors: true },
+  },
+
+  vite: {
+    optimizeDeps: {
+      exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
+    },
   },
 });

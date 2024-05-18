@@ -9,7 +9,7 @@ import { scrollTarget, scrollToBottom } from "~/utils/page_scroll";
 onMounted(async () => {
   const { music, play } = await import("~/components/main/MusicButton.vue");
   music.value = {
-    source: "https://cdn.fisschl.world/static/大哉乾元.opus",
+    source: "https://static.bronya.world/opus/大哉乾元.opus",
   };
   await play();
 });

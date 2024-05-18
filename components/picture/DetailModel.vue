@@ -17,17 +17,17 @@ const handleDeleteItem = async () => {
   visible.value = false;
 };
 
-const download = () => {
+const object_url = computed(() => {
   const { name } = props.item;
   const qs = new URLSearchParams({
     key: name,
   });
-  window.open(`/api/oss/download?${qs}`);
-};
-
-const cdn = computed(() => {
-  return `https://cdn.fisschl.world/${props.item.name}`;
+  return `/api/oss/download?${qs}`;
 });
+
+const download = () => {
+  window.open(object_url.value);
+};
 
 const imageExtensions = [
   ".jpg",
@@ -53,13 +53,13 @@ const videoExtensions = [".mp4", ".webm", ".ogg", ".ogv"];
       </template>
       <img
         v-if="imageExtensions.includes(extname(item.name))"
-        :src="cdn"
+        :src="object_url"
         :alt="item.name"
       />
       <video
         v-else-if="videoExtensions.includes(extname(item.name))"
         autoplay
-        :src="cdn"
+        :src="object_url"
         loop
         controls
       />
