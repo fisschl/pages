@@ -1,26 +1,37 @@
 <script setup lang="ts">
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { toBlobURL } from "@ffmpeg/util";
+const status = ref<"recording" | "stopped">("stopped");
 
-const ffmpeg = shallowRef<FFmpeg>();
+const recorder = shallowRef<MediaRecorder>();
 
-onMounted(async () => {
-  ffmpeg.value = new FFmpeg();
-  ffmpeg.value.on("log", ({ message }) => {
-    console.log(message);
+const handleClick = async () => {
+  const inputStream = await navigator.mediaDevices.getUserMedia({
+    audio: true,
   });
-  const baseURL = "https://cdn.jsdelivr.net/npm/@ffmpeg/core/dist/esm";
-  await ffmpeg.value.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+  recorder.value = new MediaRecorder(inputStream, {
+    mimeType: "audio/webm",
   });
-});
 
-const handleClick = async () => {};
+  const ws = new WebSocket("ws://localhost:8080");
+
+  recorder.value.ondataavailable = async ({ data }) => {
+    if (!data.size) return;
+    ws.send(data);
+  };
+
+  recorder.value.start(500);
+  status.value = "recording";
+};
+
+const clickStop = () => {
+  recorder.value?.stop();
+  status.value = "stopped";
+};
 </script>
 
 <template>
   <UContainer class="py-6">
-    <UButton type="primary" @click="handleClick">测试</UButton>
+    <UButton type="primary" @click="handleClick"> 开始 </UButton>
+    <UButton type="primary" @click="clickStop"> 停止 </UButton>
+    {{ status }}
   </UContainer>
 </template>
