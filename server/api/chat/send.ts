@@ -1,11 +1,12 @@
 import { last, pick, throttle } from "lodash-es";
 import OpenAI from "openai";
-import { database } from "~/server/database/postgres";
-import { parseMarkdown } from "../markdown";
 import { z } from "zod";
-import { uuid } from "~/server/utils/uuid";
 import { publisher } from "~/server/database/mqtt";
-import { useUser } from "~/server/utils/user";
+import { database } from "~/server/database/postgres";
+import { use401 } from "~/server/utils/user";
+import { uuid } from "~/server/utils/uuid";
+import { parseMarkdown } from "../markdown";
+
 export const OPENAI_MODEL = "gpt-4o";
 
 export const openai = new OpenAI({
@@ -20,12 +21,11 @@ const request_schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await useUser(event);
-  if (!user) throw createError({ status: 403 });
+  const user_id = await use401(event);
   const body = await readValidatedBody(event, request_schema.parse);
   if (body.chat_id) {
     const item = await database.ai_chat.findFirst({
-      where: { id: body.chat_id, user_id: user.id },
+      where: { id: body.chat_id, user_id },
       include: { images: true },
     });
     if (!item) throw createError({ status: 404 });
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       id: uuid(),
       role: "user",
       content: content,
-      user_id: user.id,
+      user_id,
       images: {
         create: images?.map((item) => ({
           id: uuid(),
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(input.content),
     user_id: undefined,
   };
-  publisher.publish(user.id, JSON.stringify(input_message));
+  publisher.publish(user_id, JSON.stringify(input_message));
   const output = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -115,7 +115,7 @@ export default defineEventHandler(async (event) => {
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
-      publisher.publish(user.id, JSON.stringify(message));
+      publisher.publish(user_id, JSON.stringify(message));
     }, 100);
     for await (const { choices } of stream) {
       if (!choices.length) continue;
@@ -149,7 +149,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(result.content),
     user_id: undefined,
   };
-  publisher.publish(user.id, JSON.stringify(message));
+  publisher.publish(user_id, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   return { message: "完成" };
 });

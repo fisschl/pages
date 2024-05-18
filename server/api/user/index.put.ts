@@ -1,22 +1,27 @@
-import { database } from "~/server/database/postgres";
-import { writeCache } from "~/server/database/redis";
-import { hashPassword } from "./index.post";
-import { checkUser } from "~/server/utils/user";
 import { omit } from "lodash-es";
+import { database } from "~/server/database/postgres";
+import { use403 } from "~/server/utils/user";
+import { hashPassword } from "./index.post";
+import { z } from "zod";
+
+export const input_schema = z
+  .object({
+    name: z.string(),
+    password: z.string(),
+    avatar: z.string().nullable(),
+    role: z.string().nullable(),
+  })
+  .partial();
 
 export default defineEventHandler(async (event) => {
-  const user = await checkUser(event);
-  const body = await readBody<Partial<typeof user>>(event);
+  const id = await use403(event);
+  const body = await readValidatedBody(event, input_schema.parse);
   // 密码应被散列
-  if (body.password) {
-    body.password = await hashPassword(body.password);
-  }
+  if (body.password) body.password = await hashPassword(body.password);
   body.role = undefined;
   const item = await database.user.update({
     data: body,
-    where: { id: user.id },
+    where: { id },
   });
-  if (!item) throw createError({ status: 400 });
-  await writeCache(item.id, item);
   return omit(item, "password");
 });

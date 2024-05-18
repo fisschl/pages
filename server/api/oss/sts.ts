@@ -1,7 +1,6 @@
 import OSS from "ali-oss";
 import { createError, defineEventHandler } from "h3";
-
-import { useUser } from "~/server/utils/user";
+import { use401 } from "~/server/utils/user";
 
 const { STS } = OSS;
 const sts = new STS({
@@ -10,7 +9,7 @@ const sts = new STS({
 });
 
 export default defineEventHandler(async (event) => {
-  const user = await useUser(event);
+  const user = await use401(event);
   if (!user) throw createError({ status: 403 });
   const policy = {
     Version: "1",
@@ -18,7 +17,7 @@ export default defineEventHandler(async (event) => {
       {
         Effect: "Allow",
         Action: ["oss:GetObject", "oss:PutObject"],
-        Resource: [`acs:oss:*:*:${process.env.OSS_BUCKET}/home/${user.id}/*`],
+        Resource: [`acs:oss:*:*:${process.env.OSS_BUCKET}/home/${user}/*`],
       },
     ],
   };

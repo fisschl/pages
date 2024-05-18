@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { throttle } from "lodash-es";
+import { debounce } from "lodash-es";
 
 const lang_list = [
   {
@@ -31,7 +31,7 @@ const input_text = ref("");
 
 const result = ref("");
 
-const translate = throttle(async () => {
+const translate = debounce(async () => {
   if (!input_text.value) return (result.value = "");
   const res = await $fetch("/api/youdao/translate", {
     method: "POST",
@@ -63,10 +63,10 @@ watch(input_text, translate);
       />
     </div>
     <UTextarea
+      v-model="input_text"
       size="lg"
       autoresize
       placeholder="请输入要翻译的文本"
-      v-model="input_text"
       class="mb-3"
     />
     <article class="prose max-w-none p-2 dark:prose-invert">

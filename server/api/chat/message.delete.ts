@@ -1,14 +1,13 @@
-import { database } from "~/server/database/postgres";
 import { z } from "zod";
-import { oss } from "~/server/api/oss/download";
-import { checkUser } from "~/server/utils/user";
+import { database } from "~/server/database/postgres";
+import { use403 } from "~/server/utils/user";
 
 const request_schema = z.object({
   id: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  await checkUser(event);
+  await use403(event);
   const { id } = await getValidatedQuery(event, request_schema.parse);
   await database.chat_image.deleteMany({
     where: {

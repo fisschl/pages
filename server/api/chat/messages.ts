@@ -1,8 +1,8 @@
-import { database } from "~/server/database/postgres";
-import { parseMarkdown } from "../markdown";
 import { z } from "zod";
-import { checkUser } from "~/server/utils/user";
 import { OPENAI_MODEL } from "~/server/api/chat/send";
+import { database } from "~/server/database/postgres";
+import { use401 } from "~/server/utils/user";
+import { parseMarkdown } from "../markdown";
 
 const request_schema = z.object({
   create_at: z
@@ -14,10 +14,10 @@ const request_schema = z.object({
 export type MessagesQuery = z.input<typeof request_schema>;
 
 export default defineEventHandler(async (event) => {
-  const user = await checkUser(event);
+  const user = await use401(event);
   const { create_at } = await getValidatedQuery(event, request_schema.parse);
   const history = await database.ai_chat.findMany({
-    where: { user_id: user.id, create_at: { lt: create_at } },
+    where: { user_id: user, create_at: { lt: create_at } },
     orderBy: { create_at: "desc" },
     take: 16,
     include: { images: true },

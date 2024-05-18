@@ -1,8 +1,7 @@
 import { createError, defineEventHandler, getQuery } from "h3";
 import type { ListObjectResult, ObjectMeta } from "ali-oss";
 import { oss } from "./download";
-
-import { useUser } from "~/server/utils/user";
+import { use401 } from "~/server/utils/user";
 
 const list_dir = async (prefix: string) => {
   const prefixes: string[] = [];
@@ -31,8 +30,8 @@ const list_dir = async (prefix: string) => {
 export default defineEventHandler(async (event) => {
   const { prefix } = getQuery(event);
   if (typeof prefix !== "string") throw createError({ status: 400 });
-  const user = await useUser(event);
+  const user = await use401(event);
   if (!user) throw createError({ status: 403 });
-  if (!prefix.startsWith(`home/${user.id}`)) throw createError({ status: 403 });
+  if (!prefix.startsWith(`home/${user}`)) throw createError({ status: 403 });
   return list_dir(prefix);
 });

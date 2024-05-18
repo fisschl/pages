@@ -31,26 +31,29 @@ export const writeCache = async <T = unknown>(
   return value;
 };
 
-export const cacheKey = (key: unknown): string => {
-  if (Array.isArray(key)) {
-    return key.map(cacheKey).filter(Boolean).join(":");
-  }
-  if (typeof key === "string") return key;
-  if (key === null || key === undefined) return "";
-  if (typeof key === "number" || typeof key === "boolean")
-    return key.toString();
-  return hash(key);
+export const deleteCache = async (key: string) => {
+  await redis.del(key);
 };
 
-export const useCache = async <T = unknown>(
-  key: unknown,
-  value: () => T | Promise<T>,
+export const cacheKey = (key: unknown): string => {
+  if (typeof key === "string") return key;
+  if (Array.isArray(key)) return key.map(cacheKey).filter(Boolean).join(":");
+  if (typeof key === "number") return key.toString();
+  if (typeof key === "bigint") return key.toString();
+  if (key && typeof key === "object") return hash(key);
+  return "";
+};
+
+export const cache = <Q extends unknown[], A>(
+  func: (...args: Q) => A,
   expire = 60 * DAY,
 ) => {
-  const keyString = cacheKey(key);
-  const cached = await readCache<T>(keyString);
-  if (cached) return cached;
-  const result = await value();
-  if (!result) return;
-  return writeCache(keyString, result, expire);
+  return async (...args: Q) => {
+    const key = cacheKey(args);
+    const value = await readCache<A>(key);
+    if (value) return value;
+    const result = await func(...args);
+    await writeCache(key, result, expire);
+    return result;
+  };
 };
