@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
     await database.log.create({
       data: {
         id: uuid(),
-        tag: "OpenAI 异常",
+        tag: "OpenAI 响应",
         content: JSON.stringify({
           error: String(err),
           input: input,

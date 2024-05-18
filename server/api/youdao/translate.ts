@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ofetch } from "ofetch";
 import { createHash } from "node:crypto";
+import { database } from "~/server/database/postgres";
 
 const request_schema = z.object({
   text: z.string(),
@@ -46,6 +47,20 @@ export default defineEventHandler(async (event) => {
     method: "POST",
     body: formData,
   });
-  const data = text_response_schema.parse(res);
-  return { text: data.translation.join("\n\n") };
+  const data = text_response_schema.safeParse(res);
+  if (!data.success) {
+    await database.log.create({
+      data: {
+        id: uuid(),
+        tag: "有道翻译",
+        content: JSON.stringify({
+          response: res,
+          input: { text, from, to },
+          error: data.error,
+        }),
+      },
+    });
+    throw createError({ status: 500 });
+  }
+  return { text: data.data.translation.join("\n\n") };
 });
