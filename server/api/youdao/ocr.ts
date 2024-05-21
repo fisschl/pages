@@ -6,10 +6,6 @@ const request_schema = z.object({
   img: z.string(),
 });
 
-const region_schema = z.object({
-  lines: z.array(z.any()),
-});
-
 export default defineEventHandler(async (event) => {
   const { img } = await readValidatedBody(event, request_schema.parse);
   const formData = new FormData();
@@ -24,6 +20,5 @@ export default defineEventHandler(async (event) => {
     body: formData,
   });
   const { regions } = Result;
-  const data = z.array(region_schema).parse(regions);
-  return data.flatMap((region) => region.lines);
+  return regions;
 });

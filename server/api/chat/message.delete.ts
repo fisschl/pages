@@ -9,15 +9,9 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   await use403(event);
   const { id } = await getValidatedQuery(event, request_schema.parse);
-  await database.chat_image.deleteMany({
-    where: {
-      ai_chat: {
-        every: { id },
-      },
-    },
-  });
-  await database.ai_chat.delete({
+  await database.ai_chat.update({
     where: { id },
+    data: { deleted: true },
   });
   return { message: "删除成功" };
 });

@@ -17,7 +17,11 @@ export default defineEventHandler(async (event) => {
   const user = await use401(event);
   const { create_at } = await getValidatedQuery(event, request_schema.parse);
   const history = await database.ai_chat.findMany({
-    where: { user_id: user, create_at: { lt: create_at } },
+    where: {
+      user_id: user,
+      create_at: { lt: create_at },
+      deleted: false,
+    },
     orderBy: { create_at: "desc" },
     take: 16,
     include: { images: true },
