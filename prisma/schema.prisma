@@ -8,13 +8,14 @@ datasource db {
 }
 
 model user {
-  id         String   @id @db.VarChar(255)
-  create_at  DateTime @default(now()) @db.Timestamptz()
-  last_login DateTime @default(now()) @db.Timestamptz()
-  name       String   @unique @db.VarChar(255)
-  password   String   @db.VarChar(255)
+  id         String    @id @db.VarChar(255)
+  create_at  DateTime  @default(now()) @db.Timestamptz()
+  last_login DateTime  @default(now()) @db.Timestamptz()
+  name       String    @unique @db.VarChar(255)
+  password   String    @db.VarChar(255)
   avatar     String?
-  role       String?  @db.VarChar(255)
+  role       String?   @db.VarChar(255)
+  ai_chat    ai_chat[]
 
   @@index([name])
 }
@@ -33,8 +34,9 @@ model ai_chat {
   content   String
   deleted   Boolean      @default(false)
   images    chat_image[]
+  user      user         @relation(fields: [user_id], references: [id])
 
-  @@index([user_id, create_at(sort: Desc)])
+  @@index([user_id, create_at(sort: Desc), deleted])
 }
 
 model log {

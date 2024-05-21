@@ -1,6 +1,6 @@
-import { database } from "~/server/database/postgres";
 import { formatDate, startOfDay, subDays } from "date-fns";
-import { groupBy, uniq } from "lodash-es";
+import { uniq, uniqBy } from "lodash-es";
+import { database } from "~/server/database/postgres";
 
 export default defineEventHandler(async () => {
   const length = 14;
@@ -16,25 +16,36 @@ export default defineEventHandler(async () => {
     select: {
       id: true,
       create_at: true,
-      user_id: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
-  const date2str = (date: Date) => {
-    return formatDate(date, "MM-dd");
-  };
-  const date_list = list.map((item) => {
-    return date2str(item.create_at);
-  });
-  const xAxis = uniq(date_list);
-  const counts = Object.values(groupBy(list, "user_id")).map((user_list) => {
-    const list = xAxis.map(() => 0);
-    user_list.forEach((item) => {
-      const index = xAxis.findIndex((date) => {
-        return date === date2str(item.create_at);
-      });
-      list[index]++;
+  const xAxis = uniqBy(
+    list.map((item) => item.create_at),
+    (date) => date.toDateString(),
+  );
+  const names = uniq(list.map((item) => item.user.name));
+  const series_list = names.map((name) => ({
+    name,
+    data: xAxis.map(() => 0),
+  }));
+  list.forEach((item) => {
+    const index = xAxis.findIndex((date) => {
+      return date.toDateString() === item.create_at.toDateString();
     });
-    return list.map((item) => Math.ceil(item / 2));
+    const series = series_list.find((series) => {
+      return series.name === item.user.name;
+    });
+    if (!series) return;
+    series.data[index] += 1;
   });
-  return { xAxis, counts };
+  return {
+    xAxis: xAxis.map((date) => {
+      return formatDate(date, "MM-dd");
+    }),
+    series: series_list,
+  };
 });
