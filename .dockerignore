@@ -6,3 +6,5 @@ node_modules
 build
 .gitignore
 eslint.config.mjs
+.git
+.vscode
