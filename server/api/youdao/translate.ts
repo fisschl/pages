@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { database } from "~/server/database/postgres";
 
 const request_schema = z.object({
-  text: z.string(),
+  text: z.string().trim(),
   from: z.string().default("auto"),
   to: z.string().default("zh-CHS"),
 });
@@ -49,6 +49,7 @@ export default defineEventHandler(async (event) => {
   });
   const data = text_response_schema.safeParse(res);
   if (!data.success) {
+    console.error(res);
     await database.log.create({
       data: {
         id: uuid(),
