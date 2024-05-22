@@ -1,16 +1,4 @@
-<script setup lang="ts">
-onMounted(async () => {
-  const { music, play } = await import("~/components/main/MusicButton.vue");
-  music.value = {
-    source: "https://static.bronya.world/opus/赴大荒.opus",
-  };
-  await play();
-});
-onBeforeUnmount(async () => {
-  const { hide } = await import("~/components/main/MusicButton.vue");
-  await hide();
-});
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <MainHeader />

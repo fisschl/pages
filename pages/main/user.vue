@@ -1,6 +1,18 @@
 <script setup lang="ts">
 import { login_schema, useUserStore, user_schema } from "~/composables/user";
 
+onMounted(async () => {
+  const { music, play } = await import("~/components/main/MusicButton.vue");
+  music.value = {
+    source: "https://static.bronya.world/opus/大哉乾元.opus",
+  };
+  await play();
+});
+onBeforeUnmount(async () => {
+  const { hide } = await import("~/components/main/MusicButton.vue");
+  await hide();
+});
+
 const store = useUserStore();
 await useShouldLogin();
 

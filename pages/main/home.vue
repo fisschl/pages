@@ -3,6 +3,18 @@ import { throttle } from "lodash-es";
 import { z } from "zod";
 import { useQuery } from "~/composables/route";
 
+onMounted(async () => {
+  const { music, play } = await import("~/components/main/MusicButton.vue");
+  music.value = {
+    source: "https://static.bronya.world/opus/赴大荒.opus",
+  };
+  await play();
+});
+onBeforeUnmount(async () => {
+  const { hide } = await import("~/components/main/MusicButton.vue");
+  await hide();
+});
+
 const { data: libraryOptions } = await useFetch("/api/poetry/facets");
 
 const query_schema = z

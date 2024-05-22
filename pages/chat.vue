@@ -4,19 +4,8 @@ import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
-import { scrollTarget, scrollToBottom } from "~/utils/page_scroll";
-
-onMounted(async () => {
-  const { music, play } = await import("~/components/main/MusicButton.vue");
-  music.value = {
-    source: "https://static.bronya.world/opus/大哉乾元.opus",
-  };
-  await play();
-});
-onBeforeUnmount(async () => {
-  const { hide } = await import("~/components/main/MusicButton.vue");
-  await hide();
-});
+import { scrollTarget } from "~/utils/page_scroll";
+import { useScrollBottom } from "~/composables/scrollend";
 
 const user = await useShouldLogin();
 
@@ -33,11 +22,12 @@ const fetchData = async (param?: MessagesQuery) => {
 const { data } = await useAsyncData(() => fetchData());
 
 const isMounted = useMounted();
-const { directions, y: source_top } = useScroll(() => {
+const scroll_element = computed(() => {
   return isMounted.value ? scrollTarget() : null;
 });
-
-onMounted(scrollToBottom);
+const { directions, y: source_top } = useScroll(scroll_element);
+const list_element = ref<HTMLElement>();
+const { scrollToBottom } = useScrollBottom(scroll_element, list_element);
 
 const top = refThrottled(source_top, 200);
 
@@ -112,33 +102,15 @@ const shouldLoadMore = computed(() => {
 });
 
 whenever(shouldLoadMore, async () => {
+  if (!data.value) return;
   loading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const [item] = data.value!.list;
-  const res = await fetchData({
+  const [item] = data.value.list;
+  const { list } = await fetchData({
     create_at: item.create_at,
   });
-  if (!res.list.length) {
-    loading.value = false;
-    isLoadAll.value = true;
-    return;
-  }
-  await nextTick();
-  // 记忆滚动位置
-  const firstElement = document.getElementById(item.id);
-  const oldRect = firstElement?.getBoundingClientRect();
-  data.value?.list!.unshift(...res.list);
-  await nextTick();
-  const newRect = firstElement?.getBoundingClientRect();
-  if (!oldRect || !newRect) {
-    loading.value = false;
-    await nextTick();
-    scrollToBottom();
-    return;
-  }
-  // 恢复滚动位置
-  const target = scrollTarget();
-  target?.scrollBy({ top: newRect.top - oldRect.top });
+  if (!list.length) isLoadAll.value = true;
+  data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
 
@@ -171,9 +143,9 @@ const handleListItemClick = async (e: MouseEvent) => {
 </script>
 
 <template>
-  <MainHeader />
   <UContainer>
     <ol
+      ref="list_element"
       class="mt-5 flex min-h-dvh flex-1 flex-col items-start"
       @click="handleListItemClick"
     >

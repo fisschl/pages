@@ -13,20 +13,20 @@ const to = computed(() => {
 
 <template>
   <article class="">
-    <p class="mb-1 flex items-center gap-3 text-base">
-      <NuxtLink :to="to" class="flex-1 truncate font-bold">
-        {{ item.title }}
-      </NuxtLink>
+    <div class="mb-1 flex items-center gap-3 text-base">
+      <h4 class="flex-1 truncate font-bold">
+        <NuxtLink :to="to">
+          {{ item.title }}
+        </NuxtLink>
+      </h4>
       <span class="text-sm text-gray-400"> {{ item.author }} </span>
       <span class="text-sm italic text-green-400"> {{ item.library }} </span>
-    </p>
-    <NuxtLink :to="to">
-      <p
-        :class="$style.content"
-        class="text-sm text-zinc-600 dark:text-zinc-200"
-        v-html="item.content"
-      />
-    </NuxtLink>
+    </div>
+    <p
+      :class="$style.content"
+      class="text-sm text-zinc-600 dark:text-zinc-200"
+      v-html="item.content"
+    />
   </article>
 </template>
 
