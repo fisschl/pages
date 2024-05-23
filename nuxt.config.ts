@@ -1,12 +1,14 @@
 import "dotenv/config";
 
+const development = process.env.NODE_ENV === "development";
+
 export default defineNuxtConfig({
   modules: [
-    process.env.NODE_ENV === "development" ? "@nuxt/devtools" : false,
+    development ? "@nuxt/devtools" : false,
     "@nuxt/ui",
     "@vueuse/nuxt",
     "@pinia/nuxt",
-    process.env.NODE_ENV === "development" ? "@nuxt/eslint" : false,
+    development ? "@nuxt/eslint" : false,
   ],
 
   ui: {
