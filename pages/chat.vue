@@ -149,7 +149,9 @@ const handleListItemClick = async (e: MouseEvent) => {
       class="mt-5 flex flex-1 flex-col items-start"
       @click="handleListItemClick"
       :class="$style.list_element"
-    ></ol>
+    >
+      <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
+    </ol>
     <UDivider class="mb-4 mt-1" :label="data?.model" />
     <UTextarea
       v-model="inputText"
