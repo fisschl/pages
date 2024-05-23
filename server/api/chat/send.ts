@@ -106,26 +106,19 @@ export default defineEventHandler(async (event) => {
       stream: true,
       max_tokens: 2048,
     });
-    /**
-     * 实时发送响应给客户端
-     */
-    const publish_throttle = throttle(async () => {
+    for await (const { choices } of stream) {
+      if (!choices.length) continue;
+      const [{ delta }] = choices;
+      if (!delta || !delta.content) continue;
+      output.content += delta.content;
       const message = {
         ...output,
         content: await parseMarkdown(output.content),
         user_id: undefined,
       };
       publisher.publish(user_id, JSON.stringify(message));
-    }, 100);
-    for await (const { choices } of stream) {
-      if (!choices.length) continue;
-      const [{ delta }] = choices;
-      if (!delta.content) continue;
-      output.content += delta.content;
-      publish_throttle();
     }
   } catch (err) {
-    output.content = String(err);
     await database.log.create({
       data: {
         id: uuid(),
@@ -138,6 +131,7 @@ export default defineEventHandler(async (event) => {
         }),
       },
     });
+    output.content = String(err);
   }
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   const result = await database.ai_chat.update({
