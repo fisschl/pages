@@ -29,6 +29,13 @@ export default defineNuxtConfig({
           href: "https://static.bronya.world/font/font.css",
         },
       ],
+      script: [
+        {
+          src: "https://static.bronya.world/npm/scrollyfills.modern.js",
+          async: true,
+          type: "module",
+        },
+      ],
     },
   },
 

@@ -19,6 +19,7 @@ export const useScrollBottom = (
     if (!element) return;
     const { scrollTop, scrollHeight, clientHeight } = element;
     bottom.value = scrollHeight - scrollTop - clientHeight;
+    console.log("scrollend", bottom.value);
   });
 
   useResizeObserver(list_element, resetScroll);
