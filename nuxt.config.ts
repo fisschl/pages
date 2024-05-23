@@ -18,10 +18,6 @@ export default defineNuxtConfig({
       link: [
         {
           rel: "preconnect",
-          href: "https://cdn.jsdelivr.net",
-        },
-        {
-          rel: "preconnect",
           href: "https://static.bronya.world",
         },
         {
@@ -31,7 +27,7 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: "https://static.bronya.world/npm/scrollyfills.modern.js",
+          src: "https://static.bronya.world/npm/scrollyfills/dist/scrollyfills.modern.js",
           async: true,
           type: "module",
         },
@@ -42,11 +38,5 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { redirect: "/main/home" },
     "/api/**": { cors: true },
-  },
-
-  vite: {
-    optimizeDeps: {
-      exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
-    },
   },
 });
