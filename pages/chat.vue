@@ -146,11 +146,10 @@ const handleListItemClick = async (e: MouseEvent) => {
   <UContainer>
     <ol
       ref="list_element"
-      class="mt-5 flex min-h-dvh flex-1 flex-col items-start"
+      class="mt-5 flex flex-1 flex-col items-start"
       @click="handleListItemClick"
-    >
-      <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
-    </ol>
+      :class="$style.list_element"
+    ></ol>
     <UDivider class="mb-4 mt-1" :label="data?.model" />
     <UTextarea
       v-model="inputText"
@@ -185,3 +184,9 @@ const handleListItemClick = async (e: MouseEvent) => {
   <ChatBottomButton v-if="isShowScrollButton" />
   <ChatLoading :loading="loading" />
 </template>
+
+<style module>
+.list_element {
+  min-height: calc(100vh - 14rem);
+}
+</style>
