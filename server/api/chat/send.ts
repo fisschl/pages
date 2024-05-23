@@ -1,4 +1,4 @@
-import { last, pick, throttle } from "lodash-es";
+import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
 import { publisher } from "~/server/database/mqtt";
