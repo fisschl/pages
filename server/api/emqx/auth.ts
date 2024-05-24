@@ -16,7 +16,7 @@ const request_schema = z.object({
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
-  const user_id = await redis.hget(body.password, "user");
-  if (user_id === body.username) return { result: "allow" };
+  const id = await redis.hget(body.password, "user");
+  if (id === body.username) return { result: "allow" };
   return { result: "deny" };
 });

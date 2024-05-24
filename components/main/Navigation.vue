@@ -34,7 +34,7 @@ const links = computed<DropdownItem[][]>(() => [
     {
       label: "文字识别",
       icon: "i-tabler-texture",
-       to: "/main/ocr",
+      to: "/main/ocr",
     },
   ],
   [
@@ -50,24 +50,27 @@ const links = computed<DropdownItem[][]>(() => [
 const user = useUserStore();
 
 const items = computed(() => {
-  const Profile: DropdownItem = {
-    label: "登录",
-    click: () => {
-      const qs = new URLSearchParams({ from: location.href });
-      const to = `/login?${qs}`;
-      return navigateTo(to);
-    },
-  };
-  if (user.user?.avatar) {
-    Profile.avatar = {
-      src: user.user.avatar,
-    };
-    Profile.label = user.user.name;
-    Profile.to = "/main/user";
+  const login_list: DropdownItem[] = [];
+  if (!user.user) {
+    login_list.push({
+      label: "登录",
+      icon: "i-tabler-user-circle",
+      click: () => {
+        const qs = new URLSearchParams({ from: location.href });
+        const to = `/login?${qs}`;
+        return navigateTo(to);
+      },
+    });
   } else {
-    Profile.icon = "i-tabler-user-circle";
+    const { avatar_url, name } = user.user;
+    login_list.push({
+      label: name,
+      icon: !avatar_url ? "i-tabler-user-circle" : undefined,
+      avatar: avatar_url ? { src: avatar_url } : undefined,
+      to: "https://gitee.com",
+    });
   }
-  return [[Profile], ...links.value];
+  return [login_list, ...links.value];
 });
 </script>
 
