@@ -3,17 +3,31 @@ import "~/assets/main.css";
 import { useAutoLogin } from "./composables/user";
 
 await useAutoLogin();
+
+useHead({
+  htmlAttrs: {
+    lang: "zh-CN",
+  },
+  title: "沅有茝兮醴有兰",
+  link: [
+    {
+      rel: "icon",
+      type: "image/svg+xml",
+      href: "/favicon.svg",
+    },
+    {
+      rel: "preconnect",
+      href: "https://static.bronya.world",
+    },
+    {
+      rel: "stylesheet",
+      href: "https://static.bronya.world/font/font.css",
+    },
+  ],
+});
 </script>
 
 <template>
-  <Html lang="zh-CN">
-    <Head>
-      <Title> 沅有茝兮醴有兰 </Title>
-      <Link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    </Head>
-    <Body class="bg-neutral-50 dark:bg-neutral-900">
-      <NuxtPage />
-      <UNotifications />
-    </Body>
-  </Html>
+  <NuxtPage />
+  <UNotifications />
 </template>

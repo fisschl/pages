@@ -7,6 +7,17 @@ import ImageViewer from "~/components/ImageViewer.vue";
 import { scrollTarget } from "~/utils/page_scroll";
 import { useScrollBottom } from "~/composables/scrollend";
 
+useHead({
+  title: "GPT",
+  script: [
+    {
+      src: "https://static.bronya.world/npm/scrollyfills/dist/scrollyfills.modern.js",
+      async: true,
+      type: "module",
+    },
+  ],
+});
+
 const user = await useShouldLogin();
 
 const fetchData = async (param?: MessagesQuery) => {
@@ -147,8 +158,8 @@ const handleListItemClick = async (e: MouseEvent) => {
     <ol
       ref="list_element"
       class="mt-5 flex flex-1 flex-col items-start"
-      @click="handleListItemClick"
       :class="$style.list_element"
+      @click="handleListItemClick"
     >
       <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
     </ol>
