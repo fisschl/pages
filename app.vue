@@ -13,7 +13,7 @@ useHead({
     {
       rel: "icon",
       type: "image/svg+xml",
-      href: "/favicon.svg",
+      href: "https://static.bronya.world/favicon.svg",
     },
     {
       rel: "preconnect",
