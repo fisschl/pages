@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="relative h-dvh">
-    <div class="h-full" id="container"></div>
+    <div id="container" class="h-full"></div>
   </main>
 </template>
 
