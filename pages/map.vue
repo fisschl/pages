@@ -18,6 +18,11 @@ const colorMode = useColorMode();
 const amap = shallowRef<AMap.Map>();
 
 onMounted(async () => {
+  if (typeof AMap === "undefined") {
+    await new Promise((resolve) => {
+      document.addEventListener("AMapLoaded", resolve, { once: true });
+    });
+  }
   const theme =
     colorMode.value === "dark"
       ? "amap://styles/dark"
