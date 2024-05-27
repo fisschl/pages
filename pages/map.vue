@@ -15,21 +15,26 @@ useHead({
 
 const colorMode = useColorMode();
 
+const amap = shallowRef<AMap.Map>();
+
 onMounted(async () => {
   const theme =
     colorMode.value === "dark"
       ? "amap://styles/dark"
       : "amap://styles/whitesmoke";
-  const map = new AMap.Map("container", {
+  amap.value = new AMap.Map("container", {
     zoom: 12,
     mapStyle: theme,
   });
 });
+onBeforeUnmount(() => {
+  amap.value?.destroy();
+});
 </script>
 
 <template>
-  <main>
-    <div class="h-dvh" id="container"></div>
+  <main class="relative h-dvh">
+    <div class="h-full" id="container"></div>
   </main>
 </template>
 

@@ -32,9 +32,9 @@ const links = computed<DropdownItem[][]>(() => [
       to: "/chat",
     },
     {
-      label: "文字识别",
-      icon: "i-tabler-texture",
-      to: "/main/ocr",
+      label: "地图",
+      icon: "i-tabler-map",
+      to: "/map",
     },
   ],
   [
