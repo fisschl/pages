@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Audio Recorder Example</title>
+  </head>
+  <body>
+    <button id="start">start</button>
+    <script type="module">
+      document.getElementById("start").onclick = async () => {
+        // 将麦克风输入连接到 AudioWorkletNode
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        // 加载 AudioContext 和 AudioWorklet
+        const audioContext = new AudioContext({ sampleRate: 16000 });
+        await audioContext.audioWorklet.addModule("./recorder-worklet.js");
+        // 创建 AudioWorkletNode
+        const recorder = new AudioWorkletNode(audioContext, "recorder", {
+          numberOfInputs: 1,
+          numberOfOutputs: 1,
+          outputChannelCount: [1],
+        });
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(recorder);
+        // 这里可以添加逻辑来处理 recorder 的输出，例如录制音频
+      };
+    </script>
+  </body>
+</html>

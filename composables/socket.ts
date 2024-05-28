@@ -15,6 +15,7 @@ export const useSocket = (options: Options) => {
   const handler: SocketHandler[] = [];
 
   onMounted(() => {
+    console.log(options);
     socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, options);
     socket.value.subscribe(options.topic);
     socket.value.on("error", console.error);
