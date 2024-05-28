@@ -31,11 +31,6 @@ const links = computed<DropdownItem[][]>(() => [
       icon: "i-tabler-brand-openai",
       to: "/chat",
     },
-    {
-      label: "地图",
-      icon: "i-tabler-map",
-      to: "/map",
-    },
   ],
   [
     {

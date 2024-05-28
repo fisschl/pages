@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@amap/amap-jsapi-types':
-        specifier: ^0.0.15
-        version: 0.0.15
       '@fancyapps/ui':
         specifier: ^5.0.36
         version: 5.0.36
@@ -86,9 +83,6 @@ importers:
       meilisearch:
         specifier: ^0.40.0
         version: 0.40.0(encoding@0.1.13)
-      mitt:
-        specifier: ^3.0.1
-        version: 3.0.1
       mongodb:
         specifier: ^6.6.2
         version: 6.6.2(socks@2.8.3)
@@ -171,9 +165,6 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
-
-  '@amap/amap-jsapi-types@0.0.15':
-    resolution: {integrity: sha512-oqyRqHpVDZh5bUe2mAJh41ZsziSj0eUzwcfIbiaBNB0eiTJnZNhKsTdk77VOklOjwuwNfsblpKW9LjmWNpeQ7A==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -5354,8 +5345,6 @@ packages:
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
-
-  '@amap/amap-jsapi-types@0.0.15': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
