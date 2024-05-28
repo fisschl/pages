@@ -179,14 +179,6 @@ const handleListItemClick = async (e: MouseEvent) => {
       />
       <span class="flex-1"></span>
       <section class="flex items-center">
-        <UButton
-          color="orange"
-          icon="i-tabler-info-octagon"
-          variant="soft"
-          title="使用统计"
-          class="mr-3"
-          to="/chat_info"
-        />
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton icon="i-tabler-send" class="px-6" @click="send">
           发送
