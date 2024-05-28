@@ -24,6 +24,12 @@ useHead({
       href: "https://static.bronya.world/font/font.css",
     },
   ],
+  script: [
+    {
+      src: "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.18.1.min.js",
+      async: true,
+    },
+  ],
 });
 </script>
 

@@ -1,5 +1,3 @@
-import OSS from "ali-oss";
-
 const refreshSTSToken = async () => {
   const res = await $fetch("/api/oss/sts");
   return {
@@ -9,16 +7,10 @@ const refreshSTSToken = async () => {
   };
 };
 
-const oss = ref<OSS>();
-
-export const upload_file = async (
-  key: string,
-  file: File,
-  progress?: (p: number) => void,
-) => {
-  if (!oss.value) {
+export const upload_file = async (key, file, progress) => {
+  if (!window.oss) {
     const res = await refreshSTSToken();
-    oss.value = new OSS({
+    window.oss = new window.OSS({
       region: "oss-cn-shanghai",
       bucket: "fisschl",
       ...res,
@@ -28,7 +20,7 @@ export const upload_file = async (
     });
   }
   const filename = encodeURIComponent(file.name);
-  await oss.value.multipartUpload(key, file, {
+  await window.oss.multipartUpload(key, file, {
     progress: (...params) => {
       if (!progress) return;
       progress(params[0] * 100);
