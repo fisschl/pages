@@ -12,11 +12,6 @@ const links = computed<DropdownItem[][]>(() => [
   ],
   [
     {
-      label: "代码格式化",
-      icon: "i-tabler-indent-increase",
-      to: "/main/format",
-    },
-    {
       label: "变量名转换",
       icon: "i-tabler-letter-case",
       to: "/main/case",
