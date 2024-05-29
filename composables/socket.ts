@@ -1,27 +1,28 @@
 import { destr } from "destr";
 import { isObject } from "lodash-es";
-import type { IClientOptions, MqttClient } from "mqtt";
+import type { MqttClient } from "mqtt";
 import mqtt from "mqtt";
 
-export type SocketHandler = (message: object) => unknown;
-
-export type Options = IClientOptions & {
+export type Options = {
   topic: string | string[];
 };
 
 export const useSocket = (options: Options) => {
   const socket = shallowRef<MqttClient>();
 
-  const handler: SocketHandler[] = [];
+  const eventHook = createEventHook<object>();
 
   onMounted(() => {
-    socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, options);
+    socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, {
+      username: "public",
+      password: "public",
+    });
     socket.value.subscribe(options.topic);
     socket.value.on("error", console.error);
-    socket.value.on("message", (topic, payload) => {
+    socket.value.on("message", async (topic, payload) => {
       const message = destr(payload.toString());
       if (!isObject(message)) return;
-      handler.forEach((fn) => fn(message));
+      await eventHook.trigger(message);
     });
   });
 
@@ -30,9 +31,5 @@ export const useSocket = (options: Options) => {
     socket.value?.end();
   });
 
-  const onMessage = (fn: SocketHandler) => {
-    handler.push(fn);
-  };
-
-  return { socket, onMessage };
+  return { socket, eventHook };
 };

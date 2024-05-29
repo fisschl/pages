@@ -43,3 +43,11 @@ export const useUserInfo = async (user_id: string) => {
   });
   return data || undefined;
 };
+
+export const useUserSecret = async (user: string) => {
+  const key = await redis.hget(user, "secret");
+  if (key) return key;
+  const secret = uuid(16);
+  await redis.hset(user, "secret", secret);
+  return secret;
+};

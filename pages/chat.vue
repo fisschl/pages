@@ -18,15 +18,19 @@ useHead({
   ],
 });
 
-const user = await useShouldLogin();
+await useShouldLogin();
+
+const headers = useRequestHeaders(["cookie"]);
+
+interface ListResponse {
+  list: Message[];
+  model: string;
+}
 
 const fetchData = async (param?: MessagesQuery) => {
-  return await $fetch<{
-    list: Message[];
-    model: string;
-  }>("/api/chat/messages", {
+  return $fetch<ListResponse>("/api/chat/messages", {
     query: param,
-    headers: useRequestHeaders(["cookie"]),
+    headers,
   });
 };
 
@@ -65,15 +69,13 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
-const token = useCookie("token");
+const { data: secret } = await useFetch("/api/auth/secret", { headers });
 
-const { onMessage } = useSocket({
-  topic: user?.id || "public",
-  username: user?.id,
-  password: token.value || undefined,
+const { eventHook } = useSocket({
+  topic: secret.value?.secret || "public",
 });
 
-onMessage(async (data) => {
+eventHook.on(async (data) => {
   const res = message_schema.safeParse(data);
   if (!res.success) return;
   await handleNewMessage(res.data);
