@@ -1,5 +1,6 @@
 import { useEventListener, useResizeObserver } from "@vueuse/core";
 import type { MaybeRefOrGetter } from "vue";
+import { debounce } from "lodash-es";
 
 export const useScrollBottom = (
   container: MaybeRefOrGetter<HTMLElement | undefined | null>,
@@ -14,13 +15,14 @@ export const useScrollBottom = (
     element.scrollTop = scrollHeight - clientHeight - bottom.value;
   };
 
-  useEventListener(container, "scrollend", () => {
+  const handleScrollEnd = debounce(() => {
     const element = toValue(container);
     if (!element) return;
     const { scrollTop, scrollHeight, clientHeight } = element;
     bottom.value = scrollHeight - scrollTop - clientHeight;
-  });
+  }, 60);
 
+  useEventListener(container, "scroll", handleScrollEnd);
   useResizeObserver(list_element, resetScroll);
   onMounted(resetScroll);
 

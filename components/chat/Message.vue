@@ -8,7 +8,11 @@ defineProps<{
 </script>
 
 <template>
-  <li :id="message.id" class="mb-4 max-w-full">
+  <li
+    :id="message.id"
+    class="relative mb-4 max-w-full"
+    :class="$style.container"
+  >
     <section
       class="relative mb-1 rounded px-3 py-2"
       :class="{
@@ -28,23 +32,32 @@ defineProps<{
         :src="file.image"
       />
     </section>
-    <section class="flex gap-1">
+    <section class="hidden w-full gap-1 pt-3" :class="$style.actions">
       <UButton
         v-if="message.role === 'user'"
         icon="i-tabler-reload"
         size="2xs"
-        variant="ghost"
         title="重新发送"
-        color="teal"
+        color="gray"
+        variant="solid"
       />
-      <span class="flex-1"></span>
       <UButton
         icon="i-tabler-trash"
         size="2xs"
-        variant="ghost"
-        color="red"
         title="删除"
+        color="gray"
+        variant="solid"
       />
     </section>
   </li>
 </template>
+
+<style module>
+.container:hover .actions {
+  display: flex;
+  position: absolute;
+  bottom: -1.5rem;
+  right: 0;
+  justify-content: flex-end;
+}
+</style>

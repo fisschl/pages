@@ -9,13 +9,6 @@ import { useScrollBottom } from "~/composables/scrollend";
 
 useHead({
   title: "GPT",
-  script: [
-    {
-      src: "https://static.bronya.world/npm/scrollyfills/dist/scrollyfills.modern.js",
-      async: true,
-      type: "module",
-    },
-  ],
 });
 
 await useShouldLogin();
