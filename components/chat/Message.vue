@@ -5,10 +5,18 @@ import type { Message } from "./type";
 defineProps<{
   message: Message;
 }>();
+
+const container = ref<HTMLElement>();
+
+onMounted(async () => {
+  const { renderMermaid } = await import("./mermaid");
+  await renderMermaid(container.value!);
+});
 </script>
 
 <template>
   <li
+    ref="container"
     :id="message.id"
     class="relative mb-4 max-w-full"
     :class="$style.container"

@@ -36,6 +36,7 @@
     "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "meilisearch": "^0.40.0",
+    "mermaid": "^10.9.1",
     "mongodb": "^6.7.0",
     "mqtt": "^5.7.0",
     "nuxt": "^3.11.2",

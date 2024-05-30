@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { Fancybox } from "@fancyapps/ui";
-
 defineProps<{
   src?: string;
   alt?: string;
@@ -9,14 +6,16 @@ defineProps<{
 
 const element = ref<HTMLElement>();
 
-onMounted(() => {
+onMounted(async () => {
   if (!element.value) return;
-  Fancybox.bind(element.value, "[data-fancybox]");
+  const { bind } = await import("~/utils/fancybox");
+  bind(element.value);
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async () => {
   if (!element.value) return;
-  Fancybox.unbind(element.value);
+  const { unbind } = await import("~/utils/fancybox");
+  unbind(element.value);
 });
 </script>
 
