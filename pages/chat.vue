@@ -34,8 +34,6 @@ const scroll_element = computed(() => {
   return isMounted.value ? scrollTarget() : null;
 });
 const { directions, y: source_top } = useScroll(scroll_element);
-const list_element = ref<HTMLElement>();
-const { scrollToBottom } = useScrollBottom(scroll_element, list_element);
 
 const top = refThrottled(source_top, 200);
 
@@ -62,11 +60,43 @@ const handleNewMessage = async (message: Message) => {
   await updateMessage(item);
 };
 
+const inputText = ref<string>();
+const inputFiles = ref<string[]>();
+
+const streaming = ref(false);
+
+const send = debounce(async () => {
+  inputText.value = inputText.value?.trim();
+  const param = { content: inputText.value, images: inputFiles.value };
+  if (!param.content) return;
+  inputFiles.value = [];
+  inputText.value = undefined;
+  streaming.value = true;
+  await $fetch("/api/chat/send", {
+    method: "POST",
+    body: param,
+  });
+  streaming.value = false;
+}, 200);
+
+const handleKeydown = async (e: KeyboardEvent) => {
+  if (e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  await send();
+};
+
 const { data: secret } = await useFetch("/api/auth/secret", { headers });
 
 const { eventHook } = useSocket({
   topic: secret.value?.secret || "public",
 });
+
+const list_element = ref<HTMLElement>();
+const { scrollToBottom } = useScrollBottom(
+  scroll_element,
+  list_element,
+  streaming,
+);
 
 eventHook.on(async (data) => {
   const res = message_schema.safeParse(data);
@@ -75,27 +105,6 @@ eventHook.on(async (data) => {
   await nextTick();
   if (!directions.top && !isShowScrollButton.value) scrollToBottom();
 });
-
-const inputText = ref<string>();
-const inputFiles = ref<string[]>();
-
-const send = debounce(async () => {
-  inputText.value = inputText.value?.trim();
-  const param = { content: inputText.value, images: inputFiles.value };
-  if (!param.content) return;
-  inputFiles.value = [];
-  inputText.value = undefined;
-  await $fetch("/api/chat/send", {
-    method: "POST",
-    body: param,
-  });
-}, 200);
-
-const handleKeydown = async (e: KeyboardEvent) => {
-  if (e.ctrlKey || e.shiftKey) return;
-  e.preventDefault();
-  await send();
-};
 
 const isLoadAll = ref(false);
 
@@ -175,7 +184,12 @@ const handleListItemClick = async (e: MouseEvent) => {
       <span class="flex-1"></span>
       <section class="flex items-center">
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
-        <UButton icon="i-tabler-send" class="px-6" @click="send">
+        <UButton
+          icon="i-tabler-send"
+          class="px-6"
+          :loading="streaming"
+          @click="send"
+        >
           发送
         </UButton>
       </section>

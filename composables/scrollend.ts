@@ -5,10 +5,12 @@ import { debounce } from "lodash-es";
 export const useScrollBottom = (
   container: MaybeRefOrGetter<HTMLElement | undefined | null>,
   list_element: MaybeRefOrGetter<HTMLElement | undefined | null>,
+  disabled?: unknown,
 ) => {
   const bottom = ref(0);
 
   const resetScroll = () => {
+    if (toValue(disabled)) return;
     const element = toValue(container);
     if (!element) return;
     const { scrollHeight, clientHeight } = element;
