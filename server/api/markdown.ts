@@ -7,9 +7,8 @@ const request_schema = z.object({
   text: z.string(),
 });
 
-const markdown = MarkdownIt();
-
-const load_plugins = once(async () => {
+const load_markdown = once(async () => {
+  const markdown = MarkdownIt();
   const shiki = await Shiki({
     theme: "vitesse-dark",
   });
@@ -19,11 +18,10 @@ const load_plugins = once(async () => {
 const clean_markdown = MarkdownIt();
 
 export const parseMarkdown = async (text: string) => {
-  await load_plugins();
   try {
+    const markdown = await load_markdown();
     return markdown.render(text);
   } catch (err) {
-    console.log("渲染 Markdown 异常", err, text);
     return clean_markdown.render(text);
   }
 };
