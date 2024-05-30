@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import "~/assets/main.css";
 import { useAutoLogin } from "./composables/user";
+import "@fontsource-variable/noto-sans-sc";
 
 await useAutoLogin();
 
@@ -19,10 +19,6 @@ useHead({
       rel: "preconnect",
       href: "https://static.bronya.world",
     },
-    {
-      rel: "stylesheet",
-      href: "https://static.bronya.world/font/font.css",
-    },
   ],
   script: [
     {
@@ -37,3 +33,14 @@ useHead({
   <NuxtPage />
   <UNotifications />
 </template>
+
+<style>
+#__nuxt {
+  height: 100dvh;
+  overflow: auto;
+}
+
+body {
+  font-family: "Noto Sans SC Variable", sans-serif;
+}
+</style>

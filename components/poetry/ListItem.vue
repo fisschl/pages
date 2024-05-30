@@ -14,7 +14,7 @@ const to = computed(() => {
 <template>
   <article class="">
     <div class="mb-1 flex items-center gap-3 text-base">
-      <h4 class="flex-1 truncate font-bold">
+      <h4 class="flex-1 truncate font-semibold">
         <NuxtLink :to="to">
           {{ item.title }}
         </NuxtLink>
