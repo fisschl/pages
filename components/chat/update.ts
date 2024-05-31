@@ -34,23 +34,12 @@ const createInnerElement = (article: HTMLElement) => {
   return element;
 };
 
-class AsyncQueue {
-  state = Promise.resolve();
-  push(task: () => Promise<void>) {
-    this.state = this.state.then(task);
-  }
-}
-
-const queue = new AsyncQueue();
-
 export const updateMessage = async (item: Message, article: HTMLElement) => {
-  queue.push(async () => {
-    const node = await parse(item.content);
-    const vNode = patch(
-      vNodeCache.get(article) || createInnerElement(article),
-      node,
-    );
-    vNodeCache.set(article, vNode);
-    if (item.status === "stable") await renderMermaid(article);
-  });
+  const node = await parse(item.content);
+  const vNode = patch(
+    vNodeCache.get(article) || createInnerElement(article),
+    node,
+  );
+  vNodeCache.set(article, vNode);
+  if (item.status === "stable") await renderMermaid(article);
 };

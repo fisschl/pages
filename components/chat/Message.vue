@@ -1,27 +1,18 @@
 <script setup lang="ts">
 import ImageViewer from "../ImageViewer.vue";
 import type { Message } from "./type";
-import { watch } from "vue";
 
 const props = defineProps<{
   message: Message;
 }>();
 
-const article = ref<HTMLElement>();
-
 onMounted(async () => {
+  const { message } = props;
+  const article = document.getElementById(`article_${message.id}`);
+  if (!article) return;
   const { renderMermaid } = await import("./mermaid");
-  await renderMermaid(article.value!);
+  await renderMermaid(article);
 });
-
-watch(
-  () => props.message.content,
-  async () => {
-    if (!article.value) return;
-    const { updateMessage } = await import("~/components/chat/update");
-    await updateMessage(props.message, article.value);
-  },
-);
 </script>
 
 <template>
@@ -33,7 +24,7 @@ watch(
     }"
   >
     <article
-      ref="article"
+      :id="`article_${message.id}`"
       v-once
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"

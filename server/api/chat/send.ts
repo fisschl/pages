@@ -127,6 +127,7 @@ export default defineEventHandler(async (event) => {
     });
     output.content = String(err);
   }
+  await new Promise((resolve) => setTimeout(resolve, 300));
   const result = await database.ai_chat.update({
     where: { id: output.id },
     data: { content: output.content },

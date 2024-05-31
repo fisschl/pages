@@ -13,6 +13,6 @@ export const renderMermaid = async (container: HTMLElement) => {
     if (pre.nextElementSibling)
       pre.parentElement?.insertBefore(box, pre.nextElementSibling);
     else pre.parentElement?.appendChild(box);
-    box.classList.add("bg-stone-200", "rounded", "px-2", "py-3");
+    box.classList.add("bg-white", "rounded", "px-2", "py-3");
   }
 };

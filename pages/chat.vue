@@ -46,15 +46,6 @@ const isShowScrollButton = computed(() => {
   return bottom > 100;
 });
 
-const handleNewMessage = async (message: Message) => {
-  if (!data.value) return;
-  const { list } = data.value;
-  if (!list) return;
-  const item = list.findLast((item) => item.id === message.id);
-  if (!item) list.push(message);
-  else Object.assign(item, message);
-};
-
 const inputText = ref<string>();
 const inputFiles = ref<string[]>();
 
@@ -93,10 +84,22 @@ const { scrollToBottom } = useScrollBottom(
   streaming,
 );
 
-eventHook.on(async (data) => {
-  const res = message_schema.safeParse(data);
+eventHook.on(async (event) => {
+  const res = message_schema.safeParse(event);
   if (!res.success) return;
-  await handleNewMessage(res.data);
+  const message = res.data;
+  if (!data.value) return;
+  const { list } = data.value;
+  if (!list) return;
+  const item = list.findLast((item) => item.id === message.id);
+  if (!item) list.push(message);
+  else {
+    Object.assign(item, message);
+    const article = document.getElementById(`article_${message.id}`);
+    if (!article) return;
+    const { updateMessage } = await import("~/components/chat/update");
+    await updateMessage(message, article);
+  }
   await nextTick();
   if (!directions.top && !isShowScrollButton.value) scrollToBottom();
 });
