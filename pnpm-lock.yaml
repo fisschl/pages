@@ -138,9 +138,6 @@ importers:
       '@nuxt/eslint':
         specifier: ^0.3.13
         version: 0.3.13(eslint@9.3.0)(nuxt@3.11.2(@opentelemetry/api@1.8.0)(@parcel/watcher@2.4.1)(@types/node@20.12.13)(@unocss/reset@0.60.3)(change-case@5.4.4)(encoding@0.1.13)(eslint@9.3.0)(floating-vue@5.2.2(@nuxt/kit@3.11.2(rollup@4.18.0))(vue@3.4.27(typescript@5.4.5)))(fuse.js@6.6.2)(ioredis@5.4.1)(optionator@0.9.4)(rollup@4.18.0)(terser@5.31.0)(typescript@5.4.5)(unocss@0.60.3(postcss@8.4.38)(rollup@4.18.0)(vite@5.2.12(@types/node@20.12.13)(terser@5.31.0)))(vite@5.2.12(@types/node@20.12.13)(terser@5.31.0))(xml2js@0.6.2))(rollup@4.18.0)(typescript@5.4.5)(vite@5.2.12(@types/node@20.12.13)(terser@5.31.0))
-      '@types/ali-oss':
-        specifier: ^6.16.11
-        version: 6.16.11
       '@types/howler':
         specifier: ^2.2.11
         version: 2.2.11
@@ -1279,9 +1276,6 @@ packages:
   '@tufjs/models@2.0.1':
     resolution: {integrity: sha512-92F7/SFyufn4DXsha9+QfKnN03JGqtMFMXgSHbZOo8JG59WkTni7UzAouNQDf7AuP9OAMxVOPQcqG3sB7w+kkg==}
     engines: {node: ^16.14.0 || >=18.0.0}
-
-  '@types/ali-oss@6.16.11':
-    resolution: {integrity: sha512-/AyemPZy93ZXGzEokMsoPFgjH37snpzH4X/fwans/n63HLaCleriCG3PyrkHCPkgHEc9vj9Uo6paqsBN3vJ3OA==}
 
   '@types/css-font-loading-module@0.0.12':
     resolution: {integrity: sha512-x2tZZYkSxXqWvTDgveSynfjq/T2HyiZHXb00j/+gy19yp70PHCizM48XFdjBCWH7eHBD0R5i/pw9yMBP/BH5uA==}
@@ -6886,8 +6880,6 @@ snapshots:
     dependencies:
       '@tufjs/canonical-json': 2.0.0
       minimatch: 9.0.4
-
-  '@types/ali-oss@6.16.11': {}
 
   '@types/css-font-loading-module@0.0.12': {}
 

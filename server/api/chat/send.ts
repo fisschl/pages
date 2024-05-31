@@ -15,7 +15,6 @@ export const openai = new OpenAI({
 });
 
 const request_schema = z.object({
-  chat_id: z.string().optional(),
   content: z.string().optional(),
   images: z.array(z.string()).optional(),
 });
@@ -23,15 +22,6 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   const user_id = await use401(event);
   const body = await readValidatedBody(event, request_schema.parse);
-  if (body.chat_id) {
-    const item = await database.ai_chat.findFirst({
-      where: { id: body.chat_id, user_id },
-      include: { images: true },
-    });
-    if (!item) throw createError({ status: 404 });
-    body.content = item.content;
-    body.images = item.images.map((item) => item.image);
-  }
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });
   const input = await database.ai_chat.create({
@@ -53,6 +43,7 @@ export default defineEventHandler(async (event) => {
     ...input,
     content: await parseMarkdown(input.content),
     user_id: undefined,
+    status: "stable",
   };
   const secret = await useUserSecret(user_id);
   publisher.publish(secret, JSON.stringify(input_message));
@@ -117,6 +108,7 @@ export default defineEventHandler(async (event) => {
         ...output,
         content: await parseMarkdown(output.content),
         user_id: undefined,
+        status: "loading",
       };
       publisher.publish(secret, JSON.stringify(message));
     }
@@ -135,7 +127,6 @@ export default defineEventHandler(async (event) => {
     });
     output.content = String(err);
   }
-  await new Promise<void>((resolve) => setTimeout(resolve, 300));
   const result = await database.ai_chat.update({
     where: { id: output.id },
     data: { content: output.content },
@@ -144,6 +135,7 @@ export default defineEventHandler(async (event) => {
     ...result,
     content: await parseMarkdown(result.content),
     user_id: undefined,
+    status: "stable",
   };
   publisher.publish(secret, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));

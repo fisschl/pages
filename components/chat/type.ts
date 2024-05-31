@@ -11,6 +11,7 @@ export const message_schema = z.object({
   content: z.string(),
   create_at: z.string().optional(),
   images: z.array(image_schema).optional(),
+  status: z.enum(["stable", "loading"]).optional(),
 });
 
 export type Message = z.output<typeof message_schema>;

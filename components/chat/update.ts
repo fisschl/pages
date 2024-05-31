@@ -10,6 +10,7 @@ import {
   toVNode,
 } from "snabbdom";
 import type { Message } from "./type";
+import { renderMermaid } from "~/components/chat/mermaid";
 
 const patch = init(
   [classModule, propsModule, attributesModule, datasetModule, styleModule],
@@ -19,12 +20,9 @@ const patch = init(
 
 const parser = new DOMParser();
 
-const parse = (html: string | Element[]) => {
-  if (typeof html === "string") {
-    const { body } = parser.parseFromString(html, "text/html");
-    html = Array.from(body.children);
-  }
-  const nodes = html.map((node) => toVNode(node));
+const parse = async (html: string) => {
+  const { body } = parser.parseFromString(html, "text/html");
+  const nodes = Array.from(body.children).map((node) => toVNode(node));
   return fragment(nodes);
 };
 
@@ -36,15 +34,23 @@ const createInnerElement = (article: HTMLElement) => {
   return element;
 };
 
-export const updateMessage = async (item: Message) => {
-  const itemElement = document.getElementById(item.id);
-  if (!itemElement) return;
-  const article = itemElement.querySelector("article.prose");
-  if (!(article instanceof HTMLElement)) return;
-  const node = parse(item.content);
-  const vNode = patch(
-    vNodeCache.get(article) || createInnerElement(article),
-    node,
-  );
-  vNodeCache.set(article, vNode);
+class AsyncQueue {
+  state = Promise.resolve();
+  push(task: () => Promise<void>) {
+    this.state = this.state.then(task);
+  }
+}
+
+const queue = new AsyncQueue();
+
+export const updateMessage = async (item: Message, article: HTMLElement) => {
+  queue.push(async () => {
+    const node = await parse(item.content);
+    const vNode = patch(
+      vNodeCache.get(article) || createInnerElement(article),
+      node,
+    );
+    vNodeCache.set(article, vNode);
+    if (item.status === "stable") await renderMermaid(article);
+  });
 };

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { debounce, remove } from "lodash-es";
+import { debounce } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
@@ -51,13 +51,8 @@ const handleNewMessage = async (message: Message) => {
   const { list } = data.value;
   if (!list) return;
   const item = list.findLast((item) => item.id === message.id);
-  if (!item) {
-    list.push(message);
-    return;
-  }
-  Object.assign(item, message);
-  const { updateMessage } = await import("~/components/chat/update");
-  await updateMessage(item);
+  if (!item) list.push(message);
+  else Object.assign(item, message);
 };
 
 const inputText = ref<string>();
@@ -128,33 +123,6 @@ whenever(shouldLoadMore, async () => {
   data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
-
-const handleListItemClick = async (e: MouseEvent) => {
-  const { target } = e;
-  if (!(target instanceof Element)) return;
-  const button = target.closest("button");
-  if (!button) return;
-  const li = button.closest("li");
-  if (!li || !li.id) return;
-  const message = data.value?.list.find((item) => item.id === li.id);
-  if (!message) return;
-  switch (button.title) {
-    case "删除":
-      await $fetch(`/api/chat/message`, {
-        method: "DELETE",
-        query: { id: message.id },
-      });
-      remove(data.value!.list, (item) => item.id === message.id);
-      break;
-    case "重新发送":
-      scrollToBottom();
-      await $fetch(`/api/chat/send`, {
-        method: "POST",
-        body: { chat_id: message.id },
-      });
-      break;
-  }
-};
 </script>
 
 <template>
@@ -163,7 +131,6 @@ const handleListItemClick = async (e: MouseEvent) => {
       ref="list_element"
       class="mt-5 flex flex-1 flex-col items-start"
       :class="$style.list_element"
-      @click="handleListItemClick"
     >
       <ChatMessage v-for="item in data?.list" :key="item.id" :message="item" />
     </ol>
