@@ -30,6 +30,9 @@ export default defineEventHandler(async (event) => {
   searchParams.append("client_secret", GITEE_AUTH_CLIENT_SECRET!);
   const acc_res = await $fetch(uri.toString(), {
     method: "POST",
+    onResponseError: async (ctx) => {
+      console.log(ctx.response);
+    },
   });
   const acc = acc_schema.parse(acc_res);
   const user_res = await $fetch("https://gitee.com/api/v5/user", {
