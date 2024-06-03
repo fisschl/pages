@@ -36,13 +36,6 @@ model ai_chat {
   @@index([user_id, create_at(sort: Desc), deleted])
 }
 
-model log {
-  id        String   @id @db.VarChar(255)
-  create_at DateTime @default(now()) @db.Timestamptz()
-  tag       String   @db.VarChar(255)
-  content   String
-}
-
 model chat_image {
   id        String    @id @db.VarChar(255)
   create_at DateTime  @default(now()) @db.Timestamptz()
