@@ -42,3 +42,10 @@ model chat_image {
   image     String
   ai_chat   ai_chat[]
 }
+
+model log {
+  id      String   @id @db.VarChar(255)
+  time    DateTime @default(now()) @db.Timestamptz()
+  tag     String
+  content String
+}

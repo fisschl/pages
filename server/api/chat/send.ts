@@ -6,7 +6,6 @@ import { database } from "~/server/database/postgres";
 import { use401, useUserSecret } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
-import { logs } from "~/server/database/mongo";
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -114,13 +113,17 @@ export default defineEventHandler(async (event) => {
       publisher.publish(secret, JSON.stringify(message));
     }
   } catch (err) {
-    await logs.insertOne({
-      tag: "OpenAI 响应",
-      time: new Date(),
-      error: String(err),
-      input: input,
-      output: output,
-      message: last(history_messages),
+    await database.log.create({
+      data: {
+        id: uuid(),
+        tag: "OpenAI 响应",
+        content: JSON.stringify({
+          error: String(err),
+          input: input,
+          output: output,
+          message: last(history_messages),
+        }),
+      },
     });
     output.content = String(err);
   }
