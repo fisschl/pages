@@ -6,6 +6,7 @@ import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
 import { scrollTarget } from "~/utils/page_scroll";
 import { useScrollBottom } from "~/composables/scrollend";
+import { useShouldLogin } from "~/composables/user";
 
 useHead({
   title: "GPT",
@@ -71,11 +72,7 @@ const handleKeydown = async (e: KeyboardEvent) => {
   await send();
 };
 
-const { data: secret } = await useFetch("/api/auth/secret", { headers });
-
-const { eventHook } = useSocket({
-  topic: secret.value?.secret || "public",
-});
+const { eventHook } = useSocket();
 
 const list_element = ref<HTMLElement>();
 const { scrollToBottom } = useScrollBottom(

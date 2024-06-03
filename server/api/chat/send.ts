@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { publisher } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
-import { use401, useUserSecret } from "~/server/utils/user";
+import { use401 } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
 
@@ -45,8 +45,7 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
     status: "stable",
   };
-  const secret = await useUserSecret(user_id);
-  publisher.publish(secret, JSON.stringify(input_message));
+  publisher.publish(user_id, JSON.stringify(input_message));
   const output = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -110,7 +109,7 @@ export default defineEventHandler(async (event) => {
         user_id: undefined,
         status: "loading",
       };
-      publisher.publish(secret, JSON.stringify(message));
+      publisher.publish(user_id, JSON.stringify(message));
     }
   } catch (err) {
     await database.log.create({
@@ -138,7 +137,7 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
     status: "stable",
   };
-  publisher.publish(secret, JSON.stringify(message));
+  publisher.publish(user_id, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   return { message: "完成" };
 });
