@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       user_id,
       images: {
         create: images?.map((item) => ({
-          id: uuid(),
+          image_id: uuid(),
           image: item,
         })),
       },

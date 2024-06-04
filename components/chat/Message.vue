@@ -24,14 +24,14 @@ onMounted(async () => {
     }"
   >
     <article
-      :id="`article_${message.id}`"
       v-once
+      :id="`article_${message.id}`"
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"
     />
     <ImageViewer
       v-for="file in message.images"
-      :key="file.id"
+      :key="file.image_id"
       class="mt-2 inline-block size-16 object-cover"
       :src="file.image"
     />

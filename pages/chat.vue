@@ -143,8 +143,8 @@ whenever(shouldLoadMore, async () => {
     />
     <div class="mb-5 mt-3 flex items-start">
       <ImageViewer
-        v-for="item in inputFiles"
-        :key="item"
+        v-for="(item, index) in inputFiles"
+        :key="index"
         class="mr-2 size-12 object-cover"
         :src="item"
       />

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const image_schema = z.object({
-  id: z.string(),
+  image_id: z.string(),
   image: z.string(),
 });
 
