@@ -24,7 +24,7 @@ onChange(async (list) => {
       image.onload = resolve;
     });
     const canvas = document.createElement("canvas");
-    const target_px = 720;
+    const target_px = 1080;
     // 如果图片的长和宽都小于 target_px 像素，那么 scale 将会是 1，这意味着图片不会被缩放。
     const scale = Math.max(
       image.width / target_px,
