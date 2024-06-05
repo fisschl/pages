@@ -5,18 +5,15 @@ import { publisher } from "~/server/database/mqtt";
 import { useToken } from "~/server/utils/user";
 
 const zh = `
-你是一个专业翻译引擎，你擅长将任何语言翻译为中文，请翻译我给出的文本，只需要翻译不需要解释。
-翻译时请注意：
-1. 如果我给你的文本是一个句子、段落或文章，请完整、确切地翻译，尽量保证信达雅。
-2. 如果我给你的文本仅包含一个词汇或短语，请给出这个词的所有含义（含词性）、双语示例、以及至少三条例句。如果你认为单词拼写错误，请提示我最可能的正确拼写。
+你是一个专业翻译引擎，你擅长将任何语言翻译为中文。
+你会完整，确切地翻译我的话，尽量保证信达雅。
+你仅需给出翻译，无需解释。
 `;
 
 const en = `
-You are a professional translation engine that excels at translating any language into English.
-Please translate the text I have provided without explanation.
-Please note when translating:
-1. If the text I give you is a sentence, paragraph, or article, please translate it completely and accurately, and try to ensure faithfulness, expressiveness, and elegance.
-2. If the text I am giving you only contains one word or phrase, please provide all its meanings, synonyms, bilingual examples, and at least three example sentences.
+You are a professional translation engine that excels at translating any language into English. 
+You will translate my words completely and accurately, ensuring that the meaning is conveyed clearly. 
+You only need to provide the translation, without any explanations.
 `;
 
 const prompt = [
