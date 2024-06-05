@@ -46,7 +46,8 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
     status: "stable",
   };
-  publisher.publish(user_id, JSON.stringify(input_message));
+  const publish_topic = `ai_chat/${user_id}`;
+  publisher.publish(publish_topic, JSON.stringify(input_message));
   const output = await database.ai_chat.create({
     data: {
       id: uuid(),
@@ -110,7 +111,7 @@ export default defineEventHandler(async (event) => {
         user_id: undefined,
         status: "loading",
       };
-      publisher.publish(user_id, JSON.stringify(message));
+      publisher.publish(publish_topic, JSON.stringify(message));
     }
   } catch (err) {
     await log("OpenAI 响应", {
@@ -132,7 +133,7 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
     status: "stable",
   };
-  publisher.publish(user_id, JSON.stringify(message));
+  publisher.publish(publish_topic, JSON.stringify(message));
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   return { message: "完成" };
 });

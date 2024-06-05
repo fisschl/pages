@@ -12,7 +12,7 @@ useHead({
   title: "GPT",
 });
 
-await useShouldLogin();
+const user = await useShouldLogin();
 
 const headers = useRequestHeaders(["cookie"]);
 
@@ -72,7 +72,13 @@ const handleKeydown = async (e: KeyboardEvent) => {
   await send();
 };
 
-const { eventHook } = useSocket();
+const token = useCookie("token");
+
+const { eventHook } = useSocket({
+  username: user?.id || "public",
+  password: token.value || "public",
+  topic: `ai_chat/${user?.id}`,
+});
 
 const list_element = ref<HTMLElement>();
 const { scrollToBottom } = useScrollBottom(
