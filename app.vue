@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAutoLogin } from "./composables/user";
+import "@fontsource-variable/open-sans";
 import "@fontsource-variable/noto-sans-sc";
 
 await useAutoLogin();
@@ -41,6 +42,6 @@ useHead({
 }
 
 body {
-  font-family: "Noto Sans SC Variable", sans-serif;
+  font-family: "Open Sans Variable", "Noto Sans SC Variable", sans-serif;
 }
 </style>
