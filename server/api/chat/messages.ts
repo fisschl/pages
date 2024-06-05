@@ -14,6 +14,7 @@ const request_schema = z.object({
 export type MessagesQuery = z.input<typeof request_schema>;
 
 export default defineEventHandler(async (event) => {
+  throw new Error("Not implemented");
   const user = await use401(event);
   const { create_at } = await getValidatedQuery(event, request_schema.parse);
   const history = await database.ai_chat.findMany({

@@ -43,12 +43,11 @@ model chat_image {
   image     String
   ai_chat   ai_chat  @relation(fields: [chat_id], references: [id])
 
-  @@index(chat_id)
+  @@index([chat_id])
 }
 
 model log {
-  id      String   @id @db.VarChar(255)
-  time    DateTime @default(now()) @db.Timestamptz()
-  tag     String
+  time    DateTime @id @db.Timestamptz()
+  label   String
   content String
 }
