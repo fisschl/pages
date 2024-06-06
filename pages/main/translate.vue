@@ -28,6 +28,7 @@ eventHook.on(async (event) => {
 const input = ref("");
 
 const handleSubmit = async () => {
+  await nextTick();
   if (!input.value) return;
   await $fetch("/api/translate", {
     method: "POST",
@@ -41,14 +42,6 @@ const handleSubmit = async () => {
 const handleKeydown = async (e: KeyboardEvent) => {
   if (e.ctrlKey || e.shiftKey) return;
   e.preventDefault();
-  await nextTick();
-  await handleSubmit();
-};
-
-const handlePaste = async () => {
-  const { clipboard } = navigator;
-  if (!clipboard) return;
-  input.value = await clipboard.readText();
   await handleSubmit();
 };
 
@@ -66,22 +59,20 @@ const language = ref("中文");
         @change="handleSubmit"
       />
       <span class="flex-1"></span>
-      <UButton icon="i-tabler-clipboard" color="blue" @click="handlePaste">
-        粘贴
-      </UButton>
       <UButton icon="i-tabler-player-play" @click="handleSubmit">
         翻译
       </UButton>
     </section>
     <UTextarea
+      v-model="input"
       autofocus
       autoresize
-      v-model="input"
       size="lg"
       placeholder="输入要翻译的内容"
       @keydown.enter="handleKeydown"
+      @paste="handleSubmit"
     />
-    <UDivider class="my-6" icon="i-tabler-language-hiragana" />
+    <UDivider class="mb-3 mt-4" icon="i-tabler-language-hiragana" />
     <article
       ref="article"
       class="prose mb-10 max-w-none px-2 dark:prose-invert"
