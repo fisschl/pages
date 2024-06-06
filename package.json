@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "preview": "nuxt preview --host",
     "postinstall": "nuxt prepare",
-    "work": "powershell ./build.ps1",
+    "build:image": "powershell ./build.ps1",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "db:generate": "prisma generate"
