@@ -1,5 +1,6 @@
-FROM registry.cn-shanghai.aliyuncs.com/fisschl/pnpm:latest AS builder
+FROM registry.cn-shanghai.aliyuncs.com/fisschl/node:latest AS builder
 WORKDIR /root
+RUN npm config set registry https://registry.npmmirror.com && npm install -g pnpm
 COPY pnpm-lock.yaml .
 COPY package.json .
 COPY .npmrc .
