@@ -4,11 +4,11 @@ import { z } from "zod";
 
 const token = useCookie("token");
 
-const { eventHook } = useSocket({
+const { eventHook } = useSocket(() => ({
   username: "public",
   password: "public",
   topic: `public/translate/${token.value}`,
-});
+}));
 
 const message_schema = z.object({
   content: z.string(),

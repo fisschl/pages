@@ -1,10 +1,14 @@
 import { database } from "~/server/database/postgres";
-import { use401 } from "~/server/utils/user";
+import { useToken } from "~/server/utils/user";
+import { redis } from "~/server/database/redis";
 
 export default defineEventHandler(async (event) => {
-  const id = await use401(event);
-  return database.user.update({
+  const token = useToken(event);
+  const id = await redis.hget(token, "user");
+  if (!id) return { token, user: null };
+  const user = await database.user.update({
     where: { id },
     data: { last_login: new Date() },
   });
+  return { token, user };
 });

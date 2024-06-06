@@ -3,8 +3,6 @@ import { useAutoLogin } from "./composables/user";
 import "@fontsource-variable/open-sans";
 import "@fontsource-variable/noto-sans-sc";
 
-await useAutoLogin();
-
 useHead({
   htmlAttrs: {
     lang: "zh-CN",
@@ -28,6 +26,8 @@ useHead({
     },
   ],
 });
+
+await useAutoLogin();
 </script>
 
 <template>

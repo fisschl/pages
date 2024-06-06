@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
     user_id: undefined,
     status: "stable",
   };
-  const publish_topic = `ai_chat/${user_id}`;
+  const publish_topic = `${user_id}/ai_chat`;
   publisher.publish(publish_topic, JSON.stringify(input_message));
   const output = await database.ai_chat.create({
     data: {

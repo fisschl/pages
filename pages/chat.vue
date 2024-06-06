@@ -77,7 +77,7 @@ const token = useCookie("token");
 const { eventHook } = useSocket({
   username: user?.id || "public",
   password: token.value || "public",
-  topic: `ai_chat/${user?.id}`,
+  topic: `${user?.id}/ai_chat`,
 });
 
 const list_element = ref<HTMLElement>();
