@@ -25,6 +25,7 @@ onMounted(async () => {
   >
     <article
       v-once
+      :class="$style.article"
       :id="`article_${message.id}`"
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"
@@ -38,4 +39,8 @@ onMounted(async () => {
   </li>
 </template>
 
-<style module></style>
+<style module>
+.article tr th {
+  text-align: left;
+}
+</style>

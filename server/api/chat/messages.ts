@@ -20,7 +20,6 @@ export default defineEventHandler(async (event) => {
     where: {
       user_id: user,
       create_at: { lt: create_at },
-      deleted: false,
     },
     orderBy: { create_at: "desc" },
     take: 16,

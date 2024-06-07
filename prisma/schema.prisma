@@ -29,11 +29,10 @@ model ai_chat {
   user_id   String       @db.VarChar(255)
   role      ChatRole
   content   String
-  deleted   Boolean      @default(false)
   images    chat_image[]
   user      user         @relation(fields: [user_id], references: [id])
 
-  @@index([user_id, create_at(sort: Desc), deleted])
+  @@index([user_id, create_at(sort: Desc)])
 }
 
 model chat_image {

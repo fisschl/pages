@@ -4,9 +4,9 @@ import { type Message, message_schema } from "~/components/chat/type";
 import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
-import { scrollTarget } from "~/utils/page_scroll";
-import { useScrollBottom } from "~/composables/scrollend";
 import { useShouldLogin } from "~/composables/user";
+import { onMounted } from "vue";
+import { useLockScroll } from "~/composables/lock_scroll";
 
 useHead({
   title: "GPT",
@@ -30,27 +30,29 @@ const fetchData = async (param?: MessagesQuery) => {
 
 const { data } = await useAsyncData(() => fetchData());
 
-const isMounted = useMounted();
-const scroll_element = computed(() => {
-  return isMounted.value ? scrollTarget() : null;
-});
-const { directions, y: source_top } = useScroll(scroll_element);
+const scrollTarget = useScrollTarget();
 
-const top = refThrottled(source_top, 200);
+const list_element = ref<HTMLElement>();
+
+const streaming = ref(false);
+
+const { scrollToBottom, directions, throttledScrollTop, arrivedState } =
+  useLockScroll({
+    scrollTarget: scrollTarget,
+    resizeTarget: list_element,
+    disabled: streaming,
+    direction: "bottom",
+  });
 
 const isShowScrollButton = computed(() => {
-  if (!isMounted.value) return;
-  const element = scrollTarget();
-  if (!element) return;
-  const { scrollHeight, clientHeight } = element;
-  const bottom = scrollHeight - top.value - clientHeight;
+  if (!scrollTarget.value) return;
+  const { scrollHeight, clientHeight } = scrollTarget.value;
+  const bottom = scrollHeight - throttledScrollTop.value - clientHeight;
   return bottom > 100;
 });
 
 const inputText = ref<string>();
 const inputFiles = ref<string[]>();
-
-const streaming = ref(false);
 
 const send = debounce(async () => {
   inputText.value = inputText.value?.trim();
@@ -80,12 +82,9 @@ const { eventHook } = useSocket({
   topic: `${user?.id}/ai_chat`,
 });
 
-const list_element = ref<HTMLElement>();
-const { scrollToBottom } = useScrollBottom(
-  scroll_element,
-  list_element,
-  streaming,
-);
+onMounted(() => {
+  scrollToBottom();
+});
 
 eventHook.on(async (event) => {
   const res = message_schema.safeParse(event);
@@ -112,9 +111,9 @@ const isLoadAll = ref(false);
 const loading = ref(false);
 
 const shouldLoadMore = computed(() => {
-  if (!isMounted.value || loading.value) return;
+  if (!scrollTarget.value || loading.value) return;
   if (isLoadAll.value || !data.value?.list.length) return;
-  return directions.top && source_top.value < 10;
+  return directions.top && arrivedState.top;
 });
 
 whenever(shouldLoadMore, async () => {

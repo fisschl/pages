@@ -1,15 +1,11 @@
-import { z } from "zod";
-
-export const user_schema = z.object({
-  id: z.string(),
-  login: z.string(),
-  name: z.string(),
-  avatar_url: z.string().nullable(),
-  email: z.string().nullable(),
-  role: z.string().nullable(),
-});
-
-export type User = z.infer<typeof user_schema>;
+export interface User {
+  id: string;
+  login: string;
+  name: string;
+  avatar_url: string | null;
+  email: string | null;
+  role: string | null;
+}
 
 export const useUserStore = defineStore("pages-user", () => {
   const user = ref<User>();
