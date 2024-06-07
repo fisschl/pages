@@ -34,7 +34,6 @@ const handleSubmit = async () => {
     method: "POST",
     body: {
       content: input.value,
-      language: language.value,
     },
   });
 };
@@ -44,20 +43,11 @@ const handleKeydown = async (e: KeyboardEvent) => {
   e.preventDefault();
   await handleSubmit();
 };
-
-const languages = ["中文", "English"];
-const language = ref("中文");
 </script>
 
 <template>
   <UContainer class="my-6">
     <section class="mb-3 flex gap-4">
-      <USelectMenu
-        v-model="language"
-        :options="languages"
-        placeholder="目标语言"
-        @change="handleSubmit"
-      />
       <span class="flex-1"></span>
       <UButton icon="i-tabler-player-play" @click="handleSubmit">
         翻译
