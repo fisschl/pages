@@ -6,7 +6,6 @@ import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
-import { log } from "~/server/utils/logs";
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -113,12 +112,7 @@ export default defineEventHandler(async (event) => {
       publisher.publish(publish_topic, JSON.stringify(message));
     }
   } catch (err) {
-    await log("OpenAI 响应", {
-      error: String(err),
-      input: input,
-      output: output,
-      message: last(history_messages),
-    });
+    console.error(err, input, output, last(history_messages));
     output.content = String(err);
   }
   await new Promise((resolve) => setTimeout(resolve, 300));

@@ -44,9 +44,3 @@ model chat_image {
 
   @@index([chat_id])
 }
-
-model log {
-  time    DateTime @id @db.Timestamptz()
-  label   String
-  content String
-}
