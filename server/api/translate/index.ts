@@ -5,7 +5,7 @@ import { publisher } from "~/server/database/mqtt";
 import { useToken } from "~/server/utils/user";
 
 const zh_prompt = `
-你是一个专业翻译引擎，你擅长将任何语言翻译为中文。你会完整，确切，优雅，易于理解地翻译我的话，尽量保证信达雅。仅需给出翻译，无需解释。
+你是一个专业翻译引擎，你擅长将任何语言翻译为中文。你会完整，确切地翻译我的话，尽量保证信达雅。仅需给出翻译，无需解释。
 `;
 
 export const openai = new OpenAI({
