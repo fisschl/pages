@@ -25,8 +25,8 @@ onMounted(async () => {
   >
     <article
       v-once
-      :class="$style.article"
       :id="`article_${message.id}`"
+      :class="$style.article"
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"
     />

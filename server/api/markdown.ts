@@ -11,19 +11,14 @@ const load_markdown = once(async () => {
   const markdown = MarkdownIt();
   const shiki = await Shiki({
     theme: "vitesse-dark",
+    fallbackLanguage: "html",
   });
   return markdown.use(shiki);
 });
 
-const clean_markdown = MarkdownIt();
-
 export const parseMarkdown = async (text: string) => {
   const markdown = await load_markdown();
-  try {
-    return markdown.render(text);
-  } catch (err) {
-    return clean_markdown.render(text);
-  }
+  return markdown.render(text);
 };
 
 export default defineEventHandler(async (event) => {
