@@ -6,6 +6,7 @@ import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
+import { writeLog } from "~/server/database/clickhouse";
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -112,8 +113,14 @@ export default defineEventHandler(async (event) => {
       publisher.publish(publish_topic, JSON.stringify(message));
     }
   } catch (err) {
-    console.error(err, input, output, last(history_messages));
-    output.content = String(err);
+    const content = JSON.stringify({
+      error: err,
+      input,
+      output,
+      message: last(history_messages),
+    });
+    await writeLog("OpenAI 异常", content);
+    output.content = "未知异常：" + err;
   }
   await new Promise((resolve) => setTimeout(resolve, 300));
   const result = await database.ai_chat.update({
