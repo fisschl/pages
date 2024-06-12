@@ -6,10 +6,10 @@ export const image_schema = z.object({
 });
 
 export const message_schema = z.object({
-  id: z.string(),
+  message_id: z.string(),
+  time: z.string().optional(),
   role: z.enum(["user", "assistant"]),
   content: z.string(),
-  create_at: z.string().optional(),
   images: z.array(image_schema).optional(),
   status: z.enum(["stable", "loading"]).optional(),
 });

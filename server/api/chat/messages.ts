@@ -3,9 +3,10 @@ import { OPENAI_MODEL } from "~/server/api/chat/send";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { parseMarkdown } from "../markdown";
+import { groupBy } from "lodash-es";
 
 const request_schema = z.object({
-  create_at: z
+  time: z
     .string()
     .datetime()
     .catch(() => new Date().toISOString()),
@@ -15,22 +16,31 @@ export type MessagesQuery = z.input<typeof request_schema>;
 
 export default defineEventHandler(async (event) => {
   const user = await use401(event);
-  const { create_at } = await getValidatedQuery(event, request_schema.parse);
-  const history = await database.ai_chat.findMany({
+  const { time } = await getValidatedQuery(event, request_schema.parse);
+  const history = await database.message_ai_chat.findMany({
     where: {
       user_id: user,
-      create_at: { lt: create_at },
+      time: { lt: time },
     },
-    orderBy: { create_at: "desc" },
+    orderBy: { time: "desc" },
     take: 16,
-    include: { images: true },
   });
-  for (const item of history) {
-    item.content = await parseMarkdown(item.content);
-  }
+  const images = await database.message_ai_image.findMany({
+    where: {
+      message_id: { in: history.map((item) => item.message_id) },
+    },
+  });
+  const image_group = groupBy(images, "message_id");
   history.reverse();
+  const list = history.map(async (item) => {
+    return {
+      ...item,
+      images: image_group[item.message_id] || [],
+      content: await parseMarkdown(item.content),
+    };
+  });
   return {
-    list: history,
+    list: await Promise.all(list),
     model: OPENAI_MODEL,
   };
 });

@@ -8,7 +8,7 @@ const props = defineProps<{
 
 onMounted(async () => {
   const { message } = props;
-  const article = document.getElementById(`article_${message.id}`);
+  const article = document.getElementById(`article_${message.message_id}`);
   if (!article) return;
   const { renderMermaid } = await import("./mermaid");
   await renderMermaid(article);
@@ -25,7 +25,7 @@ onMounted(async () => {
   >
     <article
       v-once
-      :id="`article_${message.id}`"
+      :id="`article_${message.message_id}`"
       :class="$style.article"
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"
