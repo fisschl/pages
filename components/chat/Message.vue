@@ -34,7 +34,7 @@ onMounted(async () => {
       v-for="file in message.images"
       :key="file.image_id"
       class="mt-2 inline-block size-16 object-cover"
-      :src="file.image"
+      :src="file.url"
     />
   </li>
 </template>

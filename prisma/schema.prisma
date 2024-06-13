@@ -23,19 +23,21 @@ enum ChatRole {
 }
 
 model message_ai_chat {
-  message_id String   @db.VarChar(255)
-  time       DateTime @default(now()) @db.Timestamptz()
-  user_id    String   @db.VarChar(255)
-  role       ChatRole
-  content    String
+  message_id  String             @id @db.VarChar(255)
+  user_id     String             @db.VarChar(255)
+  create_time DateTime           @default(now()) @db.Timestamptz()
+  role        ChatRole
+  content     String
+  images      message_ai_image[]
 
-  @@id([user_id, time])
+  @@index([user_id, create_time(sort: Desc)])
 }
 
 model message_ai_image {
-  image_id   String @id @db.VarChar(255)
-  message_id String @db.VarChar(255)
-  image      String
+  image_id   String          @id @db.VarChar(255)
+  message_id String          @db.VarChar(255)
+  url        String
+  chat       message_ai_chat @relation(fields: [message_id], references: [message_id])
 
   @@index([message_id])
 }

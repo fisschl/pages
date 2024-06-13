@@ -2,12 +2,12 @@ import { z } from "zod";
 
 export const image_schema = z.object({
   image_id: z.string(),
-  image: z.string(),
+  url: z.string(),
 });
 
 export const message_schema = z.object({
   message_id: z.string(),
-  time: z.string().optional(),
+  create_time: z.string().optional(),
   role: z.enum(["user", "assistant"]),
   content: z.string(),
   images: z.array(image_schema).optional(),

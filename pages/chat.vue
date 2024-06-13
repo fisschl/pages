@@ -120,7 +120,7 @@ whenever(shouldLoadMore, async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
   const [item] = data.value.list;
   const { list } = await fetchData({
-    time: item.time,
+    create_time: item.create_time,
   });
   if (!list.length) isLoadAll.value = true;
   data.value.list = [...list, ...data.value.list];

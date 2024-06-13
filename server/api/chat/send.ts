@@ -1,20 +1,12 @@
-import { groupBy, last, pick } from "lodash-es";
+import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
+import { writeLog } from "~/server/database/clickhouse";
 import { publisher } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
-import { writeLog } from "~/server/database/clickhouse";
-import type {
-  message_ai_chat as ChatMessage,
-  message_ai_image as ChatImage,
-} from "@prisma/client";
-
-type Message = ChatMessage & {
-  images?: ChatImage[];
-};
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -33,28 +25,23 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });
-  const input: Message = await database.message_ai_chat.create({
+  const input = await database.message_ai_chat.create({
     data: {
       message_id: uuid(),
       role: "user",
       content: content,
       user_id,
+      images: {
+        createMany: {
+          data: images?.map((item) => ({ image_id: uuid(), url: item })) || [],
+        },
+      },
     },
+    include: { images: true },
   });
-  input.images = images?.map((item) => ({
-    image_id: uuid(),
-    image: item,
-    message_id: input.message_id,
-  }));
-  if (input.images?.length) {
-    await database.message_ai_image.createMany({
-      data: input.images,
-    });
-  }
   const input_message = {
     ...input,
     content: await parseMarkdown(input.content),
-    user_id: undefined,
     status: "stable",
   };
   const publish_topic = `${user_id}/ai_chat`;
@@ -73,30 +60,24 @@ export default defineEventHandler(async (event) => {
   const history = await database.message_ai_chat.findMany({
     where: {
       user_id: input.user_id,
-      time: { lt: input.time },
+      create_time: { lt: input.create_time },
     },
-    orderBy: { time: "desc" },
+    orderBy: { create_time: "desc" },
     take: 9,
+    include: { images: true },
   });
-  const history_images = await database.message_ai_image.findMany({
-    where: {
-      message_id: { in: history.map((item) => item.message_id) },
-    },
-  });
-  const history_images_group = groupBy(history_images, "message_id");
   /**
    * 处理后的发送参数
    */
   const history_messages = [...history.reverse(), input].map((item) => {
-    const images = history_images_group[item.message_id];
-    if (!images?.length || item.role !== "user") {
+    if (!item.images?.length || item.role !== "user") {
       return pick(item, ["role", "content"]);
     }
     // 处理带有图片的消息
-    const content = images.map((file) => {
+    const content = item.images.map((file) => {
       const part: OpenAI.ChatCompletionContentPartImage = {
         type: "image_url",
-        image_url: { url: file.image },
+        image_url: { url: file.url },
       };
       return part;
     });
@@ -140,7 +121,7 @@ export default defineEventHandler(async (event) => {
   }
   await new Promise((resolve) => setTimeout(resolve, 300));
   const result = await database.message_ai_chat.update({
-    where: { user_id_time: { user_id: output.user_id, time: output.time } },
+    where: { message_id: output.message_id },
     data: { content: output.content },
   });
   const message = {
