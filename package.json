@@ -33,6 +33,8 @@
     "@vueuse/router": "^10.10.0",
     "change-case": "^5.4.4",
     "date-fns": "^3.6.0",
+    "destr": "^2.0.3",
+    "eventsource-parser": "^1.1.2",
     "h3": "^1.11.1",
     "howler": "^2.2.4",
     "ioredis": "^5.4.1",

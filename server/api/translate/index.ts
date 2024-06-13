@@ -1,59 +1,61 @@
-import OpenAI from "openai";
 import { z } from "zod";
 import { parseMarkdown } from "~/server/api/markdown";
 import { publisher } from "~/server/database/mqtt";
 import { useToken } from "~/server/utils/user";
 import { writeLog } from "~/server/database/clickhouse";
-
-const zh_prompt = `
-你是一个专业翻译引擎，你擅长将任何语言翻译为中文。你会完整，确切地翻译我的话，尽量保证信达雅。仅需给出翻译，无需解释。
-`;
-
-export const openai = new OpenAI({
-  apiKey: process.env["MOONSHOT_API_KEY"],
-  baseURL: "https://api.moonshot.cn/v1",
-});
+import { EventSourceParserStream } from "eventsource-parser/stream";
+import destr from "destr";
 
 const request_schema = z.object({
   content: z.string(),
 });
 
+const dashscopeSchema = z.object({
+  output: z.object({
+    text: z.string(),
+  }),
+});
+
+const { TRANSLATION_API_ID, TRANSLATION_API_KEY } = process.env;
+
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
-  body.content = body.content.replace(/\n+/g, "\n\n");
   try {
-    await writeLog("请求翻译", body.content);
-    const stream = await openai.chat.completions.create({
-      model: "moonshot-v1-8k",
-      messages: [
-        {
-          role: "system",
-          content: zh_prompt,
+    const response = await fetch(
+      `https://dashscope.aliyuncs.com/api/v1/apps/${TRANSLATION_API_ID}/completion`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${TRANSLATION_API_KEY}`,
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
         },
-        {
-          role: "user",
-          content: body.content,
-        },
-      ],
-      stream: true,
-      max_tokens: 2048,
-    });
-    const output = {
-      content: "",
-    };
+        body: JSON.stringify({
+          input: {
+            prompt: body.content,
+          },
+        }),
+      },
+    );
+    const stream = response.body
+      ?.pipeThrough(new TextDecoderStream())
+      .pipeThrough(new EventSourceParserStream())
+      .getReader();
+    if (!stream) throw createError({ status: 500 });
     const token = useToken(event);
-    for await (const { choices } of stream) {
-      if (!choices.length) continue;
-      const [{ delta }] = choices;
-      if (!delta || !delta.content) continue;
-      output.content += delta.content;
+    while (true) {
+      const { value, done } = await stream.read();
+      if (done) break;
+      if (!value) continue;
+      const res = dashscopeSchema.safeParse(destr(value.data));
+      if (!res.success) continue;
+      const { text } = res.data.output;
       const message = {
-        ...output,
-        content: await parseMarkdown(output.content),
+        content: await parseMarkdown(text),
       };
       publisher.publish(`public/translate/${token}`, JSON.stringify(message));
     }
-    return output;
+    return { message: "完成" };
   } catch (e) {
     const content = JSON.stringify({
       error: e,
