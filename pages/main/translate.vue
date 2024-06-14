@@ -3,11 +3,6 @@ import { useSocket } from "~/composables/socket";
 import { z } from "zod";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
-import Link from "@tiptap/extension-link";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
 import Placeholder from "@tiptap/extension-placeholder";
 import "~/components/editor/editor.css";
 
@@ -58,7 +53,6 @@ const handleSubmit = async () => {
   });
   if (res.message !== "完成") return;
   streaming.value = false;
-  console.log(res);
 };
 
 const editor = shallowRef<Editor>();
@@ -66,11 +60,6 @@ onMounted(() => {
   editor.value = new Editor({
     extensions: [
       StarterKit,
-      Link,
-      Table,
-      TableRow,
-      TableHeader,
-      TableCell,
       Placeholder.configure({
         placeholder: "请输入要翻译的文本",
       }),
