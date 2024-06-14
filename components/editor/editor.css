@@ -1,0 +1,15 @@
+.tiptap {
+  max-width: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #b1b1b1;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap table p {
+  margin: 0;
+}

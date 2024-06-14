@@ -6,6 +6,21 @@ import { writeLog } from "~/server/database/clickhouse";
 import { EventSourceParserStream } from "eventsource-parser/stream";
 import destr from "destr";
 import { redis } from "~/server/database/redis";
+import rehypeParse from "rehype-parse";
+import rehypeRemark from "rehype-remark";
+import remarkStringify from "remark-stringify";
+import remarkGfm from "remark-gfm";
+import { unified } from "unified";
+
+const html2markdown = async (html: string) => {
+  const file = await unified()
+    .use(rehypeParse, { fragment: true })
+    .use(rehypeRemark)
+    .use(remarkGfm)
+    .use(remarkStringify)
+    .process(html);
+  return file.toString();
+};
 
 const request_schema = z.object({
   content: z.string(),
@@ -24,6 +39,7 @@ export default defineEventHandler(async (event) => {
   const token = useToken(event);
   const current_id = uuid();
   await redis.hset(token, "translate_api", current_id);
+  const markdown = await html2markdown(body.content);
   try {
     const response = await fetch(
       `https://dashscope.aliyuncs.com/api/v1/apps/${TRANSLATION_API_ID}/completion`,
@@ -36,7 +52,7 @@ export default defineEventHandler(async (event) => {
         },
         body: JSON.stringify({
           input: {
-            prompt: body.content,
+            prompt: markdown,
           },
         }),
       },
@@ -60,7 +76,7 @@ export default defineEventHandler(async (event) => {
       };
       publisher.publish(`public/translate/${token}`, JSON.stringify(message));
     }
-    return { message: "完成" };
+    return { message: "完成", content: body.content, markdown };
   } catch (e) {
     const content = JSON.stringify({
       error: e,

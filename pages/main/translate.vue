@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { useSocket } from "~/composables/socket";
 import { z } from "zod";
+import StarterKit from "@tiptap/starter-kit";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import Link from "@tiptap/extension-link";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import Placeholder from "@tiptap/extension-placeholder";
+import "~/components/editor/editor.css";
 
 useHead({
   title: "翻译",
@@ -29,7 +38,6 @@ eventHook.on(async (event) => {
   await update(article.value, message.content);
 });
 
-const input = ref("");
 const streaming = ref(false);
 
 const stop = async () => {
@@ -39,24 +47,48 @@ const stop = async () => {
 };
 
 const handleSubmit = async () => {
-  await nextTick();
-  if (!input.value) return;
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const html = editor.value?.getHTML();
+  if (!html) return;
   if (streaming.value) await stop();
   streaming.value = true;
   const res = await $fetch("/api/translate", {
     method: "POST",
-    body: {
-      content: input.value,
-    },
+    body: { content: html },
   });
   if (res.message !== "完成") return;
   streaming.value = false;
+  console.log(res);
 };
 
-const handleKeydown = async (e: KeyboardEvent) => {
-  if (e.ctrlKey || e.shiftKey) return;
-  e.preventDefault();
-  await handleSubmit();
+const editor = shallowRef<Editor>();
+onMounted(() => {
+  editor.value = new Editor({
+    extensions: [
+      StarterKit,
+      Link,
+      Table,
+      TableRow,
+      TableHeader,
+      TableCell,
+      Placeholder.configure({
+        placeholder: "请输入要翻译的文本",
+      }),
+    ],
+    editorProps: {
+      attributes: {
+        class:
+          "prose dark:prose-invert prose-sm prose-code:text-sm focus:outline-none",
+      },
+    },
+  });
+});
+onBeforeUnmount(() => {
+  editor.value?.destroy();
+});
+
+const clearAll = () => {
+  editor.value?.commands.clearContent();
 };
 </script>
 
@@ -73,21 +105,22 @@ const handleKeydown = async (e: KeyboardEvent) => {
         <span> 中文 </span>
       </UBadge>
       <span class="flex-1"></span>
+      <UButton icon="i-tabler-clear-all" color="gray" @click="clearAll">
+        清空
+      </UButton>
       <UButton icon="i-tabler-run" @click="handleSubmit"> 开始翻译 </UButton>
     </section>
-    <UTextarea
-      v-model="input"
-      autofocus
-      autoresize
-      size="lg"
-      placeholder="输入要翻译的内容"
-      @keydown.enter="handleKeydown"
+    <EditorContent
+      v-if="editor"
+      :class="$style.editor"
+      class="rounded border border-dashed border-gray-500 bg-slate-50 px-2 py-1 focus-within:border-none focus-within:ring dark:border-gray-400 dark:bg-neutral-900"
+      :editor="editor"
       @paste="handleSubmit"
     />
     <UDivider class="mb-3 mt-4" icon="i-tabler-language-hiragana" />
     <article
       ref="article"
-      class="prose mb-2 max-w-none px-2 dark:prose-invert"
+      class="prose mb-2 max-w-none px-2 dark:prose-invert prose-code:text-base"
     ></article>
     <section class="flex justify-center p-2">
       <UIcon
@@ -100,4 +133,8 @@ const handleKeydown = async (e: KeyboardEvent) => {
   </UContainer>
 </template>
 
-<style module></style>
+<style module>
+.editor :global(.prose) {
+  min-height: 5rem;
+}
+</style>
