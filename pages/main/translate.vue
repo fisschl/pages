@@ -87,10 +87,11 @@ const handleKeydown = async (e: KeyboardEvent) => {
     <UDivider class="mb-3 mt-4" icon="i-tabler-language-hiragana" />
     <article
       ref="article"
-      class="prose mb-10 max-w-none px-2 dark:prose-invert"
+      class="prose mb-2 max-w-none px-2 dark:prose-invert"
     ></article>
-    <section v-if="streaming" class="flex justify-center p-2">
+    <section class="flex justify-center p-2">
       <UIcon
+        v-if="streaming"
         name="i-tabler-loader-2"
         class="animate-spin"
         style="font-size: 18px"
