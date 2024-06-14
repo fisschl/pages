@@ -2,6 +2,10 @@
 import { useSocket } from "~/composables/socket";
 import { z } from "zod";
 
+useHead({
+  title: "翻译",
+});
+
 const token = useCookie("token");
 
 const { eventHook } = useSocket(() => ({
@@ -26,16 +30,27 @@ eventHook.on(async (event) => {
 });
 
 const input = ref("");
+const streaming = ref(false);
+
+const stop = async () => {
+  await $fetch("/api/translate/stop", {
+    method: "POST",
+  });
+};
 
 const handleSubmit = async () => {
   await nextTick();
   if (!input.value) return;
-  await $fetch("/api/translate", {
+  if (streaming.value) await stop();
+  streaming.value = true;
+  const res = await $fetch("/api/translate", {
     method: "POST",
     body: {
       content: input.value,
     },
   });
+  if (res.message !== "完成") return;
+  streaming.value = false;
 };
 
 const handleKeydown = async (e: KeyboardEvent) => {
@@ -48,10 +63,17 @@ const handleKeydown = async (e: KeyboardEvent) => {
 <template>
   <UContainer class="my-6">
     <section class="mb-3 flex gap-4">
+      <UBadge color="white">
+        <span> 自动 </span>
+        <UIcon
+          name="i-tabler-arrow-right"
+          class="mx-3"
+          style="font-size: 14px"
+        />
+        <span> 中文 </span>
+      </UBadge>
       <span class="flex-1"></span>
-      <UButton icon="i-tabler-player-play" @click="handleSubmit">
-        翻译
-      </UButton>
+      <UButton icon="i-tabler-run" @click="handleSubmit"> 开始翻译 </UButton>
     </section>
     <UTextarea
       v-model="input"
@@ -67,6 +89,13 @@ const handleKeydown = async (e: KeyboardEvent) => {
       ref="article"
       class="prose mb-10 max-w-none px-2 dark:prose-invert"
     ></article>
+    <section v-if="streaming" class="flex justify-center p-2">
+      <UIcon
+        name="i-tabler-loader-2"
+        class="animate-spin"
+        style="font-size: 18px"
+      />
+    </section>
   </UContainer>
 </template>
 

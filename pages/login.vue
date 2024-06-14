@@ -41,13 +41,8 @@ onMounted(async () => {
 
 <template>
   <UContainer class="flex h-dvh items-center justify-center py-6">
-    <UCard>
-      <p class="mb-6 flex items-center justify-center text-base font-semibold">
-        请登录后使用
-      </p>
-      <UButton icon="i-tabler-brand-git" @click="login">
-        使用 Gitee 登录
-      </UButton>
-    </UCard>
+    <UButton icon="i-tabler-brand-git" @click="login">
+      使用 Gitee 登录
+    </UButton>
   </UContainer>
 </template>

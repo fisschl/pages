@@ -5,6 +5,7 @@ import { useToken } from "~/server/utils/user";
 import { writeLog } from "~/server/database/clickhouse";
 import { EventSourceParserStream } from "eventsource-parser/stream";
 import destr from "destr";
+import { redis } from "~/server/database/redis";
 
 const request_schema = z.object({
   content: z.string(),
@@ -20,6 +21,9 @@ const { TRANSLATION_API_ID, TRANSLATION_API_KEY } = process.env;
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
+  const token = useToken(event);
+  const current_id = uuid();
+  await redis.hset(token, "translate_api", current_id);
   try {
     const response = await fetch(
       `https://dashscope.aliyuncs.com/api/v1/apps/${TRANSLATION_API_ID}/completion`,
@@ -42,8 +46,9 @@ export default defineEventHandler(async (event) => {
       .pipeThrough(new EventSourceParserStream())
       .getReader();
     if (!stream) throw createError({ status: 500 });
-    const token = useToken(event);
     while (true) {
+      const translate_api = await redis.hget(token, "translate_api");
+      if (translate_api !== current_id) return { message: "已停止" };
       const { value, done } = await stream.read();
       if (done) break;
       if (!value) continue;
