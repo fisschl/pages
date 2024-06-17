@@ -21,11 +21,15 @@ interface ListResponse {
   model: string;
 }
 
+const model = ref<string>();
+
 const fetchData = async (param?: MessagesQuery) => {
-  return $fetch<ListResponse>("/api/chat/messages", {
+  const res = await $fetch<ListResponse>("/api/chat/messages", {
     query: param,
     headers,
   });
+  model.value = res.model;
+  return res.list;
 };
 
 const { data } = await useAsyncData(() => fetchData());
@@ -89,10 +93,10 @@ eventHook.on(async (event) => {
   if (!res.success) return;
   const message = res.data;
   if (!data.value) return;
-  const { list } = data.value;
-  if (!list) return;
-  const item = list.findLast((item) => item.message_id === message.message_id);
-  if (!item) list.push(message);
+  const item = data.value.findLast(
+    (item) => item.message_id === message.message_id,
+  );
+  if (!item) data.value = [...data.value, message];
   else {
     Object.assign(item, message);
     const article = document.getElementById(`article_${message.message_id}`);
@@ -110,7 +114,7 @@ const loading = ref(false);
 
 const shouldLoadMore = computed(() => {
   if (!scrollTarget.value || loading.value) return;
-  if (isLoadAll.value || !data.value?.list.length) return;
+  if (isLoadAll.value || !data.value?.length) return;
   return directions.top && arrivedState.top;
 });
 
@@ -118,12 +122,12 @@ whenever(shouldLoadMore, async () => {
   if (!data.value) return;
   loading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const [item] = data.value.list;
-  const { list } = await fetchData({
+  const [item] = data.value;
+  const list = await fetchData({
     create_time: item.create_time,
   });
   if (!list.length) isLoadAll.value = true;
-  data.value.list = [...list, ...data.value.list];
+  data.value = [...list, ...data.value];
   loading.value = false;
 });
 </script>
@@ -136,12 +140,12 @@ whenever(shouldLoadMore, async () => {
       :class="$style.list_element"
     >
       <ChatMessage
-        v-for="item in data?.list"
+        v-for="item in data"
         :key="item.message_id"
         :message="item"
       />
     </ol>
-    <UDivider class="mb-4 mt-1" :label="data?.model" />
+    <UDivider class="mb-4 mt-1" :label="model" />
     <UTextarea
       v-model="inputText"
       autoresize
