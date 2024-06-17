@@ -11,8 +11,6 @@ const request_schema = z.object({
     .catch(() => new Date().toISOString()),
 });
 
-export type MessagesQuery = z.input<typeof request_schema>;
-
 export default defineEventHandler(async (event) => {
   const user = await use401(event);
   const { create_time } = await getValidatedQuery(event, request_schema.parse);

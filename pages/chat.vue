@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
-import type { MessagesQuery } from "~/server/api/chat/messages";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
 import { useShouldLogin } from "~/composables/user";
@@ -14,25 +13,20 @@ useHead({
 
 const user = await useShouldLogin();
 
-const headers = useRequestHeaders(["cookie"]);
-
 interface ListResponse {
   list: Message[];
   model: string;
 }
 
-const model = ref<string>();
-
-const fetchData = async (param?: MessagesQuery) => {
-  const res = await $fetch<ListResponse>("/api/chat/messages", {
-    query: param,
-    headers,
-  });
-  model.value = res.model;
-  return res.list;
-};
-
-const { data } = await useAsyncData(() => fetchData());
+const headers = useRequestHeaders(["cookie"]);
+const { data } = await useFetch<{
+  list: Message[];
+  model: string;
+}>("/api/chat/messages", {
+  headers,
+  deep: true,
+  watch: false,
+});
 
 const scrollTarget = useScrollTarget();
 
@@ -93,10 +87,9 @@ eventHook.on(async (event) => {
   if (!res.success) return;
   const message = res.data;
   if (!data.value) return;
-  const item = data.value.findLast(
-    (item) => item.message_id === message.message_id,
-  );
-  if (!item) data.value = [...data.value, message];
+  const { list } = data.value;
+  const item = list.findLast((item) => item.message_id === message.message_id);
+  if (!item) data.value.list = [...list, message];
   else {
     Object.assign(item, message);
     const article = document.getElementById(`article_${message.message_id}`);
@@ -114,7 +107,7 @@ const loading = ref(false);
 
 const shouldLoadMore = computed(() => {
   if (!scrollTarget.value || loading.value) return;
-  if (isLoadAll.value || !data.value?.length) return;
+  if (isLoadAll.value || !data.value?.list) return;
   return directions.top && arrivedState.top;
 });
 
@@ -122,12 +115,14 @@ whenever(shouldLoadMore, async () => {
   if (!data.value) return;
   loading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const [item] = data.value;
-  const list = await fetchData({
-    create_time: item.create_time,
+  const [item] = data.value.list;
+  const { list } = await $fetch<ListResponse>("/api/chat/messages", {
+    query: {
+      create_time: item.create_time,
+    },
   });
   if (!list.length) isLoadAll.value = true;
-  data.value = [...list, ...data.value];
+  data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
 </script>
@@ -140,12 +135,12 @@ whenever(shouldLoadMore, async () => {
       :class="$style.list_element"
     >
       <ChatMessage
-        v-for="item in data"
+        v-for="item in data?.list"
         :key="item.message_id"
         :message="item"
       />
     </ol>
-    <UDivider class="mb-4 mt-1" :label="model" />
+    <UDivider class="mb-4 mt-1" :label="data?.model" />
     <UTextarea
       v-model="inputText"
       autoresize

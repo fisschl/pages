@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { throttle } from "lodash-es";
 import { z } from "zod";
 import { useQuery } from "~/composables/route";
 
@@ -15,7 +14,12 @@ onBeforeUnmount(async () => {
   await hide();
 });
 
-const { data: libraryOptions } = await useFetch("/api/poetry/facets");
+const { runWithContext } = useNuxtApp();
+
+const libraryOptions = await runWithContext(async () => {
+  const { data } = await useFetch("/api/poetry/facets");
+  return data.value;
+});
 
 const query_schema = z
   .object({
@@ -35,41 +39,40 @@ const library = computed(() => {
     .filter(Boolean);
 });
 
-const offset = ref(0);
+const params = computed(() => {
+  return {
+    keyword: query.value.keyword,
+    library: library.value.join(),
+  };
+});
 
-const fetchData = async () => {
-  return $fetch("/api/poetry/poetries", {
-    query: {
-      keyword: query.value.keyword,
-      library: library.value.join(),
-      offset: offset.value,
-    },
-  });
-};
-
-const fetchInit = async () => {
-  offset.value = 0;
-  return fetchData();
-};
-
-const { data, refresh } = await useAsyncData(fetchInit);
-const refresh_throttled = throttle(refresh, 500);
+const { data, refresh } = await useFetch("/api/poetry/poetries", {
+  query: params,
+  deep: true,
+  watch: false,
+});
 
 const handleLibraryChange = async (value: string, checked: boolean) => {
-  const c = new Set(library.value);
-  if (checked) c.add(value);
-  else c.delete(value);
+  const pack = new Set(library.value);
+  if (checked) pack.add(value);
+  else pack.delete(value);
   await setQuery({
-    library: Array.from(c).join(","),
+    library: Array.from(pack).join(","),
   });
-  await refresh_throttled();
+  await refresh();
 };
 
 const isAll = ref(false);
+const offset = ref(0);
 
 const loadMore = async () => {
   offset.value = data.value?.length || 0;
-  const res = await fetchData();
+  const res = await $fetch("/api/poetry/poetries", {
+    query: {
+      ...toValue(params),
+      offset: offset.value,
+    },
+  });
   if (!res.length) {
     isAll.value = true;
     return;
@@ -82,7 +85,7 @@ const updateKeyword = async (value: string) => {
   await setQuery({
     keyword: value,
   });
-  await refresh_throttled();
+  await refresh();
 };
 </script>
 
