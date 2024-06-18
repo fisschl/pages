@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ImageViewer from "../ImageViewer.vue";
 import type { Message } from "./type";
 
 const props = defineProps<{
@@ -30,7 +29,7 @@ onMounted(async () => {
       class="prose prose-sm max-w-none dark:prose-invert prose-code:text-sm"
       v-html="message.content"
     />
-    <ImageViewer
+    <img
       v-for="file in message.images"
       :key="file.image_id"
       class="mt-2 inline-block size-16 object-cover"

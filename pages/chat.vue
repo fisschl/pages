@@ -2,10 +2,10 @@
 import { debounce } from "lodash-es";
 import { type Message, message_schema } from "~/components/chat/type";
 import { useSocket } from "~/composables/socket";
-import ImageViewer from "~/components/ImageViewer.vue";
 import { useShouldLogin } from "~/composables/user";
 import { onMounted } from "vue";
 import { useLockScroll } from "~/composables/lock_scroll";
+import { useImageViewer } from "~/composables/fancybox";
 
 useHead({
   title: "GPT",
@@ -125,6 +125,14 @@ whenever(shouldLoadMore, async () => {
   data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
+
+const container = useCurrentElement();
+useImageViewer(() => {
+  const element = container.value;
+  if (!element) return;
+  if (!(element instanceof HTMLElement)) return;
+  return element;
+});
 </script>
 
 <template>
@@ -148,7 +156,7 @@ whenever(shouldLoadMore, async () => {
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <ImageViewer
+      <img
         v-for="(item, index) in inputFiles"
         :key="index"
         class="mr-2 size-12 object-cover"
@@ -167,9 +175,9 @@ whenever(shouldLoadMore, async () => {
         </UButton>
       </section>
     </div>
+    <ChatBottomButton v-if="isShowScrollButton" />
+    <ChatLoading :loading="loading" />
   </UContainer>
-  <ChatBottomButton v-if="isShowScrollButton" />
-  <ChatLoading :loading="loading" />
 </template>
 
 <style module>
