@@ -14,16 +14,6 @@ useHead({
       type: "image/svg+xml",
       href: "https://static.bronya.world/favicon.svg",
     },
-    {
-      rel: "preconnect",
-      href: "https://static.bronya.world",
-    },
-  ],
-  script: [
-    {
-      src: "https://gosspublic.alicdn.com/aliyun-oss-sdk-6.18.1.min.js",
-      async: true,
-    },
   ],
 });
 
