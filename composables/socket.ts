@@ -13,7 +13,7 @@ export const useSocket = (option: MaybeRefOrGetter<SocketOption>) => {
   const eventHook = createEventHook<object>();
   onMounted(() => {
     const opt = toValue(option);
-    socket.value = mqtt.connect(`wss://emqx.bronya.world:443/mqtt`, opt);
+    socket.value = mqtt.connect(`wss://mqtt.bronya.world:443/mqtt`, opt);
     socket.value.subscribe(opt.topic);
     socket.value.on("error", console.error);
     socket.value.on("message", async (topic, payload) => {
