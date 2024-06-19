@@ -14,7 +14,7 @@ export const useToken = (event: H3Event): string => {
   if (header) return header;
   const query = getQuery(event);
   if (query.token && isString(query.token)) return query.token;
-  const token = uuid(16);
+  const token = uuid(32);
   setCookie(event, "token", token, { maxAge: 30 * DAY });
   return token;
 };

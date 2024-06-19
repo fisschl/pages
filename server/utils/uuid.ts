@@ -9,7 +9,7 @@ export const timeBytes = () => {
   return new Uint8Array(buffer);
 };
 
-export const uuid = (suffix = 8) => {
-  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(suffix)]);
+export const uuid = (size = 16) => {
+  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(size - 8)]);
   return base58.encode(bytes);
 };
