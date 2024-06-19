@@ -1,10 +1,8 @@
-<script setup lang="ts">
-const fileDialog = useFileDialog();
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <UContainer class="my-6">
-    <UButton @click="fileDialog.open">Click me</UButton>
+    <UButton @click="() => {}">我是山里灵活的狗</UButton>
   </UContainer>
 </template>
 
