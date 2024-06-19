@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { base58 } from "@scure/base";
+import { blake3 } from "hash-wasm";
 
 const sliceNotExistSchema = z.object({
   url: z.string(),
@@ -10,17 +10,37 @@ const sliceExistSchema = z.object({
   size: z.number(),
 });
 
-async function calculateHash(arrayBuffer: ArrayBuffer): Promise<string> {
-  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
-  const bytes = new Uint8Array(hashBuffer);
-  return base58.encode(bytes);
-}
-
 export type UploadStatus = "uploading" | "composing" | "success" | "error";
 
 export const useFileUpload = () => {
   const token = useCookie("token");
   const user = useUserStore();
+
+  const uploadThunk = async (blob: Blob) => {
+    if (!token.value) throw new Error("token not found");
+    const buffer = await blob.arrayBuffer();
+    const hash = await blake3(new Uint8Array(buffer));
+    const sliceResponse = await $fetch("/oss/slice", {
+      headers: {
+        token: token.value!,
+      },
+      query: {
+        slice: hash,
+      },
+      baseURL: "https://bronya.world",
+    });
+    const notExist = sliceNotExistSchema.safeParse(sliceResponse);
+    if (notExist.success) {
+      await $fetch(notExist.data.url, {
+        method: "PUT",
+        body: blob,
+      });
+      return hash;
+    }
+    const exist = sliceExistSchema.safeParse(sliceResponse);
+    if (exist.success) return hash;
+    throw new Error("unknown response");
+  };
 
   async function uploadFile(
     file: File,
@@ -36,34 +56,8 @@ export const useFileUpload = () => {
         i * chunkSize,
         Math.min(file.size, (i + 1) * chunkSize),
       );
-      const reader = new FileReader();
-      const buffer = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-        reader.readAsArrayBuffer(blob);
-      });
-      if (!(buffer instanceof ArrayBuffer)) throw new Error("not array buffer");
-      const hash = await calculateHash(buffer);
+      const hash = await uploadThunk(blob);
       thunk_list.push(hash);
-      const sliceResponse = await $fetch("/oss/slice", {
-        headers: {
-          token: token.value,
-        },
-        query: {
-          slice: hash,
-        },
-        baseURL: "https://bronya.world",
-      });
-      const notExist = sliceNotExistSchema.safeParse(sliceResponse);
-      if (notExist.success) {
-        await $fetch(notExist.data.url, {
-          method: "PUT",
-          body: blob,
-        });
-        continue;
-      }
-      const exist = sliceExistSchema.safeParse(sliceResponse);
-      if (exist.success) continue;
-      throw new Error("unknown response");
     }
     if (progress) progress(99, "composing");
     await $fetch("/oss/compose", {
