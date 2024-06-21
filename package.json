@@ -9,7 +9,6 @@
     "build:image": "powershell ./build.ps1"
   },
   "dependencies": {
-    "@clickhouse/client": "^1.1.0",
     "@fancyapps/ui": "^5.0.36",
     "@fontsource-variable/noto-sans-sc": "^5.0.6",
     "@fontsource-variable/open-sans": "^5.0.29",
@@ -32,6 +31,7 @@
     "@vueuse/nuxt": "^10.11.0",
     "@vueuse/router": "^10.11.0",
     "change-case": "^5.4.4",
+    "consola": "^3.2.3",
     "date-fns": "^3.6.0",
     "destr": "^2.0.3",
     "eventsource-parser": "^1.1.2",

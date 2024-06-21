@@ -1,7 +1,7 @@
 import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
-import { writeLog } from "~/server/database/clickhouse";
+import { consola } from "consola";
 import { publisher } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
@@ -109,15 +109,17 @@ export default defineEventHandler(async (event) => {
       };
       publisher.publish(publish_topic, JSON.stringify(message));
     }
-  } catch (err) {
-    const content = JSON.stringify({
-      error: err,
+  } catch (e) {
+    consola.error(e);
+    const info = JSON.stringify({
+      content,
       input,
       output,
       message: last(history_messages),
+      error: e,
     });
-    await writeLog("OpenAI 异常", content);
-    output.content = "未知异常：" + err;
+    consola.error("OpenAI 异常", info);
+    output.content = "未知异常：" + e;
   }
   await new Promise((resolve) => setTimeout(resolve, 300));
   const result = await database.message_ai_chat.update({

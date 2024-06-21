@@ -2,10 +2,10 @@ import { z } from "zod";
 import { parseMarkdown } from "~/server/api/markdown";
 import { publisher } from "~/server/database/mqtt";
 import { useToken } from "~/server/utils/user";
-import { writeLog } from "~/server/database/clickhouse";
 import { EventSourceParserStream } from "eventsource-parser/stream";
 import destr from "destr";
 import { redis } from "~/server/database/redis";
+import { consola } from "consola";
 import rehypeParse from "rehype-parse";
 import rehypeRemark from "rehype-remark";
 import remarkStringify from "remark-stringify";
@@ -78,11 +78,12 @@ export default defineEventHandler(async (event) => {
     }
     return { message: "完成", content: body.content, markdown };
   } catch (e) {
-    const content = JSON.stringify({
+    consola.error(e);
+    const info = JSON.stringify({
       error: e,
       content: body.content,
     });
-    await writeLog("请求翻译失败", content);
+    consola.error("请求翻译失败", info);
     throw createError({ status: 500 });
   }
 });

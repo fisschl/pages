@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@clickhouse/client':
-        specifier: ^1.1.0
-        version: 1.1.0
       '@fancyapps/ui':
         specifier: ^5.0.36
         version: 5.0.36
@@ -77,6 +74,9 @@ importers:
       change-case:
         specifier: ^5.4.4
         version: 5.4.4
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
@@ -399,13 +399,6 @@ packages:
 
   '@braintree/sanitize-url@6.0.4':
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
-
-  '@clickhouse/client-common@1.1.0':
-    resolution: {integrity: sha512-saD6vNg+gIZACT5OSCWn0evLBP+Cs5bBR2Ol24yOQc8AXcw94b1qcDjQEVxms1xzO6heFhZRuPf+YefMNrL3Ig==}
-
-  '@clickhouse/client@1.1.0':
-    resolution: {integrity: sha512-fDG0dUU2nzcsE4XLDL3qUydbHJfuVCHnLuBTEmQfDrNQB9z6/qOtAUoGfAatZ07eEakZ4JAzKWMTU4MW4m0BJg==}
-    engines: {node: '>=16'}
 
   '@cloudflare/kv-asset-handler@0.3.3':
     resolution: {integrity: sha512-wpE+WiWW2kUNwNE0xyl4CtTAs+STjGtouHGiZPGRaisGB7eXXdbvfZdOrQJQVKgTxZiNAgVgmc7fj0sUmd8zyA==}
@@ -6405,12 +6398,6 @@ snapshots:
       to-fast-properties: 2.0.0
 
   '@braintree/sanitize-url@6.0.4': {}
-
-  '@clickhouse/client-common@1.1.0': {}
-
-  '@clickhouse/client@1.1.0':
-    dependencies:
-      '@clickhouse/client-common': 1.1.0
 
   '@cloudflare/kv-asset-handler@0.3.3':
     dependencies:

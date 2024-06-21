@@ -1,7 +1,7 @@
 import { database } from "~/server/database/postgres";
 import { useToken } from "~/server/utils/user";
 import { redis } from "~/server/database/redis";
-import { writeLog } from "~/server/database/clickhouse";
+import { consola } from "consola";
 
 export default defineEventHandler(async (event) => {
   const token = useToken(event);
@@ -11,6 +11,6 @@ export default defineEventHandler(async (event) => {
     where: { id },
     data: { last_login: new Date() },
   });
-  await writeLog("用户访问", JSON.stringify(user));
+  consola.info("用户访问", JSON.stringify(user));
   return { token, user };
 });
