@@ -5,7 +5,7 @@ import "@fontsource-variable/noto-sans-sc";
 
 useHead({
   htmlAttrs: {
-    lang: "zh-CN",
+    lang: "zh-Hans",
   },
   title: "沅有茝兮醴有兰",
   link: [
