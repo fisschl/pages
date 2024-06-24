@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { debounce } from "lodash-es";
-import { type Message, message_schema } from "~/components/chat/type";
+import { onMounted } from "vue";
+import { message_schema, type Message } from "~/components/chat/type";
+import { useLockScroll } from "~/composables/lock_scroll";
 import { useSocket } from "~/composables/socket";
 import { useShouldLogin } from "~/composables/user";
-import { onMounted } from "vue";
-import { useLockScroll } from "~/composables/lock_scroll";
-import { useImageViewer } from "~/composables/fancybox";
 
 useHead({
   title: "GPT",
@@ -126,13 +125,12 @@ whenever(shouldLoadMore, async () => {
   loading.value = false;
 });
 
-const container = useCurrentElement();
-useImageViewer(() => {
-  const element = container.value;
-  if (!element) return;
-  if (!(element instanceof HTMLElement)) return;
-  return element;
-});
+const handleClickImage = async (e: MouseEvent) => {
+  const { target } = e;
+  if (!(target instanceof Element)) return;
+  const { openImageViewer } = await import("@/utils/fancybox");
+  openImageViewer(target);
+};
 </script>
 
 <template>
@@ -141,6 +139,7 @@ useImageViewer(() => {
       ref="list_element"
       class="mt-5 flex flex-1 flex-col items-start"
       :class="$style.list_element"
+      @click="handleClickImage"
     >
       <ChatMessage
         v-for="item in data?.list"
@@ -156,13 +155,14 @@ useImageViewer(() => {
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <img
-        v-for="(item, index) in inputFiles"
-        :key="index"
-        class="mr-2 size-12 object-cover"
-        :src="item"
-      />
-      <span class="flex-1"></span>
+      <section class="flex-1" @click="handleClickImage">
+        <img
+          v-for="(item, index) in inputFiles"
+          :key="index"
+          class="mr-2 size-12 object-cover"
+          :src="item"
+        />
+      </section>
       <section class="flex items-center">
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton
