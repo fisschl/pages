@@ -13,16 +13,15 @@ const sliceExistSchema = z.object({
 export type UploadStatus = "uploading" | "composing" | "success" | "error";
 
 export const useFileUpload = () => {
-  const token = useCookie("token");
   const user = useUserStore();
 
   const uploadThunk = async (blob: Blob) => {
-    if (!token.value) throw new Error("token not found");
+    if (!user.token) throw new Error("token not found");
     const buffer = await blob.arrayBuffer();
     const hash = await blake3(new Uint8Array(buffer));
     const sliceResponse = await $fetch("/oss/slice", {
       headers: {
-        token: token.value!,
+        token: user.token,
       },
       query: {
         slice: hash,
@@ -46,7 +45,7 @@ export const useFileUpload = () => {
     file: File,
     progress?: (percent: number, status: UploadStatus) => unknown,
   ) {
-    if (!token.value) return;
+    if (!user.token) return;
     const chunkSize = 1024 * 1024;
     const length = Math.ceil(file.size / chunkSize);
     const thunk_list: string[] = [];
@@ -63,10 +62,10 @@ export const useFileUpload = () => {
     await $fetch("/oss/compose", {
       method: "POST",
       headers: {
-        token: token.value,
+        token: user.token,
       },
       query: {
-        key: `/${user.user?.id}/${file.name}`,
+        key: `/${user.info?.id}/${file.name}`,
       },
       body: {
         list: thunk_list,

@@ -5,7 +5,6 @@ import { useUserStore } from "~/composables/user";
 const { query } = useRoute();
 
 const store = useUserStore();
-const cookie = useCookie("token");
 
 /**
  * https://gitee.com/api/v5/oauth_doc
@@ -13,10 +12,10 @@ const cookie = useCookie("token");
 const login = async () => {
   const { from } = query;
   if (!from || !isString(from)) return;
-  if (cookie.value && store.user) {
+  if (store.info && store.token) {
     // 有登录态，直接返回
     const uri = new URL(from);
-    uri.searchParams.set("token", cookie.value);
+    uri.searchParams.set("token", store.token);
     location.href = uri.toString();
   } else {
     // 无登录态，跳转登录页
@@ -31,7 +30,7 @@ onMounted(async () => {
   const res = await $fetch("/api/auth/access", {
     query: { code },
   });
-  store.user = res;
+  store.info = res;
   const from = localStorage.getItem("pages_login_from");
   localStorage.removeItem("pages_login_from");
   if (!from) location.href = location.origin;

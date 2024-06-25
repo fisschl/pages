@@ -2,7 +2,7 @@ import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
-import { uuid } from "~/server/utils/uuid";
+import { uuidLong } from "~/server/utils/uuid";
 
 /**
  * 从请求中获取 token
@@ -10,13 +10,15 @@ import { uuid } from "~/server/utils/uuid";
 export const useToken = (event: H3Event): string => {
   const cookie = getCookie(event, "token");
   if (cookie) return cookie;
+  const setToken = (token: string) => {
+    setCookie(event, "token", token, { maxAge: 30 * DAY });
+    return token;
+  };
   const header = getHeader(event, "token");
-  if (header) return header;
+  if (header) return setToken(header);
   const query = getQuery(event);
-  if (query.token && isString(query.token)) return query.token;
-  const token = uuid(32);
-  setCookie(event, "token", token, { maxAge: 30 * DAY });
-  return token;
+  if (query.token && isString(query.token)) return setToken(query.token);
+  return setToken(uuidLong());
 };
 
 export const useUserId = async (event: H3Event) => {

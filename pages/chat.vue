@@ -4,13 +4,12 @@ import { onMounted } from "vue";
 import { message_schema, type Message } from "~/components/chat/type";
 import { useLockScroll } from "~/composables/lock_scroll";
 import { useSocket } from "~/composables/socket";
-import { useShouldLogin } from "~/composables/user";
 
 useHead({
   title: "GPT",
 });
 
-const user = await useShouldLogin();
+const user = useUserStore();
 
 interface ListResponse {
   list: Message[];
@@ -71,12 +70,12 @@ const handleKeydown = async (e: KeyboardEvent) => {
   await send();
 };
 
-const token = useCookie("token");
+await user.shouldLogin();
 
 const { eventHook } = useSocket({
-  username: user?.id || "public",
-  password: token.value || "public",
-  topic: `${user?.id}/ai_chat`,
+  username: user.info?.id || "public",
+  password: user.token || "public",
+  topic: `${user.info?.id}/ai_chat`,
 });
 
 onMounted(scrollToBottom);

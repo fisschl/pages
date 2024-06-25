@@ -2,6 +2,10 @@ import { database } from "~/server/database/postgres";
 import { useToken } from "~/server/utils/user";
 import { redis } from "~/server/database/redis";
 import { consola } from "consola";
+import type { SerializeObject } from "nitropack";
+import type { user as User } from "@prisma/client";
+
+export type UserResponse = SerializeObject<User>;
 
 export default defineEventHandler(async (event) => {
   const token = useToken(event);

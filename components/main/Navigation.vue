@@ -41,7 +41,7 @@ const user = useUserStore();
 
 const items = computed(() => {
   const login_list: DropdownItem[] = [];
-  if (!user.user) {
+  if (!user.info) {
     login_list.push({
       label: "登录",
       icon: "i-tabler-user-circle",
@@ -52,7 +52,7 @@ const items = computed(() => {
       },
     });
   } else {
-    const { avatar_url, name } = user.user;
+    const { avatar_url, name } = user.info;
     login_list.push({
       label: name,
       icon: !avatar_url ? "i-tabler-user-circle" : undefined,

@@ -1,4 +1,3 @@
-import { compact, pick } from "lodash-es";
 import { meilisearch } from "~/server/database/meilisearch";
 import { z } from "zod";
 
@@ -20,9 +19,8 @@ const request_schema = z.object({
     .string()
     .optional()
     .transform((param) => {
-      param = param?.split(",").filter(Boolean).join();
       if (!param) return;
-      return `library IN [${param}]`;
+      return;
     }),
   offset: z.coerce.number().default(0),
 });
@@ -30,18 +28,18 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   const body = await getValidatedQuery(event, request_schema.parse);
   const filters: string[] = [];
-  if (body.library) filters.push(body.library);
+  if (body.library) filters.push(`library IN [${body.library}]`);
   const res = await poetriesIndex.search<Poetry>(body.keyword, {
     limit: 32,
     offset: body.offset,
-    filter: compact([body.library]),
+    filter: filters,
     attributesToCrop: ["content"],
     cropLength: 32,
     attributesToHighlight: ["content"],
   });
   return res.hits.map((item) => {
-    Object.assign(item, pick(item._formatted, "content"));
-    delete item._formatted;
-    return item;
+    const { _formatted, ...others } = item;
+    if (_formatted?.content) others.content = _formatted.content;
+    return others;
   });
 });

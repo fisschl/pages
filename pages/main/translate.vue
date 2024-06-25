@@ -10,12 +10,12 @@ useHead({
   title: "翻译",
 });
 
-const token = useCookie("token");
+const user = useUserStore();
 
 const { eventHook } = useSocket(() => ({
   username: "public",
   password: "public",
-  topic: `public/translate/${token.value}`,
+  topic: `public/translate/${user.token}`,
 }));
 
 const message_schema = z.object({

@@ -16,11 +16,6 @@ onBeforeUnmount(async () => {
 
 const { runWithContext } = useNuxtApp();
 
-const libraryOptions = await runWithContext(async () => {
-  const { data } = await useFetch("/api/poetry/facets");
-  return data.value;
-});
-
 const query_schema = z
   .object({
     keyword: z.string(),
@@ -87,6 +82,11 @@ const updateKeyword = async (value: string) => {
   });
   await refresh();
 };
+
+const libraryOptions = await runWithContext(async () => {
+  const { data } = await useFetch("/api/poetry/facets");
+  return data.value;
+});
 </script>
 
 <template>

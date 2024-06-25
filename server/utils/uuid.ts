@@ -9,7 +9,12 @@ export const timeBytes = () => {
   return new Uint8Array(buffer);
 };
 
-export const uuid = (size = 16) => {
-  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(size - 8)]);
+export const uuid = () => {
+  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(8)]);
+  return base58.encode(bytes);
+};
+
+export const uuidLong = () => {
+  const bytes = new Uint8Array([...timeBytes(), ...randomBytes(16)]);
   return base58.encode(bytes);
 };

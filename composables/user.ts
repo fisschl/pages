@@ -1,21 +1,24 @@
-export interface User {
-  id: string;
-  login: string;
-  name: string;
-  avatar_url: string | null;
-  email: string | null;
-  role: string | null;
-}
+import type { UserResponse } from "~/server/api/auth";
 
 export const useUserStore = defineStore("pages-user", () => {
-  const user = ref<User>();
+  const info = ref<UserResponse>();
   const token = ref<string>();
-  return { user, token };
+
+  const shouldLogin = async () => {
+    if (info.value) return;
+    const url = useRequestURL();
+    await navigateTo({
+      path: "/login",
+      query: { from: url.toString() },
+    });
+  };
+
+  return { info, token, shouldLogin };
 });
 
 export const useShouldLogin = async () => {
-  const { user } = useUserStore();
-  if (user) return user;
+  const { info } = useUserStore();
+  if (info) return info;
   const url = useRequestURL();
   await navigateTo({
     path: "/login",
@@ -38,6 +41,8 @@ export const useAutoLogin = async () => {
   if (query.token && typeof query.token === "string")
     headers.token = query.token;
   const { data } = await useFetch("/api/auth", { headers });
-  store.token = data.value?.token;
-  store.user = data.value?.user || undefined;
+  if (!data.value) return;
+  const { token, user } = data.value;
+  store.token = token;
+  store.info = user || undefined;
 };
