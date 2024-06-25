@@ -33,10 +33,9 @@ const createInnerElement = (article: HTMLElement) => {
 };
 
 export const update = async (article: HTMLElement, html: string) => {
-  const node = await parse(html);
   const vNode = patch(
     vNodeCache.get(article) || createInnerElement(article),
-    node,
+    await parse(html),
   );
   vNodeCache.set(article, vNode);
 };

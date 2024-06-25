@@ -41,10 +41,12 @@ const params = computed(() => {
   };
 });
 
-const { data, refresh } = await useFetch("/api/poetry/poetries", {
-  query: params,
-  deep: true,
-  watch: false,
+const { data, refresh } = await runWithContext(() => {
+  return useFetch("/api/poetry/poetries", {
+    query: params,
+    deep: true,
+    watch: false,
+  });
 });
 
 const handleLibraryChange = async (value: string, checked: boolean) => {
@@ -83,10 +85,9 @@ const updateKeyword = async (value: string) => {
   await refresh();
 };
 
-const libraryOptions = await runWithContext(async () => {
-  const { data } = await useFetch("/api/poetry/facets");
-  return data.value;
-});
+const { data: libraryOptions } = await useAsyncData("poetry/facets", () =>
+  $fetch("/api/poetry/facets"),
+);
 </script>
 
 <template>
