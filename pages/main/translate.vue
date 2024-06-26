@@ -66,8 +66,7 @@ onMounted(() => {
     ],
     editorProps: {
       attributes: {
-        class:
-          "prose dark:prose-invert prose-sm prose-code:text-sm focus:outline-none",
+        class: "prose dark:prose-invert prose-sm prose-code:text-sm",
       },
     },
   });
@@ -101,7 +100,6 @@ const clearAll = () => {
     </section>
     <EditorContent
       v-if="editor"
-      :class="$style.editor"
       class="rounded border border-dashed border-gray-500 bg-slate-50 px-2 py-1 focus-within:border-none focus-within:ring dark:border-gray-400 dark:bg-neutral-900"
       :editor="editor"
       @paste="handleSubmit"
@@ -122,8 +120,4 @@ const clearAll = () => {
   </UContainer>
 </template>
 
-<style module>
-.editor :global(.prose) {
-  min-height: 5rem;
-}
-</style>
+<style module></style>

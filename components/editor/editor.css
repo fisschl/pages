@@ -1,5 +1,10 @@
 .tiptap {
   max-width: none;
+  min-height: 5rem;
+}
+
+.tiptap:focus {
+  outline: none;
 }
 
 .tiptap p.is-editor-empty:first-child::before {
@@ -8,8 +13,4 @@
   float: left;
   height: 0;
   pointer-events: none;
-}
-
-.tiptap table p {
-  margin: 0;
 }
