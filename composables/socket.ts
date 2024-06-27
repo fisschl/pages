@@ -1,4 +1,4 @@
-import { decode } from "@msgpack/msgpack";
+import destr from "destr";
 import { isObject } from "lodash-es";
 import type { IClientOptions, MqttClient } from "mqtt";
 import mqtt from "mqtt";
@@ -18,7 +18,8 @@ export const useSocket = (option: MaybeRefOrGetter<SocketOption>) => {
     client.subscribe(opt.topic);
     client.on("error", console.error);
     client.on("message", async (topic, payload) => {
-      const value = decode(payload);
+      const text = payload.toString();
+      const value = destr(text);
       if (!isObject(value)) return;
       await hook.trigger(value);
     });

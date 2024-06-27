@@ -1,8 +1,6 @@
-import { encode } from "@msgpack/msgpack";
 import consola from "consola";
 import mqtt from "mqtt";
 import { URL } from "node:url";
-import { arrayToBuffer } from "./redis";
 
 const uri = new URL(process.env.MQTT_URL!);
 
@@ -18,7 +16,6 @@ const createClient = () => {
 export const publisher = createClient();
 
 export const publish = (topic: string, message: object) => {
-  const encoded = encode(message);
-  const buffer = arrayToBuffer(encoded);
-  publisher.publish(topic, buffer);
+  const encoded = JSON.stringify(message);
+  publisher.publish(topic, encoded);
 };
