@@ -15,13 +15,7 @@ export const poetriesIndex = meilisearch.index("poetries");
 
 const request_schema = z.object({
   keyword: z.string().optional(),
-  library: z
-    .string()
-    .optional()
-    .transform((param) => {
-      if (!param) return;
-      return;
-    }),
+  library: z.string().optional(),
   offset: z.coerce.number().default(0),
 });
 

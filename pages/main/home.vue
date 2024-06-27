@@ -125,12 +125,7 @@ const { data: libraryOptions } = await useAsyncData("poetry/facets", () =>
       />
     </ul>
     <div v-if="!isAll" class="mb-4 mt-10 flex justify-center">
-      <UButton
-        variant="soft"
-        icon="i-tabler-arrow-down"
-        block
-        @click="loadMore"
-      />
+      <UButton variant="soft" icon="i-tabler-arrow-down" @click="loadMore" />
     </div>
   </UContainer>
 </template>
