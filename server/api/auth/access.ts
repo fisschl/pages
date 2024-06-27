@@ -2,7 +2,8 @@ import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { useToken } from "~/server/utils/user";
-import { DAY, redis } from "~/server/database/redis";
+import { DAY, redis, writeCache } from "~/server/database/redis";
+import { consola } from "consola";
 
 const { GITEE_AUTH_CLIENT_ID, GITEE_AUTH_CLIENT_SECRET } = process.env;
 
@@ -44,6 +45,8 @@ export default defineEventHandler(async (event) => {
     update: { ...gitee_user_data, id: undefined, last_login: new Date() },
     where: { id },
   });
+  await writeCache(id, user);
+  consola.info("用户登录授权", JSON.stringify(user));
   const token = useToken(event);
   await redis.hset(token, { user: user.id });
   await redis.expire(token, 30 * DAY);

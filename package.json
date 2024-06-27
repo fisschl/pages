@@ -13,6 +13,7 @@
     "@fontsource-variable/noto-sans-sc": "^5.0.6",
     "@fontsource-variable/open-sans": "^5.0.29",
     "@iconify-json/tabler": "^1.1.114",
+    "@msgpack/msgpack": "3.0.0-beta2",
     "@nuxt/devtools": "^1.3.6",
     "@nuxt/eslint": "^0.3.13",
     "@nuxt/ui": "^2.17.0",
