@@ -1,4 +1,4 @@
-import { destr } from "destr";
+import { decode } from "@msgpack/msgpack";
 import { isObject } from "lodash-es";
 import type { IClientOptions, MqttClient } from "mqtt";
 import mqtt from "mqtt";
@@ -10,21 +10,28 @@ export interface SocketOption extends IClientOptions {
 
 export const useSocket = (option: MaybeRefOrGetter<SocketOption>) => {
   const socket = shallowRef<MqttClient>();
-  const eventHook = createEventHook<object>();
+  const hook = createEventHook<object>();
+
   onMounted(() => {
     const opt = toValue(option);
-    socket.value = mqtt.connect(`wss://mqtt.bronya.world:443/mqtt`, opt);
-    socket.value.subscribe(opt.topic);
-    socket.value.on("error", console.error);
-    socket.value.on("message", async (topic, payload) => {
-      const message = destr(payload.toString());
-      if (!isObject(message)) return;
-      await eventHook.trigger(message);
+    const client = mqtt.connect(`wss://mqtt.bronya.world:443/mqtt`, opt);
+    client.subscribe(opt.topic);
+    client.on("error", console.error);
+    client.on("message", async (topic, payload) => {
+      const value = decode(payload);
+      if (!isObject(value)) return;
+      await hook.trigger(value);
     });
+    socket.value = client;
   });
+
   onBeforeUnmount(() => {
-    socket.value?.removeAllListeners();
-    socket.value?.end();
+    const client = socket.value;
+    if (!client) return;
+    socket.value = undefined;
+    client.removeAllListeners();
+    client.end();
   });
-  return { socket, eventHook };
+
+  return { socket, hook };
 };

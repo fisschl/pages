@@ -72,7 +72,7 @@ const handleKeydown = async (e: KeyboardEvent) => {
 
 await user.shouldLogin();
 
-const { eventHook } = useSocket({
+const { hook } = useSocket({
   username: user.info?.id || "public",
   password: user.token || "public",
   topic: `${user.info?.id}/ai_chat`,
@@ -80,7 +80,7 @@ const { eventHook } = useSocket({
 
 onMounted(scrollToBottom);
 
-eventHook.on(async (event) => {
+hook.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
   const message = res.data;

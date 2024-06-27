@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { parseMarkdown } from "~/server/api/markdown";
-import { publisher } from "~/server/database/mqtt";
+import { publish } from "~/server/database/mqtt";
 import { useToken } from "~/server/utils/user";
 import { EventSourceParserStream } from "eventsource-parser/stream";
 import destr from "destr";
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
       const message = {
         content: await parseMarkdown(text),
       };
-      publisher.publish(`public/translate/${token}`, JSON.stringify(message));
+      publish(`public/translate/${token}`, message);
     }
     return { message: "完成", content: body.content, markdown };
   } catch (e) {

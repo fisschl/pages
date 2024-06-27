@@ -14,3 +14,17 @@
   height: 0;
   pointer-events: none;
 }
+
+.tiptap ul li p,
+.tiptap ol li p {
+  margin: 0;
+}
+
+.tiptap ul[data-type="taskList"] li {
+  display: flex;
+}
+.tiptap ul[data-type="taskList"] input[type="checkbox"] {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.8em;
+}

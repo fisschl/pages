@@ -1,8 +1,8 @@
+import { consola } from "consola";
 import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
-import { consola } from "consola";
-import { publisher } from "~/server/database/mqtt";
+import { publish } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { uuid } from "~/server/utils/uuid";
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
     status: "stable",
   };
   const publish_topic = `${user_id}/ai_chat`;
-  publisher.publish(publish_topic, JSON.stringify(input_message));
+  publish(publish_topic, input_message);
   const output = await database.message_ai_chat.create({
     data: {
       message_id: uuid(),
@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
         content: await parseMarkdown(output.content),
         status: "loading",
       };
-      publisher.publish(publish_topic, JSON.stringify(message));
+      publish(publish_topic, message);
     }
   } catch (e) {
     consola.error(e);
@@ -131,7 +131,7 @@ export default defineEventHandler(async (event) => {
     content: await parseMarkdown(result.content),
     status: "stable",
   };
-  publisher.publish(publish_topic, JSON.stringify(message));
+  publish(publish_topic, message);
   await new Promise<void>((resolve) => setTimeout(resolve, 300));
   return { message: "完成" };
 });

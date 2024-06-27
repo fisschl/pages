@@ -2,7 +2,7 @@
 import { useSocket } from "~/composables/socket";
 import { z } from "zod";
 import StarterKit from "@tiptap/starter-kit";
-import { Editor, EditorContent } from "@tiptap/vue-3";
+import { EditorContent, useEditor } from "@tiptap/vue-3";
 import Placeholder from "@tiptap/extension-placeholder";
 import "~/components/editor/editor.css";
 
@@ -12,7 +12,7 @@ useHead({
 
 const user = useUserStore();
 
-const { eventHook } = useSocket(() => ({
+const { hook } = useSocket(() => ({
   username: "public",
   password: "public",
   topic: `public/translate/${user.token}`,
@@ -24,7 +24,7 @@ const message_schema = z.object({
 
 const article = ref<HTMLElement>();
 
-eventHook.on(async (event) => {
+hook.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
   const message = res.data;
@@ -55,24 +55,18 @@ const handleSubmit = async () => {
   streaming.value = false;
 };
 
-const editor = shallowRef<Editor>();
-onMounted(() => {
-  editor.value = new Editor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder: "请输入要翻译的文本",
-      }),
-    ],
-    editorProps: {
-      attributes: {
-        class: "prose dark:prose-invert prose-sm prose-code:text-sm",
-      },
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Placeholder.configure({
+      placeholder: "请输入要翻译的文本",
+    }),
+  ],
+  editorProps: {
+    attributes: {
+      class: "prose dark:prose-invert prose-code:text-base",
     },
-  });
-});
-onBeforeUnmount(() => {
-  editor.value?.destroy();
+  },
 });
 
 const clearAll = () => {
