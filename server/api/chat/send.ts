@@ -5,8 +5,8 @@ import { z } from "zod";
 import { publish } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
-import { uuid } from "~/server/utils/uuid";
 import { parseMarkdown } from "../markdown";
+import { ulid } from "ulid";
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -27,13 +27,13 @@ export default defineEventHandler(async (event) => {
   if (!content) throw createError({ status: 400 });
   const input = await database.message_ai_chat.create({
     data: {
-      message_id: uuid(),
+      message_id: ulid(),
       role: "user",
       content: content,
       user_id,
       images: {
         createMany: {
-          data: images?.map((item) => ({ image_id: uuid(), url: item })) || [],
+          data: images?.map((item) => ({ image_id: ulid(), url: item })) || [],
         },
       },
     },
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   publish(publish_topic, input_message);
   const output = await database.message_ai_chat.create({
     data: {
-      message_id: uuid(),
+      message_id: ulid(),
       role: "assistant",
       content: "",
       user_id: input.user_id,

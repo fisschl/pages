@@ -161,6 +161,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.4
+      ulid:
+        specifier: ^2.3.0
+        version: 2.3.0
       unified:
         specifier: ^11.0.5
         version: 11.0.5
@@ -5623,6 +5626,10 @@ packages:
 
   ufo@1.5.3:
     resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
+
+  ulid@2.3.0:
+    resolution: {integrity: sha512-keqHubrlpvT6G2wH0OEfSW4mquYRcbe/J8NMmveoQOjUqmo+hXtO+ORCpWhdbZ7k72UtY61BL7haGxW6enBnjw==}
+    hasBin: true
 
   ultrahtml@1.5.3:
     resolution: {integrity: sha512-GykOvZwgDWZlTQMtp5jrD4BVL+gNn2NVlVafjcFUJ7taY20tqYdwdoWBFy6GBJsNTZe1GkGPkSl5knQAjtgceg==}
@@ -12642,6 +12649,8 @@ snapshots:
   uc.micro@2.1.0: {}
 
   ufo@1.5.3: {}
+
+  ulid@2.3.0: {}
 
   ultrahtml@1.5.3: {}
 

@@ -2,7 +2,9 @@ import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
-import { uuidLong } from "~/server/utils/uuid";
+import { ulid } from "ulid";
+import { randomBytes } from "node:crypto";
+import { base32 } from "@scure/base";
 
 /**
  * 从请求中获取 token
@@ -18,7 +20,9 @@ export const useToken = (event: H3Event): string => {
   if (header) return setToken(header);
   const query = getQuery(event);
   if (query.token && isString(query.token)) return setToken(query.token);
-  return setToken(uuidLong());
+  const buffer = randomBytes(length);
+  const token = ulid() + base32.encode(buffer);
+  return setToken(token);
 };
 
 export const useUserId = async (event: H3Event) => {
