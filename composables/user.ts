@@ -37,12 +37,16 @@ export const useAutoLogin = async () => {
     });
   });
   const store = useUserStore();
-  const headers: Record<string, string> = useRequestHeaders(["cookie"]);
-  if (query.token && typeof query.token === "string")
-    headers.token = query.token;
-  const { data } = await useFetch("/api/auth", { headers });
-  if (!data.value) return;
-  const { token, user } = data.value;
-  store.token = token;
-  store.info = user || undefined;
+  const { runWithContext } = useNuxtApp();
+  await runWithContext(async () => {
+    const headers = useRequestHeaders(["cookie"]);
+    const { data } = await useFetch("/api/auth", { headers, query });
+    if (!data.value) return;
+    const { token, user } = data.value;
+    store.token = token;
+    store.info = user || undefined;
+  });
+  const theme = useCookie("theme");
+  const colorMode = useColorMode();
+  theme.value = colorMode.value;
 };
