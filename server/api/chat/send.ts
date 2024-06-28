@@ -5,7 +5,7 @@ import { z } from "zod";
 import { publish } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
-import { parseMarkdown } from "../markdown";
+import { parseMarkdown, parseMarkdownCache } from "../../utils/markdown";
 import { ulid } from "ulid";
 
 export const OPENAI_MODEL = "gpt-4o";
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   });
   const input_message = {
     ...input,
-    content: await parseMarkdown(input.content),
+    content: await parseMarkdownCache(input.content),
     status: "stable",
   };
   const publish_topic = `${user_id}/ai_chat`;
@@ -128,7 +128,7 @@ export default defineEventHandler(async (event) => {
   });
   const message = {
     ...result,
-    content: await parseMarkdown(result.content),
+    content: await parseMarkdownCache(result.content),
     status: "stable",
   };
   publish(publish_topic, message);

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { blake3 } from "hash-wasm";
+import { xxhash128 } from "hash-wasm";
 
 const sliceNotExistSchema = z.object({
   url: z.string(),
@@ -18,7 +18,7 @@ export const useFileUpload = () => {
   const uploadThunk = async (blob: Blob) => {
     if (!user.token) throw new Error("token not found");
     const buffer = await blob.arrayBuffer();
-    const hash = await blake3(new Uint8Array(buffer));
+    const hash = await xxhash128(new Uint8Array(buffer));
     const sliceResponse = await $fetch("/oss/slice", {
       headers: {
         token: user.token,
