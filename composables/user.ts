@@ -48,5 +48,7 @@ export const useAutoLogin = async () => {
   });
   const theme = useCookie("theme");
   const colorMode = useColorMode();
-  theme.value = colorMode.value;
+  watchEffect(() => {
+    theme.value = colorMode.value;
+  });
 };

@@ -7,7 +7,10 @@ import { xxhash3 } from "hash-wasm";
 const load_markdown = once(async () => {
   const markdown = MarkdownIt();
   const shiki = await Shiki({
-    theme: "vitesse-dark",
+    themes: {
+      light: "catppuccin-latte",
+      dark: "catppuccin-mocha",
+    },
     fallbackLanguage: "bash",
   });
   return markdown.use(shiki);

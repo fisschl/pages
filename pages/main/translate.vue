@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "~/assets/markdown.css";
 import { useSocket } from "~/composables/socket";
 import { z } from "zod";
 import StarterKit from "@tiptap/starter-kit";
