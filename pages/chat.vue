@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import "~/assets/markdown.css";
+import "katex/dist/katex.min.css";
 import { debounce } from "lodash-es";
 import { onMounted } from "vue";
 import { message_schema, type Message } from "~/components/chat/type";

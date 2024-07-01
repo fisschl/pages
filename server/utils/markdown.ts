@@ -1,32 +1,40 @@
-import Shiki from "@shikijs/markdown-it";
-import { once } from "lodash-es";
-import MarkdownIt from "markdown-it";
 import { xxhash3 } from "hash-wasm";
-import { DAY, redis } from "../database/redis";
-
-const load_markdown = once(async () => {
-  const markdown = MarkdownIt();
-  const shiki = await Shiki({
-    themes: {
-      light: "catppuccin-latte",
-      dark: "catppuccin-mocha",
-    },
-    fallbackLanguage: "bash",
-  });
-  return markdown.use(shiki);
-});
+import rehypeKatex from "rehype-katex";
+import rehypeStringify from "rehype-stringify";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
+import { LRUCache } from "lru-cache";
 
 export const parseMarkdown = async (text: string) => {
-  const markdown = await load_markdown();
-  return markdown.render(text);
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkRehype)
+    .use(rehypeKatex)
+    // .use(rehypeShiki, {
+    //   themes: {
+    //     light: "catppuccin-latte",
+    //     dark: "catppuccin-mocha",
+    //   },
+    // })
+    .use(rehypeStringify)
+    .process(text);
+  return file.toString();
 };
+
+export const markdown_cache = new LRUCache<string, string>({
+  max: 64 * 1024,
+});
 
 export const parseMarkdownCache = async (text: string) => {
   const hash = await xxhash3(text);
-  const cache_result = await redis.get(hash);
+  const cache_result = markdown_cache.get(hash);
   if (cache_result) return cache_result;
-  const markdown = await load_markdown();
-  const result = markdown.render(text);
-  await redis.setex(hash, 30 * DAY, result);
+  const result = await parseMarkdown(text);
+  markdown_cache.set(hash, result);
   return result;
 };

@@ -24,9 +24,11 @@ export default defineEventHandler(async (event) => {
     include: { images: true },
   });
   history.reverse();
+  console.time("parseMarkdown");
   for (const item of history) {
     item.content = await parseMarkdownCache(item.content);
   }
+  console.timeEnd("parseMarkdown");
   return {
     list: history,
     model: OPENAI_MODEL,
