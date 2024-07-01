@@ -22,22 +22,22 @@ enum ChatRole {
   assistant
 }
 
-model message_ai_chat {
-  message_id  String             @id @db.VarChar(255)
-  user_id     String             @db.VarChar(255)
-  create_time DateTime           @default(now()) @db.Timestamptz()
+model chat_message {
+  message_id  String       @id @db.Uuid()
+  user_id     String       @db.VarChar(255)
+  create_time DateTime     @default(now()) @db.Timestamptz()
   role        ChatRole
   content     String
-  images      message_ai_image[]
+  images      chat_image[]
 
   @@index([user_id, create_time(sort: Desc)])
 }
 
-model message_ai_image {
-  image_id   String          @id @db.VarChar(255)
-  message_id String          @db.VarChar(255)
+model chat_image {
+  image_id   String       @id @db.Uuid()
+  message_id String       @db.Uuid()
   url        String
-  chat       message_ai_chat @relation(fields: [message_id], references: [message_id])
+  chat       chat_message @relation(fields: [message_id], references: [message_id])
 
   @@index([message_id])
 }

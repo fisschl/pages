@@ -2,7 +2,7 @@ import type { H3Event } from "h3";
 import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
-import { ulid } from "ulid";
+import { v7 as uuid } from "uuid";
 import { randomBytes } from "node:crypto";
 import { base32 } from "@scure/base";
 
@@ -21,7 +21,7 @@ export const useToken = (event: H3Event): string => {
   const query = getQuery(event);
   if (query.token && isString(query.token)) return setToken(query.token);
   const buffer = randomBytes(length);
-  const token = ulid() + base32.encode(buffer);
+  const token = uuid() + base32.encode(buffer);
   return setToken(token);
 };
 

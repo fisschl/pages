@@ -6,7 +6,7 @@ import { publish } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
 import { use401 } from "~/server/utils/user";
 import { parseMarkdown, parseMarkdownCache } from "../../utils/markdown";
-import { ulid } from "ulid";
+import { v7 as uuid } from "uuid";
 
 export const OPENAI_MODEL = "gpt-4o";
 
@@ -25,15 +25,15 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });
-  const input = await database.message_ai_chat.create({
+  const input = await database.chat_message.create({
     data: {
-      message_id: ulid(),
+      message_id: uuid(),
       role: "user",
       content: content,
       user_id,
       images: {
         createMany: {
-          data: images?.map((item) => ({ image_id: ulid(), url: item })) || [],
+          data: images?.map((item) => ({ image_id: uuid(), url: item })) || [],
         },
       },
     },
@@ -46,9 +46,9 @@ export default defineEventHandler(async (event) => {
   };
   const publish_topic = `${user_id}/ai_chat`;
   publish(publish_topic, input_message);
-  const output = await database.message_ai_chat.create({
+  const output = await database.chat_message.create({
     data: {
-      message_id: ulid(),
+      message_id: uuid(),
       role: "assistant",
       content: "",
       user_id: input.user_id,
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
   /**
    * 历史消息
    */
-  const history = await database.message_ai_chat.findMany({
+  const history = await database.chat_message.findMany({
     where: {
       user_id: input.user_id,
       create_time: { lt: input.create_time },
@@ -122,7 +122,7 @@ export default defineEventHandler(async (event) => {
     output.content = "未知异常：" + e;
   }
   await new Promise((resolve) => setTimeout(resolve, 300));
-  const result = await database.message_ai_chat.update({
+  const result = await database.chat_message.update({
     where: { message_id: output.message_id },
     data: { content: output.content },
   });

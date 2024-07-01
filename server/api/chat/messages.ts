@@ -14,7 +14,7 @@ const request_schema = z.object({
 export default defineEventHandler(async (event) => {
   const user = await use401(event);
   const { create_time } = await getValidatedQuery(event, request_schema.parse);
-  const history = await database.message_ai_chat.findMany({
+  const history = await database.chat_message.findMany({
     where: {
       user_id: user,
       create_time: { lt: create_time },

@@ -11,7 +11,7 @@ import rehypeRemark from "rehype-remark";
 import remarkStringify from "remark-stringify";
 import remarkGfm from "remark-gfm";
 import { unified } from "unified";
-import { ulid } from "ulid";
+import { v7 as uuid } from "uuid";
 
 const html2markdown = async (html: string) => {
   const file = await unified()
@@ -38,7 +38,7 @@ const { TRANSLATION_API_ID, TRANSLATION_API_KEY } = process.env;
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, request_schema.parse);
   const token = useToken(event);
-  const reqId = ulid();
+  const reqId = uuid();
   await redis.hset(token, "translate_api", reqId);
   const markdown = await html2markdown(body.content);
   try {
