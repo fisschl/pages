@@ -36,6 +36,11 @@ export const useAutoLogin = async () => {
       query: { ...query, token: undefined },
     });
   });
+  const theme = useCookie("theme");
+  const colorMode = useColorMode();
+  watchEffect(() => {
+    theme.value = colorMode.value;
+  });
   const store = useUserStore();
   const { runWithContext } = useNuxtApp();
   await runWithContext(async () => {
@@ -45,10 +50,5 @@ export const useAutoLogin = async () => {
     const { token, user } = data.value;
     store.token = token;
     store.info = user || undefined;
-  });
-  const theme = useCookie("theme");
-  const colorMode = useColorMode();
-  watchEffect(() => {
-    theme.value = colorMode.value;
   });
 };

@@ -18,7 +18,7 @@ onMounted(async () => {
   <li
     class="relative mb-4 max-w-full rounded px-3 py-2"
     :class="{
-      'bg-stone-400/10 dark:bg-stone-500/10': message.role === 'assistant',
+      'bg-stone-300/10 dark:bg-stone-500/10': message.role === 'assistant',
       'bg-violet-500/10 dark:bg-violet-500/20': message.role === 'user',
     }"
   >
