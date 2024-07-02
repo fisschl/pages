@@ -3,8 +3,14 @@ import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
 import { v7 as uuid } from "uuid";
-import { randomBytes } from "node:crypto";
-import { base32 } from "@scure/base";
+import { customAlphabet } from "nanoid";
+
+export const randomToken = customAlphabet("abcdefghijklmnopqrstuvwxyz234567");
+
+export const generateToken = () => {
+  const id = uuid().replaceAll("-", "");
+  return id + randomToken();
+};
 
 /**
  * 从请求中获取 token
@@ -20,9 +26,7 @@ export const useToken = (event: H3Event): string => {
   if (header) return setToken(header);
   const query = getQuery(event);
   if (query.token && isString(query.token)) return setToken(query.token);
-  const buffer = randomBytes(32);
-  const token = uuid() + base32.encode(buffer);
-  return setToken(token);
+  return setToken(uuid());
 };
 
 export const useUserId = async (event: H3Event) => {
