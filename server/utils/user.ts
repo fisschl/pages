@@ -26,7 +26,7 @@ export const useToken = (event: H3Event): string => {
   if (header) return setToken(header);
   const query = getQuery(event);
   if (query.token && isString(query.token)) return setToken(query.token);
-  return setToken(uuid());
+  return setToken(generateToken());
 };
 
 export const useUserId = async (event: H3Event) => {
