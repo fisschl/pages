@@ -82,6 +82,17 @@ const { hook } = useSocket({
 
 onMounted(scrollToBottom);
 
+const updateMessageContent = async (message: Message) => {
+  const article = document.getElementById(`article_${message.message_id}`);
+  if (!article) return;
+  const { update } = await import("~/utils/snabbdom");
+  await update(article, message.content);
+  if (message.status === "stable") {
+    const { mountContent } = await import("~/utils/markdown");
+    await mountContent(article);
+  }
+};
+
 hook.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
@@ -92,10 +103,7 @@ hook.on(async (event) => {
   if (!item) data.value.list = [...list, message];
   else {
     Object.assign(item, message);
-    const article = document.getElementById(`article_${message.message_id}`);
-    if (!article) return;
-    const { updateMessage } = await import("~/components/chat/update");
-    await updateMessage(message, article);
+    await updateMessageContent(message);
   }
   await nextTick();
   if (!directions.top && !isShowScrollButton.value) scrollToBottom();
