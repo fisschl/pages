@@ -5,7 +5,6 @@ import { z } from "zod";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import Placeholder from "@tiptap/extension-placeholder";
-import "~/components/editor/editor.css";
 
 useHead({
   title: "翻译",
@@ -73,6 +72,11 @@ const editor = useEditor({
 const clearAll = () => {
   editor.value?.commands.clearContent();
 };
+
+const handleClickBottom = (e: MouseEvent) => {
+  e.preventDefault();
+  editor.value?.commands.focus("end");
+};
 </script>
 
 <template>
@@ -93,12 +97,16 @@ const clearAll = () => {
       </UButton>
       <UButton icon="i-tabler-run" @click="handleSubmit"> 开始翻译 </UButton>
     </section>
-    <EditorContent
-      v-if="editor"
+    <section
       class="rounded border border-dashed border-gray-500 bg-slate-50 px-2 py-1 focus-within:border-none focus-within:ring dark:border-gray-400 dark:bg-neutral-900"
-      :editor="editor"
-      @paste="handleSubmit"
-    />
+    >
+      <EditorContent v-if="editor" :editor="editor" @paste="handleSubmit" />
+      <p
+        class="cursor-text"
+        style="min-height: 2rem"
+        @mousedown="handleClickBottom"
+      ></p>
+    </section>
     <UDivider class="mb-3 mt-4" icon="i-tabler-language-hiragana" />
     <article
       ref="article"
@@ -114,5 +122,3 @@ const clearAll = () => {
     </section>
   </UContainer>
 </template>
-
-<style module></style>
