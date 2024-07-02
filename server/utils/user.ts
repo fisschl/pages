@@ -20,7 +20,7 @@ export const useToken = (event: H3Event): string => {
   if (header) return setToken(header);
   const query = getQuery(event);
   if (query.token && isString(query.token)) return setToken(query.token);
-  const buffer = randomBytes(length);
+  const buffer = randomBytes(32);
   const token = uuid() + base32.encode(buffer);
   return setToken(token);
 };
