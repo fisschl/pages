@@ -9,7 +9,6 @@
     "build:image": "powershell ./build.ps1"
   },
   "dependencies": {
-    "@fancyapps/ui": "^5.0.36",
     "@fontsource-variable/noto-sans-sc": "^5.0.6",
     "@fontsource-variable/open-sans": "^5.0.29",
     "@iconify-json/tabler": "^1.1.115",

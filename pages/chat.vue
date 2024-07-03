@@ -6,6 +6,7 @@ import { onMounted } from "vue";
 import { message_schema, type Message } from "~/components/chat/type";
 import { useLockScroll } from "~/composables/lock_scroll";
 import { useSocket } from "~/composables/socket";
+import ImageViewer from "~/components/ImageViewer.vue";
 
 useHead({
   title: "GPT",
@@ -133,13 +134,6 @@ whenever(shouldLoadMore, async () => {
   data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
-
-const handleClickImage = async (e: MouseEvent) => {
-  const { target } = e;
-  if (!(target instanceof Element)) return;
-  const { openImageViewer } = await import("@/utils/fancybox");
-  openImageViewer(target);
-};
 </script>
 
 <template>
@@ -148,7 +142,6 @@ const handleClickImage = async (e: MouseEvent) => {
       ref="list_element"
       class="mt-5 flex flex-1 flex-col items-start"
       :class="$style.list_element"
-      @click="handleClickImage"
     >
       <ChatMessage
         v-for="item in data?.list"
@@ -164,7 +157,7 @@ const handleClickImage = async (e: MouseEvent) => {
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <section class="flex-1" @click="handleClickImage">
+      <section class="flex-1">
         <img
           v-for="(item, index) in inputFiles"
           :key="index"
@@ -186,6 +179,7 @@ const handleClickImage = async (e: MouseEvent) => {
     </div>
     <ChatBottomButton v-if="isShowScrollButton" />
     <ChatLoading :loading="loading" />
+    <ImageViewer />
   </UContainer>
 </template>
 
