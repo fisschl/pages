@@ -65,17 +65,13 @@ const editor = useEditor({
   editorProps: {
     attributes: {
       class: "prose dark:prose-invert prose-code:text-base",
+      style: "min-height: 4rem",
     },
   },
 });
 
 const clearAll = () => {
   editor.value?.commands.clearContent();
-};
-
-const handleClickBottom = (e: MouseEvent) => {
-  e.preventDefault();
-  editor.value?.commands.focus("end");
 };
 </script>
 
@@ -101,11 +97,6 @@ const handleClickBottom = (e: MouseEvent) => {
       class="rounded border border-dashed border-gray-500 bg-slate-50 px-2 py-1 focus-within:border-none focus-within:ring dark:border-gray-400 dark:bg-neutral-900"
     >
       <EditorContent v-if="editor" :editor="editor" @paste="handleSubmit" />
-      <p
-        class="cursor-text"
-        style="min-height: 2rem"
-        @mousedown="handleClickBottom"
-      ></p>
     </section>
     <UDivider class="mb-3 mt-4" icon="i-tabler-language-hiragana" />
     <article
