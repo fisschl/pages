@@ -7,11 +7,11 @@ import { consola } from "consola";
 
 const { GITEE_AUTH_CLIENT_ID, GITEE_AUTH_CLIENT_SECRET } = process.env;
 
-const acc_schema = z.object({
+const oauth_token_schema = z.object({
   access_token: z.string(),
 });
 
-const user_schema = z.object({
+const fetch_user_schema = z.object({
   id: z.number().min(1),
   login: z.string(),
   name: z.string(),
@@ -22,29 +22,38 @@ const user_schema = z.object({
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event);
   if (!code || !isString(code)) throw createError({ status: 400 });
-  const uri = new URL("https://gitee.com/oauth/token");
-  const { searchParams } = uri;
-  searchParams.append("grant_type", "authorization_code");
-  searchParams.append("code", code);
-  searchParams.append("client_id", GITEE_AUTH_CLIENT_ID!);
-  searchParams.append("redirect_uri", "https://bronya.world/login");
-  searchParams.append("client_secret", GITEE_AUTH_CLIENT_SECRET!);
-  const acc_res = await $fetch(uri.toString(), {
-    method: "POST",
-  });
-  const acc = acc_schema.parse(acc_res);
-  const user_res = await $fetch("https://gitee.com/api/v5/user", {
-    query: {
-      access_token: acc.access_token,
-    },
-  });
-  const gitee_user_data = user_schema.parse(user_res);
-  const id = gitee_user_data.id.toString();
+
+  const fetchOAuthToken = async () => {
+    const res = await $fetch("https://gitee.com/oauth/token", {
+      method: "POST",
+      query: {
+        grant_type: "authorization_code",
+        code,
+        client_id: GITEE_AUTH_CLIENT_ID,
+        redirect_uri: "URL_ADDRESS",
+        client_secret: GITEE_AUTH_CLIENT_SECRET,
+      },
+    });
+    return oauth_token_schema.parse(res);
+  };
+
+  const fetchUser = async () => {
+    const { access_token } = await fetchOAuthToken();
+    const res = await $fetch("https://gitee.com/api/v5/user", {
+      query: { access_token },
+    });
+    return fetch_user_schema.parse(res);
+  };
+
+  const user_result = await fetchUser();
+  const id = user_result.id.toString();
+
   const user = await database.user.upsert({
-    create: { ...gitee_user_data, id },
-    update: { ...gitee_user_data, id: undefined, last_login: new Date() },
+    create: { ...user_result, id },
+    update: { ...user_result, id: undefined, last_login: new Date() },
     where: { id },
   });
+
   await writeCache(id, user);
   consola.info("用户登录授权", JSON.stringify(user));
   const token = useToken(event);

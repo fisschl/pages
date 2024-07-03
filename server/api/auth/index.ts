@@ -11,10 +11,12 @@ export default defineEventHandler(async (event) => {
   const token = useToken(event);
   const id = await redis.hget(token, "user");
   if (!id) return { token, user: null };
-  const cacheValue = await readCache<User>(id);
-  if (cacheValue) {
-    consola.info("用户访问", "缓存", JSON.stringify(cacheValue));
-    return { token, user: cacheValue };
+  {
+    const user = await readCache<User>(id);
+    if (user) {
+      consola.info("用户访问", "缓存", JSON.stringify(user));
+      return { token, user: user };
+    }
   }
   const user = await database.user.update({
     where: { id },

@@ -1,32 +1,41 @@
 import type { H3Event } from "h3";
-import { isString } from "lodash-es";
 import { database } from "~/server/database/postgres";
 import { DAY, redis } from "~/server/database/redis";
 import { v7 as uuid } from "uuid";
 import { customAlphabet } from "nanoid";
+import { z } from "zod";
 
 export const randomToken = customAlphabet("abcdefghijklmnopqrstuvwxyz234567");
 
 export const generateToken = () => {
-  const id = uuid().replaceAll("-", "");
-  return id + randomToken();
+  return uuid() + "-" + randomToken();
 };
+
+const tokenSchema = z.string().min(10);
 
 /**
  * 从请求中获取 token
  */
 export const useToken = (event: H3Event): string => {
-  const cookie = getCookie(event, "token");
-  if (cookie) return cookie;
-  const setToken = (token: string) => {
+  {
+    const cookie = getCookie(event, "token");
+    if (cookie) return cookie;
+  }
+  {
+    const header = getHeader(event, "token");
+    const result = tokenSchema.safeParse(header);
+    if (result.success) return result.data;
+  }
+  {
+    const { token } = getQuery(event);
+    const result = tokenSchema.safeParse(token);
+    if (result.success) return result.data;
+  }
+  {
+    const token = generateToken();
     setCookie(event, "token", token, { maxAge: 30 * DAY });
     return token;
-  };
-  const header = getHeader(event, "token");
-  if (header) return setToken(header);
-  const query = getQuery(event);
-  if (query.token && isString(query.token)) return setToken(query.token);
-  return setToken(generateToken());
+  }
 };
 
 export const useUserId = async (event: H3Event) => {
