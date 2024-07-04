@@ -75,10 +75,10 @@ const handleKeydown = async (e: KeyboardEvent) => {
 
 await user.shouldLogin();
 
-const { hook } = useSocket({
-  username: user.info?.id || "public",
-  password: user.token || "public",
-  topic: `${user.info?.id}/ai_chat`,
+const { hook } = useSocket(() => {
+  const { info } = user;
+  if (!info) return;
+  return `${info.id}/ai_chat`;
 });
 
 onMounted(scrollToBottom);

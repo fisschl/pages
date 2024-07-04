@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import "~/assets/markdown.css";
-import { useSocket } from "~/composables/socket";
-import { z } from "zod";
+import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
-import Placeholder from "@tiptap/extension-placeholder";
+import { z } from "zod";
+import "~/assets/markdown.css";
+import { useSocket } from "~/composables/socket";
 
 useHead({
   title: "翻译",
@@ -12,11 +12,7 @@ useHead({
 
 const user = useUserStore();
 
-const { hook } = useSocket(() => ({
-  username: "public",
-  password: "public",
-  topic: `public/translate/${user.token}`,
-}));
+const { hook } = useSocket(`public/translate/${user.token}`);
 
 const message_schema = z.object({
   content: z.string(),
