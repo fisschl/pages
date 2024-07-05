@@ -18,23 +18,32 @@ const position = reactive({
 
 const src = ref<string>();
 
-const setImage = (element?: Element) => {
+onClickOutside(image, () => {
+  src.value = undefined;
+});
+
+const setImage = async (element?: Element) => {
   if (!(element instanceof HTMLImageElement)) return;
+  if (src.value === element.src) return;
   src.value = element.src;
   const { naturalWidth, naturalHeight } = element;
-  const { width, height } = container.value!.getBoundingClientRect();
+  await nextTick();
+  if (!container.value) return;
+  const { width, height } = container.value.getBoundingClientRect();
   const scale = Math.min(width / naturalWidth, height / naturalHeight) * 0.9;
-  position.scale = scale;
   position.left = (width - naturalWidth * scale) / 2;
   position.top = (height - naturalHeight * scale) / 2;
-  position.width = naturalWidth;
-  position.height = naturalHeight;
+  position.width = naturalWidth * scale;
+  position.height = naturalHeight * scale;
+  position.scale = 1;
   const style: CSSProperties = {
     width: position.width + "px",
     height: position.height + "px",
-    transform: `translate(${position.left}px, ${position.top}px) scale(${position.scale})`,
+    left: position.left + "px",
+    top: position.top + "px",
   };
-  Object.assign(image.value!.style, style);
+  if (!image.value) return;
+  Object.assign(image.value.style, style);
 };
 
 const container = ref<HTMLElement>();
@@ -65,7 +74,8 @@ const handleMouseDown = (e: MouseEvent) => {
     position.left = left + dx;
     position.top = top + dy;
     const style: CSSProperties = {
-      transform: `translate(${position.left}px, ${position.top}px) scale(${position.scale})`,
+      left: position.left + "px",
+      top: position.top + "px",
     };
     Object.assign(image.value!.style, style);
   };
@@ -80,10 +90,12 @@ const handleMouseDown = (e: MouseEvent) => {
 const handleMouseWheel = (e: WheelEvent) => {
   e.preventDefault();
   const { deltaY } = e;
-  const d = -deltaY / 6000;
+  const d = -deltaY / 5000;
+  if (d < 0 && position.scale < 0.25) return;
+  if (d > 0 && position.scale > 4) return;
   position.scale += d;
   const style: CSSProperties = {
-    transform: `translate(${position.left}px, ${position.top}px) scale(${position.scale})`,
+    transform: `scale(${position.scale})`,
   };
   Object.assign(image.value!.style, style);
 };
@@ -92,18 +104,16 @@ const handleMouseWheel = (e: WheelEvent) => {
 <template>
   <teleport to="body">
     <div
+      v-if="src"
       class="fixed top-0 z-10 flex h-full w-full flex-col overflow-hidden backdrop-blur-md"
     >
-      <section class="flex justify-center">
-        <button :class="$style.control">1</button>
-      </section>
       <section ref="container" class="relative flex-1 overflow-hidden">
         <img
           ref="image"
           :src="src"
           draggable="false"
           alt="预览图片"
-          class="absolute left-0 top-0 origin-top-left"
+          class="absolute origin-center"
           @mousedown="handleMouseDown"
           @wheel="handleMouseWheel"
         />
@@ -112,9 +122,4 @@ const handleMouseWheel = (e: WheelEvent) => {
   </teleport>
 </template>
 
-<style module>
-.control {
-  width: 2rem;
-  height: 2rem;
-}
-</style>
+<style module></style>

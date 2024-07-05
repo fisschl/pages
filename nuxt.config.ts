@@ -15,4 +15,6 @@ export default defineNuxtConfig({
     "/": { redirect: "/main/home" },
     "/api/**": { cors: true },
   },
+
+  compatibilityDate: "2024-07-05",
 });
