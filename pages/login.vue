@@ -10,19 +10,20 @@ const store = useUserStore();
  * https://gitee.com/api/v5/oauth_doc
  */
 const login = async () => {
+  location.href = location.origin + "/api/auth/oauth";
+};
+
+onMounted(() => {
   const { from } = query;
   if (!from || !isString(from)) return;
+  localStorage.setItem("pages_login_from", from);
   if (store.info && store.token) {
     // 有登录态，直接返回
     const uri = new URL(from);
     uri.searchParams.set("token", store.token);
     location.href = uri.toString();
-  } else {
-    // 无登录态，跳转登录页
-    localStorage.setItem("pages_login_from", from);
-    location.href = location.origin + "/api/auth/oauth";
   }
-};
+});
 
 onMounted(async () => {
   const { code } = query;
@@ -32,7 +33,6 @@ onMounted(async () => {
   });
   store.info = res;
   const from = localStorage.getItem("pages_login_from");
-  localStorage.removeItem("pages_login_from");
   if (!from) location.href = location.origin;
   else location.href = from;
 });

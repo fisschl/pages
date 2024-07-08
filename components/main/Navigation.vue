@@ -46,9 +46,10 @@ const items = computed(() => {
       label: "登录",
       icon: "i-tabler-user-circle",
       click: () => {
-        const qs = new URLSearchParams({ from: location.href });
-        const to = `/login?${qs}`;
-        return navigateTo(to);
+        return navigateTo({
+          path: "https://bronya.world/login",
+          query: { from: location.href },
+        });
       },
     });
   } else {
