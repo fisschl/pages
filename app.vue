@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAutoLogin } from "./composables/user";
-import "@fontsource-variable/open-sans";
 import "@fontsource-variable/noto-sans-sc";
+import "@fontsource-variable/open-sans";
+import { useAutoLogin } from "./composables/user";
 
 useHead({
   htmlAttrs: {
-    lang: "zh-Hans",
+    lang: "zh-CN",
   },
   title: "沅有茝兮醴有兰",
   link: [

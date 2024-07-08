@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useUserStore } from "~/composables/user";
 import type { DropdownItem } from "#ui/types";
+import { useUserStore } from "~/composables/user";
 
 const links = computed<DropdownItem[][]>(() => [
   [
@@ -46,10 +46,10 @@ const items = computed(() => {
       label: "登录",
       icon: "i-tabler-user-circle",
       click: () => {
-        return navigateTo({
-          path: "https://bronya.world/login",
-          query: { from: location.href },
+        const query = new URLSearchParams({
+          from: location.href,
         });
+        location.href = `https://bronya.world/login?${query}`;
       },
     });
   } else {
