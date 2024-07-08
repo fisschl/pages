@@ -1,9 +1,9 @@
+import { consola } from "consola";
 import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
-import { useToken } from "~/server/utils/user";
 import { DAY, redis, writeCache } from "~/server/database/redis";
-import { consola } from "consola";
+import { useToken } from "~/server/utils/user";
 
 const { GITEE_AUTH_CLIENT_ID, GITEE_AUTH_CLIENT_SECRET } = process.env;
 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
         grant_type: "authorization_code",
         code,
         client_id: GITEE_AUTH_CLIENT_ID,
-        redirect_uri: "URL_ADDRESS",
+        redirect_uri: "https://bronya.world/login",
         client_secret: GITEE_AUTH_CLIENT_SECRET,
       },
     });
