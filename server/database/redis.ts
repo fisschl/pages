@@ -1,7 +1,7 @@
+import { decode, encode } from "@msgpack/msgpack";
 import IORedis from "ioredis";
-import { URL } from "node:url";
-import { encode, decode } from "@msgpack/msgpack";
 import { Buffer } from "node:buffer";
+import { URL } from "node:url";
 
 const uri = new URL(process.env.REDIS_URL!);
 export const redis = new IORedis({
@@ -37,4 +37,15 @@ export const readCache = async <T = any>(key: string): Promise<T | null> => {
   const buffer = await redis.getBuffer(key);
   if (!buffer) return null;
   return decode(buffer) as T;
+};
+
+export const useCache = async <T extends object>(
+  key: string,
+  fetchData: () => Promise<T> | T,
+): Promise<T> => {
+  const data = await readCache<T>(key);
+  if (data) return data;
+  const value = await fetchData();
+  await writeCache(key, value);
+  return value;
 };

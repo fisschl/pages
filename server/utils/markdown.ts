@@ -1,4 +1,5 @@
 import { xxhash3 } from "hash-wasm";
+import { LRUCache } from "lru-cache";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
@@ -6,7 +7,6 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { LRUCache } from "lru-cache";
 
 export const parseMarkdown = async (text: string) => {
   const file = await unified()
@@ -15,12 +15,6 @@ export const parseMarkdown = async (text: string) => {
     .use(remarkMath)
     .use(remarkRehype)
     .use(rehypeKatex)
-    // .use(rehypeShiki, {
-    //   themes: {
-    //     light: "catppuccin-latte",
-    //     dark: "catppuccin-mocha",
-    //   },
-    // })
     .use(rehypeStringify)
     .process(text);
   return file.toString();

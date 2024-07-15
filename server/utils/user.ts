@@ -27,20 +27,34 @@ export const useToken = (event: H3Event): string => {
     setCookie(event, "token", token, { maxAge: 30 * DAY });
     return token;
   };
-  {
+
+  const getTokenFromQuery = () => {
     const { token } = getQuery(event);
-    if (token && typeof token === "string") return saveCookie(token);
-  }
-  {
+    if (!token || typeof token !== "string") return;
+    return saveCookie(token);
+  };
+
+  const getTokenFromHeader = () => {
     const header = getHeader(event, "token");
-    if (header) return saveCookie(header);
-  }
-  {
-    const cookie = getCookie(event, "token");
-    if (cookie) return cookie;
-  }
-  const token = generateToken();
-  return saveCookie(token);
+    if (!header) return;
+    return saveCookie(header);
+  };
+
+  const getTokenFromCookie = () => {
+    return getCookie(event, "token");
+  };
+
+  const getNewToken = () => {
+    const token = generateToken();
+    return saveCookie(token);
+  };
+
+  return (
+    getTokenFromQuery() ||
+    getTokenFromHeader() ||
+    getTokenFromCookie() ||
+    getNewToken()
+  );
 };
 
 export const useUserId = async (event: H3Event) => {

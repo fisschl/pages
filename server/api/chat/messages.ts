@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { OPENAI_MODEL } from "~/server/api/chat/send";
 import { database } from "~/server/database/postgres";
-import { use401 } from "~/server/utils/user";
 import { parseMarkdownCache } from "~/server/utils/markdown";
+import { use401 } from "~/server/utils/user";
 
 const request_schema = z.object({
   create_time: z
@@ -24,11 +24,9 @@ export default defineEventHandler(async (event) => {
     include: { images: true },
   });
   history.reverse();
-  console.time("parseMarkdown");
   for (const item of history) {
     item.content = await parseMarkdownCache(item.content);
   }
-  console.timeEnd("parseMarkdown");
   return {
     list: history,
     model: OPENAI_MODEL,

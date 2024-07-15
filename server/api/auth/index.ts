@@ -1,9 +1,9 @@
-import { database } from "~/server/database/postgres";
-import { useToken } from "~/server/utils/user";
-import { readCache, redis, writeCache } from "~/server/database/redis";
+import type { user as User } from "@prisma/client";
 import { consola } from "consola";
 import type { SerializeObject } from "nitropack";
-import type { user as User } from "@prisma/client";
+import { database } from "~/server/database/postgres";
+import { redis, useCache } from "~/server/database/redis";
+import { useToken } from "~/server/utils/user";
 
 export type UserResponse = SerializeObject<User>;
 
@@ -11,18 +11,12 @@ export default defineEventHandler(async (event) => {
   const token = useToken(event);
   const id = await redis.hget(token, "user");
   if (!id) return { token, user: null };
-  {
-    const user = await readCache<User>(id);
-    if (user) {
-      consola.info("用户访问", "缓存", JSON.stringify(user));
-      return { token, user: user };
-    }
-  }
-  const user = await database.user.update({
-    where: { id },
-    data: { last_login: new Date() },
+  const user = await useCache(id, async () => {
+    return database.user.update({
+      where: { id },
+      data: { last_login: new Date() },
+    });
   });
-  await writeCache(id, user);
   consola.info("用户访问", JSON.stringify(user));
   return { token, user };
 });
