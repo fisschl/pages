@@ -7,12 +7,19 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import rehypeShiki from "@shikijs/rehype";
 
 export const parseMarkdown = async (text: string) => {
   const file = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkMath)
+    .use(rehypeShiki, {
+      themes: {
+        light: "catppuccin-latte",
+        dark: "catppuccin-mocha",
+      },
+    })
     .use(remarkRehype)
     .use(rehypeKatex)
     .use(rehypeStringify)
