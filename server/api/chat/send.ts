@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
       model: OPENAI_MODEL,
       messages: history_messages,
       stream: true,
-      max_tokens: 32 * 1024,
+      max_tokens: 4096,
     });
     for await (const { choices } of stream) {
       if (!choices.length) continue;
