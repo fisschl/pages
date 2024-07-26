@@ -1,9 +1,9 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import "~/assets/markdown.css";
 import "katex/dist/katex.min.css";
 import { debounce } from "lodash-es";
 import { onMounted } from "vue";
-import { message_schema, type Message } from "~/components/chat/type";
+import { type Message, message_schema } from "~/components/chat/type";
 import { useLockScroll } from "~/composables/lock_scroll";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
@@ -20,14 +20,6 @@ interface ListResponse {
 }
 
 const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch<{
-  list: Message[];
-  model: string;
-}>("/api/chat/messages", {
-  headers,
-  deep: true,
-  watch: false,
-});
 
 const scrollTarget = useScrollTarget();
 
@@ -73,12 +65,16 @@ const handleKeydown = async (e: KeyboardEvent) => {
   await send();
 };
 
-await user.shouldLogin();
+const socket = useSocket();
 
-const { hook } = useSocket(() => {
+onMounted(async () => {
+  const { token } = await $fetch("/api/chat/client");
   const { info } = user;
   if (!info) return;
-  return `${info.id}/ai_chat`;
+  await socket.connect({
+    username: token,
+    topic: `${info.id}/ai_chat`,
+  });
 });
 
 onMounted(scrollToBottom);
@@ -94,7 +90,7 @@ const updateMessageContent = async (message: Message) => {
   }
 };
 
-hook.on(async (event) => {
+socket.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
   const message = res.data;
@@ -134,14 +130,21 @@ whenever(shouldLoadMore, async () => {
   data.value.list = [...list, ...data.value.list];
   loading.value = false;
 });
+
+const { data } = await useFetch<ListResponse>("/api/chat/messages", {
+  headers,
+  deep: true,
+  watch: false,
+});
+await user.shouldLogin();
 </script>
 
 <template>
   <UContainer>
     <ol
       ref="list_element"
-      class="mt-5 flex flex-1 flex-col items-start"
       :class="$style.list_element"
+      class="mt-5 flex flex-1 flex-col items-start"
     >
       <ChatMessage
         v-for="item in data?.list"
@@ -149,7 +152,7 @@ whenever(shouldLoadMore, async () => {
         :message="item"
       />
     </ol>
-    <UDivider class="mb-4 mt-1" :label="data?.model" />
+    <UDivider :label="data?.model" class="mb-4 mt-1" />
     <UTextarea
       v-model="inputText"
       autoresize
@@ -161,16 +164,17 @@ whenever(shouldLoadMore, async () => {
         <img
           v-for="(item, index) in inputFiles"
           :key="index"
-          class="mr-2 size-12 object-cover"
           :src="item"
+          alt="输入图片"
+          class="mr-2 size-12 object-cover"
         />
       </section>
       <section class="flex items-center">
         <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton
-          icon="i-tabler-send"
-          class="px-6"
           :loading="streaming"
+          class="px-6"
+          icon="i-tabler-send"
           @click="send"
         >
           发送

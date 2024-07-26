@@ -1,26 +1,37 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import { z } from "zod";
 import "~/assets/markdown.css";
 import { useSocket } from "~/composables/socket";
+import { v7 as uuid } from "uuid";
 
 useHead({
   title: "翻译",
 });
 
-const user = useUserStore();
+const clientId = ref("");
 
-const { hook } = useSocket(`public/translate/${user.token}`);
+const socket = useSocket();
+
+onMounted(async () => {
+  clientId.value = uuid();
+  await socket.connect({
+    username: "public",
+    topic: `public/translate/${clientId.value}`,
+    clientId: clientId.value,
+  });
+});
 
 const message_schema = z.object({
   content: z.string(),
 });
 
 const article = ref<HTMLElement>();
+const requestToken = ref("");
 
-hook.on(async (event) => {
+socket.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
   const message = res.data;
@@ -29,26 +40,25 @@ hook.on(async (event) => {
   await update(article.value, message.content);
 });
 
-const streaming = ref(false);
-
-const stop = async () => {
-  await $fetch("/api/translate/stop", {
-    method: "POST",
-  });
-};
+const streaming = ref<string[]>([]);
 
 const handleSubmit = async () => {
   await new Promise((resolve) => setTimeout(resolve, 100));
   const html = editor.value?.getHTML();
   if (!html) return;
-  if (streaming.value) await stop();
-  streaming.value = true;
+  const token = uuid();
+  requestToken.value = token;
+  streaming.value = [token];
   const res = await $fetch("/api/translate", {
     method: "POST",
-    body: { content: html },
+    body: {
+      content: html,
+      clientId: clientId.value,
+      requestToken: token,
+    },
   });
   if (res.message !== "完成") return;
-  streaming.value = false;
+  if (streaming.value.includes(token)) streaming.value.length = 0;
 };
 
 const editor = useEditor({
@@ -77,17 +87,17 @@ const clearAll = () => {
       <UBadge color="white">
         <span> 自动 </span>
         <UIcon
-          name="i-tabler-arrow-right"
           class="mx-3"
+          name="i-tabler-arrow-right"
           style="font-size: 14px"
         />
         <span> 中文 </span>
       </UBadge>
       <span class="flex-1"></span>
-      <UButton icon="i-tabler-clear-all" color="gray" @click="clearAll">
+      <UButton color="gray" icon="i-tabler-clear-all" @click="clearAll">
         清空
       </UButton>
-      <UButton icon="i-tabler-run" @click="handleSubmit"> 开始翻译 </UButton>
+      <UButton icon="i-tabler-run" @click="handleSubmit"> 开始翻译</UButton>
     </section>
     <section
       class="rounded border border-dashed border-gray-500 bg-slate-50 px-2 py-1 focus-within:border-none focus-within:ring dark:border-gray-400 dark:bg-neutral-900"
@@ -101,9 +111,9 @@ const clearAll = () => {
     ></article>
     <section class="flex justify-center p-2">
       <UIcon
-        v-if="streaming"
-        name="i-tabler-loader-2"
+        v-if="streaming.includes(requestToken)"
         class="animate-spin"
+        name="i-tabler-loader-2"
         style="font-size: 18px"
       />
     </section>
