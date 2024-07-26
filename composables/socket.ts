@@ -12,7 +12,6 @@ export interface SocketOptions {
 export const useSocket = () => {
   const socket = shallowRef<MqttClient>();
   const hook = createEventHook<object>();
-  const user = useUserStore();
 
   const destroyClient = () => {
     const client = socket.value;

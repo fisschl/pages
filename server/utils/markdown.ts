@@ -8,20 +8,21 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import rehypeShiki from "@shikijs/rehype";
+import { consola } from "consola";
 
 export const parseMarkdown = async (text: string) => {
   const file = await unified()
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkMath)
+    .use(remarkRehype)
+    .use(rehypeKatex)
     .use(rehypeShiki, {
       themes: {
         light: "catppuccin-latte",
         dark: "catppuccin-mocha",
       },
     })
-    .use(remarkRehype)
-    .use(rehypeKatex)
     .use(rehypeStringify)
     .process(text);
   return file.toString();
@@ -36,6 +37,7 @@ export const parseMarkdownCache = async (text: string) => {
   const cache_result = markdown_cache.get(hash);
   if (cache_result) return cache_result;
   const result = await parseMarkdown(text);
+  consola.info(result);
   markdown_cache.set(hash, result);
   return result;
 };

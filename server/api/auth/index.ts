@@ -9,8 +9,9 @@ export type UserResponse = SerializeObject<User>;
 
 export default defineEventHandler(async (event) => {
   const token = useToken(event);
+  if (!token) throw createError({ status: 401 });
   const id = await redis.hget(token, "user");
-  if (!id) return { token, user: null };
+  if (!id) throw createError({ status: 403 });
   const user = await useCache(id, async () => {
     return database.user.update({
       where: { id },
@@ -18,5 +19,5 @@ export default defineEventHandler(async (event) => {
     });
   });
   consola.info("用户访问", JSON.stringify(user));
-  return { token, user };
+  return user;
 });

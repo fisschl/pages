@@ -3,7 +3,7 @@ import { isString } from "lodash-es";
 import { z } from "zod";
 import { database } from "~/server/database/postgres";
 import { DAY, redis, writeCache } from "~/server/database/redis";
-import { useToken } from "~/server/utils/user";
+import { generateToken } from "~/server/utils/user";
 
 const { GITEE_AUTH_CLIENT_ID, GITEE_AUTH_CLIENT_SECRET } = process.env;
 
@@ -56,8 +56,8 @@ export default defineEventHandler(async (event) => {
 
   await writeCache(id, user);
   consola.info("用户登录授权", JSON.stringify(user));
-  const token = useToken(event);
+  const token = generateToken();
   await redis.hset(token, { user: user.id });
-  await redis.expire(token, 30 * DAY);
-  return user;
+  await redis.expire(token, 120 * DAY);
+  return { user, token };
 });

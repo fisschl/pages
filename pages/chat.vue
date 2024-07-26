@@ -14,12 +14,8 @@ useHead({
 
 const user = useUserStore();
 
-interface ListResponse {
-  list: Message[];
-  model: string;
-}
-
-const headers = useRequestHeaders(["cookie"]);
+const model = useState(() => "");
+const list = useState<Message[]>(() => []);
 
 const scrollTarget = useScrollTarget();
 
@@ -66,14 +62,16 @@ const handleKeydown = async (e: KeyboardEvent) => {
 };
 
 const socket = useSocket();
+const token = useCookie("token");
 
 onMounted(async () => {
-  const { token } = await $fetch("/api/chat/client");
+  const data = await $fetch("/api/chat/client");
   const { info } = user;
-  if (!info) return;
+  if (!info || !token.value) return;
   await socket.connect({
-    username: token,
+    username: data.token,
     topic: `${info.id}/ai_chat`,
+    clientId: token.value,
   });
 });
 
@@ -94,10 +92,10 @@ socket.on(async (event) => {
   const res = message_schema.safeParse(event);
   if (!res.success) return;
   const message = res.data;
-  if (!data.value) return;
-  const { list } = data.value;
-  const item = list.findLast((item) => item.message_id === message.message_id);
-  if (!item) data.value.list = [...list, message];
+  const item = list.value.findLast(
+    (item) => item.message_id === message.message_id,
+  );
+  if (!item) list.value = [...list.value, message];
   else {
     Object.assign(item, message);
     await updateMessageContent(message);
@@ -112,31 +110,35 @@ const loading = ref(false);
 
 const shouldLoadMore = computed(() => {
   if (!scrollTarget.value || loading.value) return;
-  if (isLoadAll.value || !data.value?.list) return;
+  if (isLoadAll.value || !list.value.length) return;
   return directions.top && arrivedState.top;
 });
 
 whenever(shouldLoadMore, async () => {
-  if (!data.value) return;
+  if (!list.value.length) return;
   loading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 500));
-  const [item] = data.value.list;
-  const { list } = await $fetch<ListResponse>("/api/chat/messages", {
+  const [item] = list.value;
+  const res = await $fetch("/api/chat/messages", {
     query: {
       create_time: item.create_time,
     },
   });
-  if (!list.length) isLoadAll.value = true;
-  data.value.list = [...list, ...data.value.list];
+  if (!res.list.length) isLoadAll.value = true;
+  list.value = [...res.list, ...list.value];
   loading.value = false;
 });
 
-const { data } = await useFetch<ListResponse>("/api/chat/messages", {
-  headers,
-  deep: true,
-  watch: false,
-});
+const headers = useRequestHeaders(["cookie"]);
+
 await user.shouldLogin();
+await callOnce(async () => {
+  const res = await $fetch("/api/chat/messages", {
+    headers,
+  });
+  list.value = res.list;
+  model.value = res.model;
+});
 </script>
 
 <template>
@@ -147,12 +149,12 @@ await user.shouldLogin();
       class="mt-5 flex flex-1 flex-col items-start"
     >
       <ChatMessage
-        v-for="item in data?.list"
+        v-for="item in list"
         :key="item.message_id"
         :message="item"
       />
     </ol>
-    <UDivider :label="data?.model" class="mb-4 mt-1" />
+    <UDivider :label="model" class="mb-4 mt-1" />
     <UTextarea
       v-model="inputText"
       autoresize

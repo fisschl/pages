@@ -1,7 +1,8 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import "@fontsource-variable/noto-sans-sc";
 import "@fontsource-variable/open-sans";
-import { useAutoLogin } from "./composables/user";
+import { useUserStore } from "./composables/user";
+import { parseRecord } from "~/utils/query";
 
 useHead({
   htmlAttrs: {
@@ -17,7 +18,41 @@ useHead({
   ],
 });
 
-await useAutoLogin();
+const route = useRoute();
+const query = parseRecord(route.query);
+
+const router = useRouter();
+
+onMounted(async () => {
+  if (!query.token) return;
+  await router.replace({
+    query: { ...query, token: undefined },
+  });
+});
+
+const token = useCookie("token", {
+  // 120 天
+  maxAge: 60 * 60 * 24 * 120,
+});
+if (query.token) token.value = query.token;
+
+const theme = useCookie("theme", {
+  // 120 天
+  maxAge: 60 * 60 * 24 * 120,
+});
+const colorMode = useColorMode();
+
+watchEffect(() => {
+  theme.value = colorMode.value;
+});
+
+const user = useUserStore();
+const headers = useRequestHeaders(["cookie"]);
+const { data } = await useFetch("/api/auth", {
+  headers,
+  query: { token: query.token },
+});
+if (data.value) user.info = data.value;
 </script>
 
 <template>
@@ -31,6 +66,7 @@ await useAutoLogin();
   overflow: auto;
 }
 
+html:root,
 body {
   font-family: "Open Sans Variable", "Noto Sans SC Variable", sans-serif;
 }
