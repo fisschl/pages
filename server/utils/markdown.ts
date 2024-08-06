@@ -18,10 +18,7 @@ export const parseMarkdown = async (text: string) => {
     .use(remarkRehype)
     .use(rehypeKatex)
     .use(rehypeShiki, {
-      themes: {
-        light: "catppuccin-latte",
-        dark: "catppuccin-mocha",
-      },
+      theme: "catppuccin-mocha",
     })
     .use(rehypeStringify)
     .process(text);

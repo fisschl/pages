@@ -12,11 +12,6 @@ const links = computed<DropdownItem[][]>(() => [
   ],
   [
     {
-      label: "变量名转换",
-      icon: "i-tabler-letter-case",
-      to: "/main/case",
-    },
-    {
       label: "智能对话",
       icon: "i-tabler-brand-openai",
       to: "/chat",

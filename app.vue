@@ -3,6 +3,7 @@ import "@fontsource-variable/noto-sans-sc";
 import "@fontsource-variable/open-sans";
 import { useUserStore } from "./composables/user";
 import { parseRecord } from "~/utils/query";
+import "@fontsource-variable/fira-code";
 
 useHead({
   htmlAttrs: {

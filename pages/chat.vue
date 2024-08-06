@@ -157,7 +157,7 @@ await callOnce(async () => {
     <UDivider :label="model" class="mb-4 mt-1" />
     <UTextarea
       v-model="inputText"
-      autoresize
+      :autoresize="true"
       placeholder="请输入"
       @keydown.enter="handleKeydown"
     />
