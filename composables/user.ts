@@ -6,10 +6,13 @@ export const useUserStore = defineStore("pages-user", () => {
   const shouldLogin = async () => {
     if (info.value) return;
     const url = useRequestURL();
-    await navigateTo({
-      path: "https://bronya.world/login",
-      query: { from: url.toString() },
-    });
+    await navigateTo(
+      {
+        path: "https://bronya.world/login",
+        query: { from: url.toString() },
+      },
+      { external: true },
+    );
   };
 
   return { info, shouldLogin };
