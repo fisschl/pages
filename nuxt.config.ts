@@ -7,14 +7,10 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
   ],
 
-  ui: {
-    icons: ["tabler"],
-  },
-
   routeRules: {
     "/": { redirect: "/main/home" },
     "/api/**": { cors: true },
   },
 
-  compatibilityDate: "2024-07-05",
+  compatibilityDate: "2024-08-05",
 });
