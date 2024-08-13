@@ -5,8 +5,6 @@ const openai = new OpenAI({
   baseURL: "https://api.moonshot.cn/v1",
 });
 
-export const runTask = (func: () => unknown) => func();
-
 export default defineEventHandler(async (event) => {
   const { model, messages } = await readBody(event);
   const stream = await openai.chat.completions.create({
@@ -15,13 +13,13 @@ export default defineEventHandler(async (event) => {
     stream: true,
   });
   const eventStream = createEventStream(event);
-  runTask(async () => {
+  setTimeout(async () => {
     for await (const item of stream) {
       await eventStream.push(JSON.stringify(item));
       await eventStream.flush();
-      await new Promise((resolve) => setTimeout(resolve, 60));
+      await new Promise((resolve) => setImmediate(resolve));
     }
     await eventStream.close();
-  });
+  }, 60);
   await eventStream.send();
 });

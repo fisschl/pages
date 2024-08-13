@@ -95,9 +95,6 @@ importers:
       howler:
         specifier: ^2.2.4
         version: 2.2.4
-      idb-keyval:
-        specifier: ^6.2.1
-        version: 6.2.1
       ioredis:
         specifier: ^5.4.1
         version: 5.4.1
@@ -9410,7 +9407,8 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  idb-keyval@6.2.1: {}
+  idb-keyval@6.2.1:
+    optional: true
 
   ieee754@1.2.1: {}
 
