@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     for await (const item of stream) {
       await eventStream.push(JSON.stringify(item));
       await eventStream.flush();
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => setTimeout(resolve, 32));
     }
     await eventStream.close();
   }, 60);
