@@ -16,8 +16,11 @@ export default defineEventHandler(async (event) => {
   });
   const eventStream = createEventStream(event);
   runTask(async () => {
-    for await (const item of stream)
+    for await (const item of stream) {
       await eventStream.push(JSON.stringify(item));
+      await eventStream.flush();
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    }
     await eventStream.close();
   });
   await eventStream.send();
