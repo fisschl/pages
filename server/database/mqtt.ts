@@ -1,4 +1,3 @@
-import consola from "consola";
 import mqtt from "mqtt";
 import { URL } from "node:url";
 
@@ -9,7 +8,9 @@ const createClient = () => {
     username: uri.username,
     password: uri.password,
   });
-  client.on("error", consola.error);
+  client.on("error", (e) => {
+    console.error(e);
+  });
   return client;
 };
 

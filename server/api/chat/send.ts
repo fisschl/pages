@@ -1,4 +1,3 @@
-import { consola } from "consola";
 import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -110,7 +109,7 @@ export default defineEventHandler(async (event) => {
       publish(publish_topic, message);
     }
   } catch (e) {
-    consola.error(e);
+    console.error(e);
     const info = JSON.stringify({
       content,
       input,
@@ -118,7 +117,7 @@ export default defineEventHandler(async (event) => {
       message: last(history_messages),
       error: e,
     });
-    consola.error("OpenAI 异常", info);
+    console.error("OpenAI 异常", info);
     output.content = "未知异常：" + e;
   }
   await new Promise((resolve) => setTimeout(resolve, 300));

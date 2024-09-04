@@ -1,18 +1,9 @@
-
 .prose {
   max-width: none;
 }
 
 .prose:focus {
   outline: none;
-}
-
-.prose p.is-editor-empty:first-child::before {
-  color: #b1b1b1;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
 }
 
 .prose ul li p,

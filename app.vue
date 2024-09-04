@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import "@fontsource-variable/noto-sans-sc";
 import "@fontsource-variable/open-sans";
-import { useUserStore } from "./composables/user";
 import { parseRecord } from "~/utils/query";
 import "@fontsource-variable/fira-code";
 
@@ -46,14 +45,6 @@ const colorMode = useColorMode();
 watchEffect(() => {
   theme.value = colorMode.value;
 });
-
-const user = useUserStore();
-const headers = useRequestHeaders(["cookie"]);
-const { data } = await useFetch("/api/auth", {
-  headers,
-  query: { token: query.token },
-});
-if (data.value) user.info = data.value;
 </script>
 
 <template>
