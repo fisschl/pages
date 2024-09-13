@@ -7,37 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id         String   @id @db.VarChar(255)
-  last_login DateTime @default(now()) @db.Timestamptz()
-  login      String   @unique @db.VarChar(255)
-  name       String   @db.VarChar(255)
-  avatar_url String?
-  email      String?  @db.VarChar(255)
-  role       String?  @db.VarChar(255)
-}
-
 enum ChatRole {
   user
   assistant
 }
 
 model chat_message {
-  message_id  String       @id @db.Uuid()
-  user_id     String       @db.VarChar(255)
-  create_time DateTime     @default(now()) @db.Timestamptz()
+  message_id  String   @id @db.Uuid()
+  user        String   @db.VarChar(255)
+  create_time DateTime @default(now()) @db.Timestamptz()
   role        ChatRole
   content     String
-  images      chat_image[]
 
-  @@index([user_id, create_time(sort: Desc)])
-}
-
-model chat_image {
-  image_id   String       @id @db.Uuid()
-  message_id String       @db.Uuid()
-  url        String
-  chat       chat_message @relation(fields: [message_id], references: [message_id])
-
-  @@index([message_id])
+  @@index([user, create_time(sort: Desc)])
 }

@@ -4,7 +4,7 @@ import "katex/dist/katex.min.css";
 import { debounce } from "lodash-es";
 import { onMounted } from "vue";
 import { type Message, message_schema } from "~/components/chat/type";
-import { useLockScroll } from "~/composables/lock_scroll";
+import { useLockScroll } from "~/composables/lockScroll";
 import { useSocket } from "~/composables/socket";
 import ImageViewer from "~/components/ImageViewer.vue";
 
@@ -17,7 +17,12 @@ const user = useUserStore();
 const model = useState(() => "");
 const list = useState<Message[]>(() => []);
 
-const scrollTarget = useScrollTarget();
+const isMounted = useMounted();
+const scrollTarget = computed(() => {
+  if (!isMounted.value) return;
+  if (typeof window === "undefined") return;
+  return document.getElementById("__nuxt");
+});
 
 const list_element = ref<HTMLElement>();
 
@@ -131,7 +136,6 @@ whenever(shouldLoadMore, async () => {
 
 const headers = useRequestHeaders(["cookie"]);
 
-await user.shouldLogin();
 await callOnce(async () => {
   const res = await $fetch("/api/chat/messages", {
     headers,
@@ -162,17 +166,8 @@ await callOnce(async () => {
       @keydown.enter="handleKeydown"
     />
     <div class="mb-5 mt-3 flex items-start">
-      <section class="flex-1">
-        <img
-          v-for="(item, index) in inputFiles"
-          :key="index"
-          :src="item"
-          alt="输入图片"
-          class="mr-2 size-12 object-cover"
-        />
-      </section>
+      <section class="flex-1"></section>
       <section class="flex items-center">
-        <ChatUpload v-model:files="inputFiles" class="mr-3" />
         <UButton
           :loading="streaming"
           class="px-6"
@@ -183,7 +178,6 @@ await callOnce(async () => {
         </UButton>
       </section>
     </div>
-    <ChatBottomButton v-if="isShowScrollButton" />
     <ChatLoading :loading="loading" />
     <ImageViewer />
   </UContainer>

@@ -1,4 +1,3 @@
-import { xxhash3 } from "hash-wasm";
 import { LRUCache } from "lru-cache";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
@@ -8,6 +7,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import rehypeShiki from "@shikijs/rehype";
+import { hash } from "ohash";
 
 const BracketsPattern =
   /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\]|\\\((.*?)\\\)/g;
@@ -44,11 +44,11 @@ export const markdown_cache = new LRUCache<string, string>({
 });
 
 export const parseMarkdownCache = async (text: string) => {
-  const hash = await xxhash3(text);
-  const cache_result = markdown_cache.get(hash);
+  const key = hash(text);
+  const cache_result = markdown_cache.get(key);
   if (cache_result) return cache_result;
   const result = await parseMarkdown(text);
   console.info(result);
-  markdown_cache.set(hash, result);
+  markdown_cache.set(key, result);
   return result;
 };
