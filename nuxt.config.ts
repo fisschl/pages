@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   ],
 
   routeRules: {
-    "/": { redirect: "/main/home" },
+    "/": { redirect: "/main" },
     "/api/**": { cors: true },
   },
 

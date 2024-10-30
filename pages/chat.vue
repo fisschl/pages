@@ -12,8 +12,6 @@ useHead({
   title: "GPT",
 });
 
-const user = useUserStore();
-
 const model = useState(() => "");
 const list = useState<Message[]>(() => []);
 
