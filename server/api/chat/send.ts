@@ -1,9 +1,7 @@
 import { last, pick } from "lodash-es";
 import OpenAI from "openai";
 import { z } from "zod";
-import { publish } from "~/server/database/mqtt";
 import { database } from "~/server/database/postgres";
-import { use401 } from "~/server/utils/user";
 import { parseMarkdown, parseMarkdownCache } from "../../utils/markdown";
 import { v7 as uuid } from "uuid";
 
@@ -20,7 +18,6 @@ const request_schema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const user_id = await use401(event);
   const body = await readValidatedBody(event, request_schema.parse);
   const { content, images } = body;
   if (!content) throw createError({ status: 400 });

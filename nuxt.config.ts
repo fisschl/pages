@@ -6,11 +6,9 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@pinia/nuxt",
   ],
-
-  routeRules: {
-    "/": { redirect: "/main" },
-    "/api/**": { cors: true },
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
   },
-
-  compatibilityDate: "2024-08-05",
 });

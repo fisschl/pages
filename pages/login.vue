@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-const { query } = useRoute();
-
 const login = async () => {};
 </script>
 
