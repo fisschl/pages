@@ -18,7 +18,7 @@ const patch = init(
 
 const parser = new DOMParser();
 
-const parse = async (html: string) => {
+const parse = (html: string) => {
   const { body } = parser.parseFromString(html, "text/html");
   const nodes = Array.from(body.children).map((node) => toVNode(node));
   return fragment(nodes);
@@ -32,10 +32,10 @@ const createInnerElement = (article: HTMLElement) => {
   return element;
 };
 
-export const update = async (article: HTMLElement, html: string) => {
+export const update = (article: HTMLElement, html: string) => {
   const vNode = patch(
     vNodeCache.get(article) || createInnerElement(article),
-    await parse(html),
+    parse(html),
   );
   vNodeCache.set(article, vNode);
 };

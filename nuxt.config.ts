@@ -11,4 +11,9 @@ export default defineNuxtConfig({
       websocket: true,
     },
   },
+  eslint: {
+    config: {
+      standalone: false,
+    },
+  },
 });

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { TranslateRequest } from "~/server/api/translate";
-import { v7 as uuid } from "uuid";
-import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import { unified } from "unified";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import rehypeParse from "rehype-parse";
 import rehypeRemark from "rehype-remark";
 import remarkStringify from "remark-stringify";
-import rehypeParse from "rehype-parse";
+import { unified } from "unified";
+import { v7 as uuid } from "uuid";
+import type { TranslateRequest } from "~/server/api/translate";
 
 const translateURL = computed(() => {
   if (typeof window === "undefined") return;
@@ -51,7 +51,7 @@ const request = reactive<TranslateRequest>({
   model: "moonshot-v1-32k",
 });
 
-const handleKeyDown = async (e: KeyboardEvent) => {
+const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === "Enter" && !e.ctrlKey) return startTranslate();
 };
 
@@ -95,7 +95,7 @@ const handleClickEditor = ({ target }: MouseEvent) => {
           style="width: 11rem"
           :options="modelOptions"
         />
-        <p class="flex-1"></p>
+        <p class="flex-1" />
         <UButton icon="i-tabler-topology-star" @click="startTranslate">
           开始翻译
         </UButton>
@@ -105,7 +105,7 @@ const handleClickEditor = ({ target }: MouseEvent) => {
       <article
         ref="article-element"
         class="prose mb-2 dark:prose-invert prose-code:text-base"
-      ></article>
+      />
       <UIcon
         v-if="loading"
         name="i-tabler-loader-2"
