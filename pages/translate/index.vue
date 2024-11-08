@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
-import rehypeParse from "rehype-parse";
-import rehypeRemark from "rehype-remark";
-import remarkStringify from "remark-stringify";
-import { unified } from "unified";
 import { v7 as uuid } from "uuid";
 import type { TranslateRequest } from "~/server/api/translate";
 
@@ -27,7 +23,7 @@ const { send } = useWebSocket(translateURL, {
     const article = articleElement.value;
     if (!article || !text) return;
     const { update } = await import("~/utils/snabbdom");
-    await update(article, text);
+    update(article, text);
   },
   autoReconnect: true,
 });
@@ -35,14 +31,8 @@ const { send } = useWebSocket(translateURL, {
 const startTranslate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 60));
   request.key = uuid();
-  const result = await unified()
-    .use(rehypeParse)
-    .use(rehypeRemark)
-    .use(remarkStringify)
-    .process(editor.value?.getHTML());
-  const text = result.toString();
-  if (!text.trim()) return;
-  request.text = text;
+  const result = editor.value?.getHTML();
+  request.text = result;
   send(JSON.stringify(request));
   loading.value = true;
 };

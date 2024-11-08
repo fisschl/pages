@@ -1,5 +1,7 @@
+import process from "node:process";
 import { first } from "lodash-es";
 import OpenAI from "openai";
+import { htmlToMarkdown } from "../utils/markdown";
 
 const TranslatePrompt = `
 你是一名翻译助手，精通多种语言和领域的翻译。
@@ -58,21 +60,31 @@ export default defineWebSocketHandler({
       content: TranslatePrompt,
     });
     const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [];
-    if (request.text) {
+    const text = await htmlToMarkdown(request.text);
+    if (text.trim()) {
       content.push({
         type: "text",
-        text: request.text,
+        text,
       });
     }
+    const finish = () => {
+      peer.send(
+        JSON.stringify({
+          key: request.key,
+          finished: true,
+        }),
+      );
+    };
+    if (!content.length) return finish();
     messages.push({
       role: "user",
-      content: content,
+      content,
     });
     const baseModel =
       models.find((model) => model.model === request.model) || first(models)!;
     const stream = await baseModel.client.chat.completions.create({
       model: baseModel.model,
-      messages: messages,
+      messages,
       stream: true,
       max_tokens: 2048,
       max_completion_tokens: 2048,
@@ -92,11 +104,6 @@ export default defineWebSocketHandler({
         }),
       );
     }
-    peer.send(
-      JSON.stringify({
-        key: request.key,
-        finished: true,
-      }),
-    );
+    return finish();
   },
 });

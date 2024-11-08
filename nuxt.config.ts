@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/eslint",
     "@pinia/nuxt",
+    "@pinia/colada-nuxt",
   ],
   nitro: {
     experimental: {
