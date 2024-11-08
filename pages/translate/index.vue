@@ -55,7 +55,7 @@ const handleKeyDown = async (e: KeyboardEvent) => {
   if (e.key === "Enter" && !e.ctrlKey) return startTranslate();
 };
 
-const modelOptions = ["moonshot-v1-32k", "qwen-plus", "gpt-4o", "gpt-4o-mini"];
+const modelOptions = ["moonshot-v1-32k", "qwen-max", "gpt-4o", "gpt-4o-mini"];
 
 const editor = shallowRef<Editor>();
 

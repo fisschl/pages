@@ -30,7 +30,7 @@ export const models = [
     client: MoonshotBaseClient,
   },
   {
-    model: "qwen-plus",
+    model: "qwen-max",
     client: DashscopeBaseClient,
   },
   {
