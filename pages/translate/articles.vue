@@ -2,6 +2,7 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { v7 as uuid } from "uuid";
+import ImageViewer from "~/components/ImageViewer.vue";
 import type { TranslateRequest } from "~/server/api/translate";
 
 const translateURL = computed(() => {
@@ -102,6 +103,7 @@ const handleClickEditor = ({ target }: MouseEvent) => {
         class="animate-spin"
       />
     </div>
+    <ImageViewer />
   </main>
 </template>
 
