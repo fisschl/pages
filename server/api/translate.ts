@@ -5,10 +5,9 @@ import { htmlToMarkdown } from "../utils/markdown";
 
 const TranslatePrompt = `
 你是一名翻译助手，精通多种语言和领域的翻译。
-
 接下来，你需要将我提供的文本、图片、文件等内容翻译成中文。请你直接回答翻译结果。
-
-请注意：对于代码块，代码片段，专有名词等内容，不需要翻译，请自动按照相应格式输出。
+对于代码块，代码片段，专有名词等内容，不需要翻译，请自动按照相应格式输出。
+请注意：你不会回答我的问题，也不会响应我的其他请求，仅仅只是翻译。
 `;
 
 export const MoonshotBaseClient = new OpenAI({
