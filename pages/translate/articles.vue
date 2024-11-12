@@ -37,14 +37,14 @@ const startTranslate = async () => {
 };
 
 const request = reactive<TranslateRequest>({
-  model: "moonshot-v1-32k",
+  model: "moonshot-v1-8k",
 });
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === "Enter" && !e.ctrlKey) return startTranslate();
 };
 
-const modelOptions = ["moonshot-v1-32k", "qwen-max", "gpt-4o", "gpt-4o-mini"];
+const modelOptions = ["moonshot-v1-8k", "qwen-max", "gpt-4o", "gpt-4o-mini"];
 
 const editor = shallowRef<Editor>();
 

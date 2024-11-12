@@ -31,7 +31,7 @@ export default defineWebSocketHandler({
       },
     );
     const stream = await MoonshotBaseClient.chat.completions.create({
-      model: "moonshot-v1-32k",
+      model: "moonshot-v1-8k",
       messages,
       stream: true,
       max_tokens: 2048,

@@ -28,7 +28,7 @@ export const DashscopeBaseClient = new OpenAI({
 
 export const models = [
   {
-    model: "moonshot-v1-32k",
+    model: "moonshot-v1-8k",
     client: MoonshotBaseClient,
   },
   {
@@ -36,11 +36,11 @@ export const models = [
     client: DashscopeBaseClient,
   },
   {
-    model: "gpt-4o",
+    model: "gpt-4o-mini",
     client: OpenAIBaseClient,
   },
   {
-    model: "gpt-4o-mini",
+    model: "gpt-4o",
     client: OpenAIBaseClient,
   },
 ];

@@ -13,21 +13,6 @@ const namingURL = computed(() => {
   const scheme = location.protocol.startsWith("https") ? "wss" : "ws";
   return `${scheme}://${location.host}/api/variables`;
 });
-
-const loading = ref(false);
-
-const textResult = ref("");
-
-const wordsResult = computed(() => {
-  const result = textResult.value.matchAll(/\w+/g);
-  const action = changeCase[request.case];
-  return Array.from(result).map(([item]) => {
-    const value = action(item);
-    if (typeof value !== "string") return item;
-    return value;
-  });
-});
-
 const { send } = useWebSocket(namingURL, {
   onMessage(ws, { data }) {
     if (!data) return;
@@ -35,10 +20,23 @@ const { send } = useWebSocket(namingURL, {
     if (response.key !== request.key) return;
     if (response.finished) loading.value = false;
     if (!response.text) return;
-    console.info(response.text);
     textResult.value = response.text;
   },
   autoReconnect: true,
+});
+
+const loading = ref(false);
+const textResult = ref("");
+
+const wordsResult = computed((): string[] => {
+  const result = textResult.value.matchAll(/\w+/g);
+  const action = changeCase[request.case];
+  if (typeof action !== "function") return [];
+  return Array.from(result).map(([item]) => {
+    const value = action(item);
+    if (typeof value !== "string") return item;
+    return value;
+  });
 });
 
 const startSend = () => {
