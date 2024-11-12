@@ -70,7 +70,7 @@ const handleClickEditor = ({ target }: MouseEvent) => {
 
 <template>
   <main class="mt-4 flex gap-5 px-4 pb-6">
-    <div class="flex-1">
+    <div class="min-w-0 flex-1">
       <EditorContent
         class="markdown editor rounded-md border-gray-200 focus-within:border-blue-500 dark:border-gray-500 dark:focus-within:border-blue-500"
         :editor="editor"
@@ -90,7 +90,7 @@ const handleClickEditor = ({ target }: MouseEvent) => {
         </UButton>
       </div>
     </div>
-    <div class="markdown flex-1">
+    <div class="markdown min-w-0 flex-1">
       <article
         ref="article-element"
         class="prose mb-2 dark:prose-invert prose-code:text-base"
