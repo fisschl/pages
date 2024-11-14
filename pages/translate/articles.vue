@@ -37,8 +37,20 @@ const startTranslate = async () => {
   loading.value = true;
 };
 
+const languageOptions = [
+  {
+    value: "zh",
+    label: "简体中文",
+  },
+  {
+    value: "en",
+    label: "English",
+  },
+];
+
 const request = reactive<TranslateRequest>({
   model: "moonshot-v1-8k",
+  language: "zh",
 });
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,9 +96,24 @@ const handleClickEditor = ({ target }: MouseEvent) => {
           v-model="request.model"
           style="width: 11rem"
           :options="modelOptions"
+          class="mr-3"
+        />
+        <USelectMenu
+          v-model="request.language"
+          style="width: 8rem"
+          :options="languageOptions"
+          value-attribute="value"
         />
         <p class="flex-1" />
-        <UButton icon="i-tabler-topology-star" @click="startTranslate">
+        <UButton
+          square
+          color="violet"
+          title="清空内容"
+          class="mr-3"
+          icon="i-tabler-clear-all"
+          @click="editor?.commands.clearContent"
+        />
+        <UButton icon="i-tabler-run" @click="startTranslate">
           开始翻译
         </UButton>
       </div>

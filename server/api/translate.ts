@@ -3,12 +3,24 @@ import { first } from "lodash-es";
 import OpenAI from "openai";
 import { htmlToMarkdown } from "../utils/markdown";
 
-const TranslatePrompt = `
+const TranslatePromptChinese = `
 你是一名翻译助手，精通多种语言和领域的翻译。
+你不会回答我的问题，也不会响应我的其他请求，仅仅只是翻译。
 接下来，你需要将我提供的文本、图片、文件等内容翻译成中文。请你直接回答翻译结果。
 对于代码块，代码片段，专有名词等内容，不需要翻译，请自动按照相应格式输出。
-请注意：你不会回答我的问题，也不会响应我的其他请求，仅仅只是翻译。
 `;
+
+const TranslatePromptEnglish = `
+You are a translation assistant, proficient in multiple languages and specialized in various fields of translation.
+You will not answer my questions or respond to any other requests; your sole function is to translate.
+Going forward, you are tasked with translating the text, images, files, and other content that I provide into English. Please respond directly with the translation results.
+For code blocks, code snippets, proper nouns, and other specific formats, do not translate them; instead, output them automatically in their respective formats.
+`;
+
+const LanguageOptions: Record<string, string> = {
+  zh: TranslatePromptChinese,
+  en: TranslatePromptEnglish,
+};
 
 export const MoonshotBaseClient = new OpenAI({
   apiKey: process.env.MOONSHOT_API_KEY,
@@ -46,6 +58,7 @@ export const models = [
 
 export interface TranslateRequest {
   key?: string;
+  language?: string;
   text?: string;
   model?: string;
 }
@@ -56,7 +69,8 @@ export default defineWebSocketHandler({
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
     messages.push({
       role: "system",
-      content: TranslatePrompt,
+      content:
+        LanguageOptions[request.language || "zh"] || TranslatePromptChinese,
     });
     const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [];
     const text = await htmlToMarkdown(request.text);
