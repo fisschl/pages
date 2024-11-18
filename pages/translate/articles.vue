@@ -79,6 +79,22 @@ const handleClickEditor = ({ target }: MouseEvent) => {
   if (prose) return;
   editor.value?.commands.focus();
 };
+
+const fileDialog = useFileDialog({
+  multiple: true,
+});
+
+fileDialog.onChange(async (files) => {
+  if (!files) return;
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+    await $fetch("/api/moonshot/file-upload", {
+      method: "PUT",
+      body: formData,
+    });
+  }
+});
 </script>
 
 <template>
@@ -101,9 +117,11 @@ const handleClickEditor = ({ target }: MouseEvent) => {
         <USelectMenu
           v-model="request.language"
           style="width: 8rem"
+          class="mr-3"
           :options="languageOptions"
           value-attribute="value"
         />
+        <UButton @click="fileDialog.open"> 上传文件 </UButton>
         <p class="flex-1" />
         <UButton
           square

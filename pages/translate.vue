@@ -16,7 +16,7 @@ const links = [
 </script>
 
 <template>
-  <UHorizontalNavigation :links="links" class="px-2" />
+  <UHorizontalNavigation :links="links" class="px-2 pt-1" />
   <NuxtPage />
   <AppFooter />
 </template>
