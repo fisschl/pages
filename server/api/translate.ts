@@ -6,14 +6,14 @@ import { htmlToMarkdown } from "../utils/markdown";
 const TranslatePromptChinese = `
 你是一名翻译助手，精通多种语言和领域的翻译。
 你不会回答我的问题，也不会响应我的其他请求，仅仅只是翻译。
-接下来，你需要将我提供的文本、图片、文件等内容翻译成中文。请你直接回答翻译结果。
+接下来，你需要将我提供的内容翻译成中文。请你直接回答翻译结果。
 对于代码块，代码片段，专有名词等内容，不需要翻译，请自动按照相应格式输出。
 `;
 
 const TranslatePromptEnglish = `
 You are a translation assistant, proficient in multiple languages and specialized in various fields of translation.
 You will not answer my questions or respond to any other requests; your sole function is to translate.
-Going forward, you are tasked with translating the text, images, files, and other content that I provide into English. Please respond directly with the translation results.
+Next, you need to translate the content I provide into English. Please respond directly with the translation results.
 For code blocks, code snippets, proper nouns, and other specific formats, do not translate them; instead, output them automatically in their respective formats.
 `;
 
@@ -61,6 +61,7 @@ export interface TranslateRequest {
   language?: string;
   text?: string;
   model?: string;
+  files?: string[];
 }
 
 export default defineWebSocketHandler({
@@ -72,14 +73,16 @@ export default defineWebSocketHandler({
       content:
         LanguageOptions[request.language || "zh"] || TranslatePromptChinese,
     });
-    const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [];
-    const text = await htmlToMarkdown(request.text);
-    if (text.trim()) {
-      content.push({
-        type: "text",
-        text,
-      });
+    const textContents: string[] = [await htmlToMarkdown(request.text)];
+    if (request.files) {
+      for (const id of request.files) {
+        const result = await MoonshotBaseClient.files
+          .content(id)
+          .then((res) => res.json());
+        textContents.push(result.content);
+      }
     }
+    const text = textContents.join("\n\n").trim();
     const finish = () => {
       peer.send(
         JSON.stringify({
@@ -88,10 +91,10 @@ export default defineWebSocketHandler({
         }),
       );
     };
-    if (!content.length) return finish();
+    if (!text) return finish();
     messages.push({
       role: "user",
-      content,
+      content: text,
     });
     const baseModel =
       models.find((model) => model.model === request.model) || first(models)!;
