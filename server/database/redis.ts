@@ -1,14 +1,15 @@
 import IORedis from "ioredis";
-import { Buffer } from "node:buffer";
 import { URL } from "node:url";
-import { unpack, pack } from "msgpackr";
+import { destr } from "destr";
+import type { SerializeObject } from "nitropack";
 
-const uri = new URL(process.env.REDIS_URL!);
+const redis_url = new URL(process.env.REDIS_URL!);
+
 export const redis = new IORedis({
-  username: uri.username,
-  password: uri.password,
-  host: uri.hostname,
-  port: parseInt(uri.port),
+  username: redis_url.username,
+  password: redis_url.password,
+  host: redis_url.hostname,
+  port: parseInt(redis_url.port),
   db: 0,
   maxRetriesPerRequest: null,
 });
@@ -17,34 +18,28 @@ export const HOUR = 60 * 60;
 
 export const DAY = 24 * HOUR;
 
-export const arrayToBuffer = (uintArray: Uint8Array) => {
-  const { buffer, byteOffset, byteLength } = uintArray;
-  return Buffer.from(buffer, byteOffset, byteLength);
-};
-
 export const writeCache = async <T extends object>(
   key: string,
   value: T,
   ttl: number = 30 * DAY,
-) => {
-  const buffer = pack(value);
-  await redis.setex(key, ttl, buffer);
-  return value;
+): Promise<SerializeObject<T>> => {
+  const text = JSON.stringify(value);
+  await redis.setex(key, ttl, text);
+  return JSON.parse(text);
 };
 
 export const readCache = async <T = any>(key: string): Promise<T | null> => {
-  const buffer = await redis.getBuffer(key);
-  if (!buffer) return null;
-  return unpack(buffer);
+  const text = await redis.get(key);
+  if (!text) return null;
+  return destr(text);
 };
 
-export const useCache = async <T extends object>(
+export const useRedisCache = async <T extends object>(
   key: string,
   fetchData: () => Promise<T> | T,
-): Promise<T> => {
-  const data = await readCache<T>(key);
+) => {
+  const data = await readCache<SerializeObject<T>>(key);
   if (data) return data;
   const value = await fetchData();
-  await writeCache(key, value);
-  return value;
+  return writeCache(key, value);
 };
