@@ -82,7 +82,6 @@ const handleClickEditor = ({ target }: MouseEvent) => {
 
 const fileDialog = useFileDialog({
   multiple: true,
-  accept: "image/*",
 });
 
 const isUploading = ref(false);
@@ -152,17 +151,15 @@ const handlePaste = async () => {
           />
         </div>
       </article>
-      <div class="mb-3 flex justify-end">
+      <div class="mb-3 flex flex-wrap justify-end gap-3">
         <USelectMenu
           v-model="request.model"
           style="width: 11rem"
           :options="modelOptions"
-          class="mr-3"
         />
         <USelectMenu
           v-model="request.language"
           style="width: 8rem"
-          class="mr-3"
           :options="languageOptions"
           value-attribute="value"
         />
@@ -171,7 +168,6 @@ const handlePaste = async () => {
           square
           color="violet"
           title="清空内容"
-          class="mr-3"
           icon="i-tabler-clear-all"
           @click="clearContent"
         />
@@ -181,7 +177,6 @@ const handlePaste = async () => {
           title="上传文件"
           :loading="isUploading"
           color="yellow"
-          class="mr-3"
           @click="fileDialog.open"
         />
         <UButton icon="i-tabler-run" @click="startTranslate">

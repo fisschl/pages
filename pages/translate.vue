@@ -12,6 +12,11 @@ const links = [
     icon: "i-tabler-writing-sign",
     to: "/translate/variables",
   },
+  {
+    label: "文字识别",
+    icon: "i-tabler-credit-card",
+    to: "/translate/ocr",
+  },
 ];
 </script>
 

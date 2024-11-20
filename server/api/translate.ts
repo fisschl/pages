@@ -2,6 +2,7 @@ import process from "node:process";
 import { first } from "lodash-es";
 import OpenAI from "openai";
 import { htmlToMarkdown } from "../utils/markdown";
+import { fileMoonshotContent } from "~/server/api/moonshot/file-content";
 
 const TranslatePromptChinese = `
 你是一名翻译助手，精通多种语言和领域的翻译。
@@ -73,12 +74,11 @@ export default defineWebSocketHandler({
       content:
         LanguageOptions[request.language || "zh"] || TranslatePromptChinese,
     });
-    const textContents: string[] = [await htmlToMarkdown(request.text)];
+    const textContents: string[] = [];
+    textContents.push(await htmlToMarkdown(request.text));
     if (request.files) {
       for (const id of request.files) {
-        const result = await MoonshotBaseClient.files
-          .content(id)
-          .then((res) => res.json());
+        const result = await fileMoonshotContent(id);
         textContents.push(result.content);
       }
     }

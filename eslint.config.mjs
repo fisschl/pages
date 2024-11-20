@@ -1,18 +1,10 @@
-import { sxzz } from "@sxzz/eslint-config";
 import withNuxt from "./.nuxt/eslint.config.mjs";
+import prettier from "eslint-config-prettier";
 
-export default withNuxt(
-  sxzz([
-    {
-      rules: {
-        "vue/component-name-in-template-casing": [
-          "error",
-          "PascalCase",
-          { registeredComponentsOnly: false },
-        ],
-        "vue/multi-word-component-names": "off",
-        "vue/no-multiple-template-root": "off",
-      },
-    },
-  ]),
-);
+export default withNuxt(prettier, {
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+    "vue/no-v-html": "off",
+    "vue/no-multiple-template-root": "off",
+  },
+});

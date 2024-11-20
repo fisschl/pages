@@ -51,7 +51,6 @@ export const parseMarkdownCache = async (text: string) => {
   const cache_result = markdown_cache.get(key);
   if (cache_result) return cache_result;
   const result = await parseMarkdown(text);
-  console.info(result);
   markdown_cache.set(key, result);
   return result;
 };
