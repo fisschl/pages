@@ -28,15 +28,15 @@ export const writeCache = async <T extends object>(
   return JSON.parse(text);
 };
 
-export const readCache = async <T = any>(key: string): Promise<T | null> => {
+export const readCache = async <T = any>(key: string) => {
   const text = await redis.get(key);
   if (!text) return null;
-  return destr(text);
+  return destr<T>(text);
 };
 
 export const useRedisCache = async <T extends object>(
   key: string,
-  fetchData: () => Promise<T> | T,
+  fetchData: () => T | Promise<T>,
 ) => {
   const data = await readCache<SerializeObject<T>>(key);
   if (data) return data;
