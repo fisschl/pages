@@ -32,7 +32,6 @@ const startTranslate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 60));
   request.key = uuid();
   request.text = editor.value?.getHTML();
-  request.files = fileList.map(({ id }) => id);
   send(JSON.stringify(request));
   loading.value = true;
 };
@@ -80,51 +79,8 @@ const handleClickEditor = ({ target }: MouseEvent) => {
   editor.value?.commands.focus();
 };
 
-const fileDialog = useFileDialog({
-  multiple: true,
-});
-
-const isUploading = ref(false);
-const toast = useToast();
-
-interface FileInfo {
-  id: string;
-  src: string;
-}
-const fileList = reactive<FileInfo[]>([]);
-
-const uploadFiles = async (files: FileList | null | undefined) => {
-  if (!files) return;
-  isUploading.value = true;
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const { id } = await $fetch("/api/moonshot/file-upload", {
-        method: "PUT",
-        body: formData,
-      });
-      const src = URL.createObjectURL(file);
-      fileList.push({ id, src });
-    } catch (error) {
-      console.error(error);
-      toast.add({
-        title: "解析失败",
-        description: file.name,
-        color: "red",
-        icon: "i-tabler-alert-triangle",
-      });
-    }
-  }
-  isUploading.value = false;
-  await startTranslate();
-};
-
-fileDialog.onChange(uploadFiles);
-
 const clearContent = () => {
   editor.value?.commands.clearContent();
-  fileList.splice(0);
 };
 
 const handlePaste = async () => {
@@ -142,14 +98,6 @@ const handlePaste = async () => {
         @click="handleClickEditor"
       >
         <EditorContent class="markdown" :editor="editor" />
-        <div class="mb-2 space-x-3 space-y-3">
-          <img
-            v-for="item in fileList"
-            :key="item.id"
-            :src="item.src"
-            alt="上传的图片"
-          />
-        </div>
       </article>
       <div class="mb-3 flex flex-wrap justify-end gap-3">
         <USelectMenu
@@ -170,14 +118,6 @@ const handlePaste = async () => {
           title="清空内容"
           icon="i-tabler-clear-all"
           @click="clearContent"
-        />
-        <UButton
-          icon="i-tabler-photo-scan"
-          square
-          title="上传文件"
-          :loading="isUploading"
-          color="yellow"
-          @click="fileDialog.open"
         />
         <UButton icon="i-tabler-run" @click="startTranslate">
           开始翻译

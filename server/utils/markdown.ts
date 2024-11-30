@@ -62,5 +62,5 @@ export const htmlToMarkdown = async (html?: string) => {
     .use(rehypeRemark)
     .use(remarkStringify)
     .process(html);
-  return result.toString();
+  return result.toString().trim();
 };

@@ -2,7 +2,6 @@ import process from "node:process";
 import { first } from "lodash-es";
 import OpenAI from "openai";
 import { htmlToMarkdown } from "../utils/markdown";
-import { fileMoonshotContent } from "~/server/api/moonshot/file-content";
 
 const TranslatePromptChinese = `
 你是一名翻译助手，精通多种语言和领域的翻译。
@@ -62,7 +61,6 @@ export interface TranslateRequest {
   language?: string;
   text?: string;
   model?: string;
-  files?: string[];
 }
 
 export default defineWebSocketHandler({
@@ -74,15 +72,6 @@ export default defineWebSocketHandler({
       content:
         LanguageOptions[request.language || "zh"] || TranslatePromptChinese,
     });
-    const textContents: string[] = [];
-    textContents.push(await htmlToMarkdown(request.text));
-    if (request.files) {
-      for (const id of request.files) {
-        const result = await fileMoonshotContent(id);
-        textContents.push(result.content);
-      }
-    }
-    const text = textContents.join("\n\n").trim();
     const finish = () => {
       peer.send(
         JSON.stringify({
@@ -91,6 +80,7 @@ export default defineWebSocketHandler({
         }),
       );
     };
+    const text = await htmlToMarkdown(request.text);
     if (!text) return finish();
     messages.push({
       role: "user",
