@@ -1,7 +1,7 @@
 import process from "node:process";
 import { first } from "lodash-es";
 import OpenAI from "openai";
-import { htmlToMarkdown } from "../utils/markdown";
+import { htmlToMarkdown, parseMarkdown } from "../utils/markdown";
 
 const TranslatePromptChinese = `
 你是一名翻译助手，精通多种语言和领域的翻译。

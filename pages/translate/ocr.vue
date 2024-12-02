@@ -1,62 +1,66 @@
 <script setup lang="ts">
 import { first } from "lodash-es";
+import { v7 as uuid } from "uuid";
 
-const fileDialog = useFileDialog();
+const fileDialog = useFileDialog({
+  accept: "image/*",
+});
 
 interface FileInfo {
-  id: string;
-  type: string;
+  key: string;
   src: string;
-  status: "uploading" | "watching" | "success" | "error";
   name: string;
-  content: string;
 }
 
 const fileInfo = reactive<Partial<FileInfo>>({});
-const toast = useToast();
+
+const loading = ref(false);
+
+const ocr_url = computed(() => {
+  if (typeof window === "undefined") return;
+  const scheme = location.protocol.startsWith("https") ? "wss" : "ws";
+  return `${scheme}://${location.host}/api/ocr`;
+});
+
+const articleElement = useTemplateRef<HTMLElement>("article-element");
+
+const { send } = useWebSocket(ocr_url, {
+  async onMessage(ws, { data }) {
+    if (!data) return;
+    const response = JSON.parse(data);
+    const { key, text, finished } = response;
+    if (key !== fileInfo.key) return;
+    if (finished) loading.value = false;
+    const article = articleElement.value;
+    if (!article || !text) return;
+    const { update } = await import("~/utils/snabbdom");
+    update(article, text);
+  },
+  autoReconnect: true,
+});
 
 const uploadFile = async (file: File | null | undefined) => {
   if (!file) return;
-  fileInfo.type = file.type;
-  fileInfo.src = URL.createObjectURL(file);
-  fileInfo.status = "uploading";
   fileInfo.name = file.name;
-  const formData = new FormData();
-  formData.append("file", file);
-  try {
-    const { id } = await $fetch("/api/moonshot/file-upload", {
-      method: "PUT",
-      body: formData,
-    });
-    fileInfo.id = id;
-    fileInfo.status = "watching";
-  } catch (error) {
-    fileInfo.status = "error";
-    toast.add({
-      title: "上传失败",
-      description: `${file.name}：${error}`,
-      color: "red",
-      icon: "i-tabler-alert-triangle",
-    });
-    return;
-  }
-  try {
-    const { html } = await $fetch("/api/moonshot/file-content", {
-      query: {
-        id: fileInfo.id,
-      },
-    });
-    fileInfo.content = html;
-    fileInfo.status = "success";
-  } catch (error) {
-    fileInfo.status = "error";
-    toast.add({
-      title: "解析失败",
-      description: `${file.name}：${error}`,
-      color: "red",
-      icon: "i-tabler-alert-triangle",
-    });
-  }
+  fileInfo.src = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const { result } = reader;
+      if (typeof result !== "string") {
+        reject(new Error("Failed to read file"));
+        return;
+      }
+      resolve(result);
+    };
+    reader.readAsDataURL(file);
+  });
+  fileInfo.key = uuid();
+  send(
+    JSON.stringify({
+      key: fileInfo.key,
+      image_url: fileInfo.src,
+    }),
+  );
 };
 
 fileDialog.onChange(async (files) => {
@@ -74,11 +78,7 @@ const handlePaste = async (e: ClipboardEvent) => {
 <template>
   <main class="flex px-4 pb-7 pt-4">
     <section class="mb-5 mr-6 flex flex-1 flex-col gap-4">
-      <img
-        v-if="fileInfo.type?.includes('image')"
-        :src="fileInfo.src"
-        :alt="fileInfo.name"
-      />
+      <img v-if="fileInfo.src" :src="fileInfo.src" :alt="fileInfo.name" />
       <UButton icon="i-tabler-upload" block @click="fileDialog.open">
         点击上传
       </UButton>
@@ -87,32 +87,16 @@ const handlePaste = async (e: ClipboardEvent) => {
         @paste="handlePaste"
       />
     </section>
-    <section class="markdown flex-1">
-      <div
-        v-if="fileInfo.status === 'uploading'"
-        class="flex items-center gap-2"
-      >
-        <UIcon
-          name="i-tabler-loader-2"
-          style="font-size: 20px"
-          class="animate-spin"
-        />
-        <span>正在上传</span>
-      </div>
-      <div
-        v-else-if="fileInfo.status === 'watching'"
-        class="flex items-center gap-2"
-      >
-        <UIcon
-          name="i-tabler-loader-2"
-          style="font-size: 20px"
-          class="animate-spin"
-        />
-        <span>正在解析</span>
-      </div>
+    <section class="markdown min-w-0 flex-1">
       <article
+        ref="article-element"
         class="prose mb-2 dark:prose-invert prose-code:text-base"
-        v-html="fileInfo.content"
+      />
+      <UIcon
+        v-if="loading"
+        name="i-tabler-loader-2"
+        style="font-size: 20px"
+        class="animate-spin"
       />
     </section>
   </main>
