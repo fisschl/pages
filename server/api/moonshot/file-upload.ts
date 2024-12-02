@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     },
     body: formData,
   });
-  return database.moonshot_files.create({
+  return database.files_moonshot.create({
     data: {
       id: result.id,
       bytes: result.bytes,

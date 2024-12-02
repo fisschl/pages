@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model moonshot_files {
+model files_moonshot {
   id         String   @id @db.VarChar(255)
   filename   String
   bytes      Int

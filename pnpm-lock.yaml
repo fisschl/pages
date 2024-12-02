@@ -198,6 +198,9 @@ importers:
       eslint:
         specifier: ^9.16.0
         version: 9.16.0(jiti@2.4.1)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.16.0(jiti@2.4.1))
       prettier:
         specifier: ^3.4.1
         version: 3.4.1
@@ -3214,6 +3217,12 @@ packages:
 
   eslint-config-flat-gitignore@0.2.0:
     resolution: {integrity: sha512-s4lsQLYX+76FCt3PZPwdLwWlqssa5SLufl2gopFmCo3PETOLY3OW5IrD3/l2R0FfYEJvd9BRJ19yJ+yfc5oW3g==}
+
+  eslint-config-prettier@9.1.0:
+    resolution: {integrity: sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
 
   eslint-flat-config-utils@0.4.0:
     resolution: {integrity: sha512-kfd5kQZC+BMO0YwTol6zxjKX1zAsk8JfSAopbKjKqmENTJcew+yBejuvccAg37cvOrN0Mh+DVbeyznuNWEjt4A==}
@@ -9562,6 +9571,10 @@ snapshots:
       find-up-simple: 1.0.0
     transitivePeerDependencies:
       - eslint
+
+  eslint-config-prettier@9.1.0(eslint@9.16.0(jiti@2.4.1)):
+    dependencies:
+      eslint: 9.16.0(jiti@2.4.1)
 
   eslint-flat-config-utils@0.4.0:
     dependencies:
