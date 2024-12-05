@@ -29,7 +29,7 @@ const loading = ref(false);
 const textResult = ref("");
 
 const wordsResult = computed((): string[] => {
-  const result = textResult.value.matchAll(/[\w -]+/g);
+  const result = textResult.value.matchAll(/\w+/g);
   const action = changeCase[request.case];
   if (typeof action !== "function") return [];
   return Array.from(result).map(([item]) => {
