@@ -2,6 +2,7 @@
 import { v7 as uuid } from "uuid";
 import { changeCaseOptions } from "~/utils/change-case";
 import type { NamingRequest } from "~/server/api/variables";
+import { pascalCase } from "change-case";
 
 const request = reactive<NamingRequest>({
   text: "",
@@ -30,12 +31,12 @@ const textResult = ref("");
 
 const wordsResult = computed((): string[] => {
   const result = textResult.value.matchAll(/\w+/g);
-  const action = changeCase[request.case];
-  if (typeof action !== "function") return [];
+  const caseItem = changeCaseOptions.find(
+    (item) => item.value === request.case,
+  );
+  const action = caseItem?.action || pascalCase;
   return Array.from(result).map(([item]) => {
-    const value = action(item);
-    if (typeof value !== "string") return item;
-    return value;
+    return action(item);
   });
 });
 

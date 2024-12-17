@@ -1,5 +1,4 @@
 import { MoonshotBaseClient } from "~/server/api/translate";
-import type { CaseLabel } from "~/utils/change-case";
 import type OpenAI from "openai";
 
 const NamingPrompt = `
@@ -11,7 +10,7 @@ const NamingPrompt = `
 export interface NamingRequest {
   key?: string;
   text: string;
-  case: CaseLabel;
+  case: string;
 }
 
 export default defineWebSocketHandler({
