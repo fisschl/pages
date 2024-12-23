@@ -18,11 +18,11 @@ const openImageViewer = async (url: string) => {
   await nextTick();
   const svg = create("svg").style("width", "100%").style("height", "100%");
   container.value!.append(svg.node()!);
-  const g = svg.append("g");
+  const wrapper = svg.append("g");
   const zoomBehavior = zoom<any, any>()
     .scaleExtent([0.5, 2])
     .on("zoom", ({ transform }) => {
-      g.attr("transform", transform);
+      wrapper.attr("transform", transform);
     });
   svg.call(zoomBehavior);
   const { width, height } = container.value!.getBoundingClientRect();
@@ -30,7 +30,7 @@ const openImageViewer = async (url: string) => {
   const scale = Math.min(width / naturalWidth, height / naturalHeight) * 0.9;
   const left = (width - naturalWidth * scale) / 2;
   const top = (height - naturalHeight * scale) / 2;
-  g.append("image")
+  wrapper.append("image")
     .attr("href", url)
     .attr("width", naturalWidth * scale)
     .attr("height", naturalHeight * scale)
