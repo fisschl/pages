@@ -3,37 +3,39 @@ import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { v7 as uuid } from "uuid";
 import type { TranslateRequest } from "~/server/api/translate";
+import { io, type Socket } from "socket.io-client";
 
-const translateURL = computed(() => {
-  if (typeof window === "undefined") return;
-  const scheme = location.protocol.startsWith("https") ? "wss" : "ws";
-  return `${scheme}://${location.host}/api/translate`;
+const socket = shallowRef<Socket>();
+onBeforeUnmount(() => {
+  socket.value?.disconnect();
+});
+onMounted(() => {
+  socket.value = io("http://localhost:4030");
 });
 
 const articleElement = useTemplateRef<HTMLElement>("article-element");
 const loading = ref(false);
 
-const { send } = useWebSocket(translateURL, {
-  async onMessage(ws, { data }) {
-    if (!data) return;
-    const response = JSON.parse(data);
-    const { key, text, finished } = response;
-    if (key !== request.key) return;
-    if (finished) loading.value = false;
-    const article = articleElement.value;
-    if (!article || !text) return;
-    const { update } = await import("~/utils/snabbdom");
-    update(article, text);
-  },
-  autoReconnect: true,
-});
+const effects: (() => unknown)[] = [];
 
 const startTranslate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 60));
   request.key = uuid();
   request.text = editor.value?.getHTML();
-  send(JSON.stringify(request));
   loading.value = true;
+  effects.forEach((fn) => fn());
+  effects.length = 0;
+  socket.value?.emit("translation", request);
+  const handler = async (response: Record<string, any>) => {
+    const { text, finished } = response;
+    if (finished) loading.value = false;
+    const article = articleElement.value;
+    if (!article || !text) return;
+    const { update } = await import("~/utils/snabbdom");
+    update(article, text);
+  };
+  socket.value?.on(request.key, handler);
+  effects.push(() => socket.value?.off(request.key, handler));
 };
 
 const languageOptions = [
