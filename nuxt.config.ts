@@ -7,9 +7,6 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@pinia/colada-nuxt",
   ],
-  nitro: {
-    experimental: {
-      websocket: true,
-    },
-  },
+
+  compatibilityDate: "2025-01-02",
 });

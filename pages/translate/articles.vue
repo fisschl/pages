@@ -2,16 +2,8 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { v7 as uuid } from "uuid";
-import type { TranslateRequest } from "~/server/api/translate";
-import { io, type Socket } from "socket.io-client";
 
-const socket = shallowRef<Socket>();
-onBeforeUnmount(() => {
-  socket.value?.disconnect();
-});
-onMounted(() => {
-  socket.value = io("http://localhost:4030");
-});
+const socket = useSocket();
 
 const articleElement = useTemplateRef<HTMLElement>("article-element");
 const loading = ref(false);
@@ -20,12 +12,17 @@ const effects: (() => unknown)[] = [];
 
 const startTranslate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 60));
-  request.key = uuid();
-  request.text = editor.value?.getHTML();
+  const key = uuid();
+  const htmlText = editor.value?.getHTML();
+  if (!htmlText) return;
+  request.text = htmlText;
   loading.value = true;
   effects.forEach((fn) => fn());
   effects.length = 0;
-  socket.value?.emit("translation", request);
+  socket.value?.emit("translation", {
+    ...request,
+    key,
+  });
   const handler = async (response: Record<string, any>) => {
     const { text, finished } = response;
     if (finished) loading.value = false;
@@ -34,8 +31,8 @@ const startTranslate = async () => {
     const { update } = await import("~/utils/snabbdom");
     update(article, text);
   };
-  socket.value?.on(request.key, handler);
-  effects.push(() => socket.value?.off(request.key, handler));
+  socket.value?.on(key, handler);
+  effects.push(() => socket.value?.off(key, handler));
 };
 
 const languageOptions = [
@@ -49,7 +46,8 @@ const languageOptions = [
   },
 ];
 
-const request = reactive<TranslateRequest>({
+const request = reactive({
+  text: "",
   model: "moonshot-v1-8k",
   language: "zh",
 });

@@ -1,30 +1,14 @@
 <script setup lang="ts">
 import { v7 as uuid } from "uuid";
 import { changeCaseOptions } from "~/utils/change-case";
-import type { NamingRequest } from "~/server/api/variables";
 import { pascalCase } from "change-case";
 
-const request = reactive<NamingRequest>({
+const request = reactivePick({
   text: "",
   case: "pascalCase",
 });
 
-const namingURL = computed(() => {
-  if (typeof window === "undefined") return;
-  const scheme = location.protocol.startsWith("https") ? "wss" : "ws";
-  return `${scheme}://${location.host}/api/variables`;
-});
-const { send } = useWebSocket(namingURL, {
-  onMessage(ws, { data }) {
-    if (!data) return;
-    const response = JSON.parse(data);
-    if (response.key !== request.key) return;
-    if (response.finished) loading.value = false;
-    if (!response.text) return;
-    textResult.value = response.text;
-  },
-  autoReconnect: true,
-});
+const socket = useSocket();
 
 const loading = ref(false);
 const textResult = ref("");
@@ -40,13 +24,28 @@ const wordsResult = computed((): string[] => {
   });
 });
 
+const effects: (() => unknown)[] = [];
+
 const startSend = () => {
   const text = request.text.trim();
   if (!text) return;
   request.text = text;
-  request.key = uuid();
-  send(JSON.stringify(request));
+  effects.forEach((fn) => fn());
+  effects.length = 0;
+  const key = uuid();
+  socket.value?.emit("variables", {
+    ...request,
+    key,
+  });
   loading.value = true;
+  const handler = async (response: Record<string, any>) => {
+    const { text, finished } = response;
+    if (finished) loading.value = false;
+    if (!text) return;
+    textResult.value = text;
+  };
+  socket.value?.on(key, handler);
+  effects.push(() => socket.value?.off(key, handler));
 };
 
 const clipboard = reactive(useClipboard());
