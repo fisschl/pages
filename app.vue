@@ -8,7 +8,7 @@ useHead({
     {
       rel: "icon",
       type: "image/svg+xml",
-      href: "https://static.bronya.world/favicon.svg",
+      href: "/favicon.svg",
     },
   ],
 });
