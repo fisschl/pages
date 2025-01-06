@@ -1,10 +1,24 @@
 import { io, type Socket } from "socket.io-client";
 
+export const useSocketStore = defineStore("socket.io-client", {
+  state: (): {
+    socket: Socket | null;
+  } => ({
+    socket: null,
+  }),
+  actions: {
+    setSocket() {
+      if (this.socket) return;
+      const instance = io("https://bronya.world");
+      this.socket = markRaw(instance);
+    },
+  },
+});
+
 export const useSocket = () => {
-  const socket = useState("socket.io-client", () => shallowRef<Socket>());
+  const store = useSocketStore();
   onMounted(() => {
-    if (socket.value) return;
-    socket.value = io("https://bronya.world");
+    store.setSocket();
   });
-  return socket;
+  return toRef(store, "socket");
 };

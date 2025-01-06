@@ -48,15 +48,12 @@ const languageOptions = [
 
 const request = reactive({
   text: "",
-  model: "moonshot-v1-8k",
   language: "zh",
 });
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === "Enter" && !e.ctrlKey) return startTranslate();
 };
-
-const modelOptions = ["moonshot-v1-8k", "qwen-max", "gpt-4o", "gpt-4o-mini"];
 
 const editor = shallowRef<Editor>();
 
@@ -100,11 +97,6 @@ const handlePaste = async () => {
         <EditorContent class="markdown" :editor="editor" />
       </article>
       <div class="mb-3 flex flex-wrap justify-end gap-3">
-        <USelectMenu
-          v-model="request.model"
-          style="width: 11rem"
-          :options="modelOptions"
-        />
         <USelectMenu
           v-model="request.language"
           style="width: 8rem"
