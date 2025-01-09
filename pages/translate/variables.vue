@@ -2,13 +2,12 @@
 import { v7 as uuid } from "uuid";
 import { changeCaseOptions } from "~/utils/change-case";
 import { pascalCase } from "change-case";
+import { socket } from "~/composables/socket";
 
 const request = reactivePick({
   text: "",
   case: "pascalCase",
 });
-
-const socket = useSocket();
 
 const loading = ref(false);
 const textResult = ref("");
@@ -25,15 +24,18 @@ const wordsResult = computed((): string[] => {
 });
 
 const effects: (() => unknown)[] = [];
+const clearEffects = () => {
+  effects.forEach((fn) => fn());
+  effects.length = 0;
+};
 
 const startSend = () => {
   const text = request.text.trim();
   if (!text) return;
   request.text = text;
-  effects.forEach((fn) => fn());
-  effects.length = 0;
+  clearEffects();
   const key = uuid();
-  socket.value?.emit("variables", {
+  socket().emit("variables", {
     ...request,
     key,
   });
@@ -44,8 +46,8 @@ const startSend = () => {
     if (!text) return;
     textResult.value = text;
   };
-  socket.value?.on(key, handler);
-  effects.push(() => socket.value?.off(key, handler));
+  socket().on(key, handler);
+  effects.push(() => socket().off(key, handler));
 };
 
 const clipboard = reactive(useClipboard());

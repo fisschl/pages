@@ -2,13 +2,16 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { v7 as uuid } from "uuid";
-
-const socket = useSocket();
+import { socket } from "~/composables/socket";
 
 const articleElement = useTemplateRef<HTMLElement>("article-element");
 const loading = ref(false);
 
 const effects: (() => unknown)[] = [];
+const clearEffects = () => {
+  effects.forEach((fn) => fn());
+  effects.length = 0;
+};
 
 const startTranslate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 60));
@@ -17,9 +20,8 @@ const startTranslate = async () => {
   if (!htmlText) return;
   request.text = htmlText;
   loading.value = true;
-  effects.forEach((fn) => fn());
-  effects.length = 0;
-  socket.value?.emit("translation", {
+  clearEffects();
+  socket().emit("translation", {
     ...request,
     key,
   });
@@ -31,8 +33,8 @@ const startTranslate = async () => {
     const { update } = await import("~/utils/snabbdom");
     update(article, text);
   };
-  socket.value?.on(key, handler);
-  effects.push(() => socket.value?.off(key, handler));
+  socket().on(key, handler);
+  effects.push(() => socket().off(key, handler));
 };
 
 const languageOptions = [
