@@ -12,6 +12,20 @@ useHead({
     },
   ],
 });
+
+const route = useRoute();
+watchEffect(() => {
+  if (typeof window === "undefined") return;
+  const { fullPath } = route;
+  if (typeof navigator === "undefined" || !navigator.userAgent) return;
+  $fetch("/api/visit_log", {
+    method: "POST",
+    body: {
+      full_path: fullPath,
+      ua: navigator.userAgent,
+    },
+  });
+});
 </script>
 
 <template>
