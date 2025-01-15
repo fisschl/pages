@@ -1,6 +1,20 @@
 import { database } from "~/server/database/postgres";
-import { throttle } from "lodash-es";
 import { z } from "zod";
+import pLimit from "p-limit";
+
+export const defineBatchInsert = <T>(handler: (items: T[]) => unknown) => {
+  const data: T[] = [];
+  const limit = pLimit(1);
+  return async (item: T) => {
+    data.push(item);
+    if (limit.pendingCount > 1) return;
+    await limit(async () => {
+      if (!data.length) return;
+      const list = data.splice(0, data.length);
+      await handler(list);
+    });
+  };
+};
 
 const InsertSchema = z.object({
   full_path: z.string(),
@@ -9,18 +23,14 @@ const InsertSchema = z.object({
 
 type InsertBody = z.infer<typeof InsertSchema>;
 
-const data: InsertBody[] = [];
-
-const insert = throttle(async () => {
-  const list = data.splice(0, data.length);
+const insert = defineBatchInsert(async (items: InsertBody[]) => {
   await database.visit_logs.createMany({
-    data: list,
+    data: items,
   });
-}, 3 * 1000);
+});
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, InsertSchema.parse);
-  data.push(body);
-  insert();
+  await insert(body);
   return { message: "ok" };
 });
