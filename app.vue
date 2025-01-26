@@ -15,8 +15,8 @@ useHead({
 
 const route = useRoute();
 watchEffect(() => {
-  if (typeof window === "undefined") return;
   const { fullPath } = route;
+  if (typeof window === "undefined" || !fullPath) return;
   if (typeof navigator === "undefined" || !navigator.userAgent) return;
   $fetch("/api/visit_log", {
     method: "POST",
@@ -29,16 +29,12 @@ watchEffect(() => {
 </script>
 
 <template>
-  <NuxtPage />
-  <UNotifications />
+  <UApp>
+    <NuxtPage />
+  </UApp>
 </template>
 
 <style>
-#__nuxt {
-  height: 100dvh;
-  overflow: auto;
-}
-
 html:root {
   font-family: "Open Sans Variable", "Noto Sans SC Variable", sans-serif;
 }
