@@ -1,23 +1,21 @@
-FROM registry.cn-shanghai.aliyuncs.com/fisschl/node:22 AS builder
+FROM registry.cn-shanghai.aliyuncs.com/fisschl/bun:latest AS builder
 WORKDIR /root
 
-RUN npm config set registry https://registry.npmmirror.com && npm install -g pnpm
-
-COPY pnpm-lock.yaml .
 COPY package.json .
+COPY bun.lock .
 COPY .npmrc .
 
-RUN pnpm install --prod
+RUN bun install --production
 
 COPY prisma prisma
 
-RUN pnpm prisma generate
+RUN bun run prisma generate
 
 COPY . .
 
-RUN pnpm build
+RUN bun run build
 
-FROM registry.cn-shanghai.aliyuncs.com/fisschl/node:22
+FROM registry.cn-shanghai.aliyuncs.com/fisschl/bun:latest
 WORKDIR /root
 COPY --from=builder /root/.output .
-CMD node ./server/index.mjs
+CMD bun ./server/index.mjs
