@@ -47,6 +47,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.0",
     "@types/d3": "^7.4.3",
     "@types/lodash-es": "^4.17.12",
     "eslint": "^9.19.0",
