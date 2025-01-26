@@ -1,3 +1,6 @@
+import browserslist from "browserslist";
+import { browserslistToTargets } from "lightningcss";
+
 export default defineNuxtConfig({
   modules: [
     "@nuxt/devtools",
@@ -12,6 +15,19 @@ export default defineNuxtConfig({
   vite: {
     build: {
       cssMinify: false,
+    },
+    css: {
+      transformer: "lightningcss",
+      lightningcss: {
+        targets: browserslistToTargets(browserslist()),
+      },
+    },
+  },
+  postcss: {
+    plugins: {
+      cssnano: {
+        plugins: [],
+      },
     },
   },
 });
