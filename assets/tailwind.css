@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "@nuxt/ui";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
-@plugin "@tailwindcss/aspect-ratio";
+@import "@nuxt/ui";

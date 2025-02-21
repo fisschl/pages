@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import "@fontsource-variable/noto-sans-sc";
 import "@fontsource-variable/open-sans";
-import "@fontsource-variable/fira-code";
+import { debounce } from "lodash-es";
 
 useHead({
   link: [
@@ -14,17 +14,22 @@ useHead({
 });
 
 const route = useRoute();
+
+const reportVisit = debounce(() => {
+  $fetch("/api/visit_log", {
+    method: "POST",
+    body: {
+      full_path: location.href,
+      ua: navigator.userAgent,
+    },
+  });
+}, 500);
+
 watchEffect(() => {
   const { fullPath } = route;
   if (typeof window === "undefined" || !fullPath) return;
   if (typeof navigator === "undefined" || !navigator.userAgent) return;
-  $fetch("/api/visit_log", {
-    method: "POST",
-    body: {
-      full_path: fullPath,
-      ua: navigator.userAgent,
-    },
-  });
+  reportVisit();
 });
 </script>
 
