@@ -9,6 +9,9 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@pinia/nuxt",
   ],
+  ui: {
+    fonts: false,
+  },
   css: ["./assets/tailwind.css"],
   compatibilityDate: "2025-01-02",
   vite: {

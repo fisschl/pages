@@ -16,7 +16,8 @@ useHead({
 const route = useRoute();
 
 const reportVisit = debounce(() => {
-  $fetch("/api/visit_log", {
+  $fetch("/api/visit", {
+    baseURL: "https://bronya.world",
     method: "POST",
     body: {
       full_path: location.href,
@@ -34,9 +35,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <UApp>
-    <NuxtPage />
-  </UApp>
+   <UApp> <NuxtPage /> </UApp>
 </template>
 
 <style>
