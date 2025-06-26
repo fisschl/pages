@@ -4,4 +4,11 @@ export default defineNuxtConfig({
     fonts: false,
   },
   css: ["~/assets/css/main.css"],
+  nitro: {
+    preset: "cloudflare_module",
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true,
+    },
+  },
 });
